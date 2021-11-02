@@ -7,4 +7,10 @@ public interface UserClient {
 
     void get(RequestCallback<User> callback, Header... headers);
 
+    void get(int id, RequestCallback<User> callback, Header... headers);
+
+    void save(User user, RequestCallback<User> callback, Header... headers);
+
+    void update(int id, User user, RequestCallback<User> callback, Header... headers);
+
 }
