@@ -1,29 +1,25 @@
 package org.thehive.hiveserverclient.net.http;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import org.apache.http.Header;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
+import org.thehive.hiveserverclient.model.Error;
 import org.thehive.hiveserverclient.model.User;
 
 import java.util.concurrent.ThreadPoolExecutor;
 
-public class DefaultUserClient implements UserClient {
+@AllArgsConstructor
+public class UserClientImpl implements UserClient {
 
     protected final String url;
-    protected final ThreadPoolExecutor executor;
-    protected final ObjectMapper objectMapper;
     protected final CloseableHttpClient httpClient;
-
-    public DefaultUserClient(String url, ThreadPoolExecutor executor, ObjectMapper objectMapper, CloseableHttpClient httpClient) {
-        this.url = url;
-        this.executor = executor;
-        this.objectMapper = objectMapper;
-        this.httpClient = httpClient;
-    }
+    protected final ObjectMapper objectMapper;
+    protected final ThreadPoolExecutor executor;
 
     @Override
     public void get(RequestCallback<User> callback, Header... headers) {
@@ -60,7 +56,7 @@ public class DefaultUserClient implements UserClient {
             try {
                 try (var response = httpClient.execute(request)) {
                     var responseBody = EntityUtils.toString(response.getEntity());
-                    if (response.getStatusLine().getStatusCode() % 100 == 2)
+                    if (response.getStatusLine().getStatusCode() / 100 == 2)
                         callback.onRequest(objectMapper.readValue(responseBody, User.class));
                     else
                         callback.onError(objectMapper.readValue(responseBody, Error.class));
