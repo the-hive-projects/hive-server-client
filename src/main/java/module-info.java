@@ -1,3 +1,0 @@
-module hive.server.client {
-
-}
