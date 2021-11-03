@@ -8,4 +8,6 @@ public interface UserService {
 
     void signIn(String username, String password, Consumer<? super Result<SignInStatus, User>> consumer);
 
+    void signUp(User user,Consumer<? super Result<SignUpStatus, User>> consumer)
+
 }
