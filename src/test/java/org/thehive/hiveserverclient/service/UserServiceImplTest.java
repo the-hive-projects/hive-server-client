@@ -5,7 +5,10 @@ import org.apache.http.impl.client.HttpClients;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.thehive.hiveserverclient.model.User;
+import org.thehive.hiveserverclient.model.UserInfo;
 import org.thehive.hiveserverclient.net.http.UserClientImpl;
+import org.thehive.hiveserverclient.test.util.StringUtils;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
@@ -53,6 +56,46 @@ class UserServiceImplTest {
         var latch = new CountDownLatch(1);
         userService.signIn(username, password, result -> {
             assertEquals(SignInStatus.INCORRECT, result.status());
+            assertTrue(result.message().isPresent());
+            assertTrue(result.entity().isEmpty());
+            assertTrue(result.exception().isEmpty());
+            latch.countDown();
+        });
+        latch.await();
+    }
+
+    @DisplayName("Sign-up with invalid credentials")
+    @Test
+    void signUpWithValidCredentials() throws InterruptedException {
+        var username = StringUtils.randomAlphabeticString(11);
+        var password = "password";
+        var email = StringUtils.randomAlphabeticString(13) + "@test.com";
+        var firstname = "testFirstname";
+        var lastname = "testLastname";
+        var user = new User(0, username, password, email, new UserInfo(firstname, lastname, 0));
+        var latch = new CountDownLatch(1);
+        userService.signUp(user, result -> {
+            assertEquals(SignUpStatus.VALID, result.status());
+            assertTrue(result.entity().isPresent());
+            assertTrue(result.message().isEmpty());
+            assertTrue(result.exception().isEmpty());
+            latch.countDown();
+        });
+        latch.await();
+    }
+
+    @DisplayName("Sign-up with invalid credentials")
+    @Test
+    void signUpWithInvalidCredentials() throws InterruptedException {
+        var username = "user-name";
+        var password = "password";
+        var email = StringUtils.randomAlphabeticString(13) + "@test.com";
+        var firstname = "testFirstname";
+        var lastname = "testLastname";
+        var user = new User(0, username, password, email, new UserInfo(firstname, lastname, 0));
+        var latch = new CountDownLatch(1);
+        userService.signUp(user, result -> {
+            assertEquals(SignUpStatus.INVALID, result.status());
             assertTrue(result.message().isPresent());
             assertTrue(result.entity().isEmpty());
             assertTrue(result.exception().isEmpty());

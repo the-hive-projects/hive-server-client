@@ -43,10 +43,38 @@ public class UserServiceImpl implements UserService {
 
             @Override
             public void onFail(Throwable t) {
-                var result = Result.<SignInStatus, User>initWithException(SignInStatus.FAILED, t);
+                var result = Result.<SignInStatus, User>initWithException(SignInStatus.FAIL, t);
                 consumer.accept(result);
             }
         }, authHeader);
+    }
+
+    @Override
+    public void signUp(User user, Consumer<? super Result<SignUpStatus, User>> consumer) {
+        userClient.save(user, new RequestCallback<User>() {
+            @Override
+            public void onRequest(User entity) {
+                var user = Result.initWithEntity(SignUpStatus.VALID, entity);
+                consumer.accept(user);
+            }
+
+            @Override
+            public void onError(Error e) {
+                Result<SignUpStatus, User> result;
+                if (e.getStatus() == HttpStatus.SC_BAD_REQUEST) {
+                    result = Result.initWithMessage(SignUpStatus.INVALID, e.getMessage());
+                } else {
+                    result = Result.initWithMessage(SignUpStatus.ERROR, e.getMessage());
+                }
+                consumer.accept(result);
+            }
+
+            @Override
+            public void onFail(Throwable t) {
+                var result = Result.<SignUpStatus, User>initWithException(SignUpStatus.FAIL, t);
+                consumer.accept(result);
+            }
+        });
     }
 
 }

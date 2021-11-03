@@ -11,6 +11,7 @@ public class User implements Entity {
 
     private int id;
     private String username;
+    private String password;
     private String email;
     private UserInfo userInfo;
 

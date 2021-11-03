@@ -7,6 +7,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.thehive.hiveserverclient.model.Error;
 import org.thehive.hiveserverclient.model.User;
+import org.thehive.hiveserverclient.model.UserInfo;
+import org.thehive.hiveserverclient.test.util.StringUtils;
 import org.thehive.hiveserverclient.util.HeaderUtils;
 
 import java.util.concurrent.CountDownLatch;
@@ -67,7 +69,7 @@ class UserClientImplTest {
         userClient.get(new RequestCallback<>() {
             @Override
             public void onRequest(User entity) {
-                fail("Login is successful");
+                fail("'get' was successful with unsuccessful authentication");
                 latch.countDown();
             }
 
@@ -85,6 +87,66 @@ class UserClientImplTest {
         latch.await();
     }
 
+    @DisplayName("Save validated user")
+    @Test
+    void saveValidatedUser() throws InterruptedException {
+        var username = StringUtils.randomAlphabeticString(11);
+        var password = "password";
+        var email = StringUtils.randomAlphabeticString(13) + "@test.com";
+        var firstname = "testFirstname";
+        var lastname = "testLastname";
+        var user = new User(0, username, password, email, new UserInfo(firstname, lastname, 0));
+        var latch = new CountDownLatch(1);
+        userClient.save(user, new RequestCallback<>() {
+            @Override
+            public void onRequest(User entity) {
+                latch.countDown();
+            }
 
+            @Override
+            public void onError(Error e) {
+                fail(e.getMessage());
+                latch.countDown();
+            }
+
+            @Override
+            public void onFail(Throwable t) {
+                fail(t);
+                latch.countDown();
+            }
+        });
+        latch.await();
+    }
+
+    @DisplayName("Save invalidated user")
+    @Test
+    void saveInvalidUser() throws InterruptedException {
+        var username = "user-name";
+        var password = "password";
+        var email = StringUtils.randomAlphabeticString(13) + "@test.com";
+        var firstname = "testFirstname";
+        var lastname = "testLastname";
+        var user = new User(0, username, password, email, new UserInfo(firstname, lastname, 0));
+        var latch = new CountDownLatch(1);
+        userClient.save(user, new RequestCallback<>() {
+            @Override
+            public void onRequest(User entity) {
+                fail("'save' invalidated user was successful");
+                latch.countDown();
+            }
+
+            @Override
+            public void onError(Error e) {
+                latch.countDown();
+            }
+
+            @Override
+            public void onFail(Throwable t) {
+                fail(t);
+                latch.countDown();
+            }
+        });
+        latch.await();
+    }
 
 }

@@ -5,6 +5,6 @@ public enum SignInStatus {
     CORRECT,
     INCORRECT,
     ERROR,
-    FAILED;
+    FAIL;
 
 }
