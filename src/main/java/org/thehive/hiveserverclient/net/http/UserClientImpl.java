@@ -1,8 +1,8 @@
 package org.thehive.hiveserverclient.net.http;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.http.Header;
 import org.apache.http.client.methods.HttpRequestBase;
@@ -13,7 +13,7 @@ import org.thehive.hiveserverclient.model.User;
 
 import java.util.concurrent.ThreadPoolExecutor;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserClientImpl implements UserClient {
 
     protected final String url;

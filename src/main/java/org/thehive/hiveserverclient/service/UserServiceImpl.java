@@ -1,8 +1,9 @@
 package org.thehive.hiveserverclient.service;
 
-import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.apache.http.message.BasicHeader;
+import org.thehive.hiveserverclient.Session;
 import org.thehive.hiveserverclient.model.Error;
 import org.thehive.hiveserverclient.model.User;
 import org.thehive.hiveserverclient.net.http.RequestCallback;
@@ -12,7 +13,7 @@ import org.thehive.hiveserverclient.util.HeaderUtils;
 
 import java.util.function.Consumer;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     protected final UserClient userClient;
@@ -23,6 +24,8 @@ public class UserServiceImpl implements UserService {
         userClient.get(new RequestCallback<User>() {
             @Override
             public void onRequest(User data) {
+                Session.SESSION.authenticate(authHeader.getValue());
+                Session.SESSION.addArgument("header", authHeader);
                 consumer.accept(LoginResult.successfulOf(data));
             }
 
