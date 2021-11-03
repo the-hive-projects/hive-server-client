@@ -6,14 +6,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.thehive.hiveserverclient.net.http.UserClientImpl;
-import org.thehive.hiveserverclient.service.result.LoginResult;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+// Run this test while server is up.
 class UserServiceImplTest {
 
     UserServiceImpl userService;
@@ -35,7 +36,10 @@ class UserServiceImplTest {
         final var password = "password";
         var latch = new CountDownLatch(1);
         userService.signIn(username, password, result -> {
-            assertEquals(LoginResult.Status.SUCCESSFUL, result.status);
+            assertEquals(SignInStatus.CORRECT, result.status());
+            assertTrue(result.entity().isPresent());
+            assertTrue(result.message().isEmpty());
+            assertTrue(result.exception().isEmpty());
             latch.countDown();
         });
         latch.await();
@@ -48,7 +52,10 @@ class UserServiceImplTest {
         final var password = "password";
         var latch = new CountDownLatch(1);
         userService.signIn(username, password, result -> {
-            assertEquals(LoginResult.Status.UNSUCCESSFUL, result.status);
+            assertEquals(SignInStatus.INCORRECT, result.status());
+            assertTrue(result.message().isPresent());
+            assertTrue(result.entity().isEmpty());
+            assertTrue(result.exception().isEmpty());
             latch.countDown();
         });
         latch.await();

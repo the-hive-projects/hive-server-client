@@ -15,6 +15,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
+// Run this test while server is up.
 class UserClientImplTest {
 
     UserClientImpl userClient;
@@ -35,9 +36,9 @@ class UserClientImplTest {
         final var password = "password";
         var authHeader = HeaderUtils.httpBasicAuthenticationHeader(username, password);
         var latch = new CountDownLatch(1);
-        userClient.get(new RequestCallback<User>() {
+        userClient.get(new RequestCallback<>() {
             @Override
-            public void onRequest(User data) {
+            public void onRequest(User entity) {
                 latch.countDown();
             }
 
@@ -63,9 +64,9 @@ class UserClientImplTest {
         final var password = "password";
         var authHeader = HeaderUtils.httpBasicAuthenticationHeader(username, password);
         var latch = new CountDownLatch(1);
-        userClient.get(new RequestCallback<User>() {
+        userClient.get(new RequestCallback<>() {
             @Override
-            public void onRequest(User data) {
+            public void onRequest(User entity) {
                 fail("Login is successful");
                 latch.countDown();
             }
