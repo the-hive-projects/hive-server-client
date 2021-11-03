@@ -14,8 +14,12 @@ public class HeaderUtils {
         return "Basic " + Base64.getEncoder().encodeToString((username + ":" + password).getBytes());
     }
 
+    public static Header httpBasicAuthenticationHeader(@NonNull String token) {
+        return new BasicHeader(HTTP_BASIC_AUTHENTICATION_HEADER_NAME, token);
+    }
+
     public static Header httpBasicAuthenticationHeader(@NonNull String username, @NonNull String password) {
-        return new BasicHeader(HTTP_BASIC_AUTHENTICATION_HEADER_NAME, httpBasicAuthenticationToken(username, password));
+        return httpBasicAuthenticationHeader(httpBasicAuthenticationToken(username, password));
     }
 
 }

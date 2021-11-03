@@ -1,13 +1,18 @@
 package org.thehive.hiveserverclient.util;
 
-import lombok.AllArgsConstructor;
-import lombok.With;
+import lombok.*;
 
-@AllArgsConstructor
+@ToString
+@EqualsAndHashCode
 @With
-public class Pair<K,V> {
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+public class Pair<K, V> {
 
     public final K key;
     public final V value;
+
+    public static <K, V> Pair<K, V> of(K key, V value) {
+        return new Pair<>(key, value);
+    }
 
 }
