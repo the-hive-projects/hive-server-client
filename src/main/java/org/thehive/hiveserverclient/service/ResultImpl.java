@@ -1,12 +1,12 @@
 package org.thehive.hiveserverclient.service;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import lombok.*;
 import org.thehive.hiveserverclient.model.Entity;
 
 import java.util.Optional;
 
+@ToString
+@EqualsAndHashCode
 @Builder(access = AccessLevel.PACKAGE)
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
 public class ResultImpl<S extends Enum<?>, E extends Entity> implements Result<S, E> {

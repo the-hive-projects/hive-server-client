@@ -4,7 +4,6 @@ import lombok.*;
 
 @ToString
 @EqualsAndHashCode
-@With
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Pair<K, V> {
 

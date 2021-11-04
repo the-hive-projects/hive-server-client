@@ -40,7 +40,7 @@ class UserServiceImplTest {
         final var username = "user";
         final var password = "password";
         var latch = new CountDownLatch(1);
-        log.info("Username: {}, Password: {}",username,password);
+        log.info("Username: {}, Password: {}", username, password);
         userService.signIn(username, password, result -> {
             log.info("Result: {}", result);
             assertEquals(SignInStatus.CORRECT, result.status());
@@ -58,7 +58,7 @@ class UserServiceImplTest {
         final var username = "username";
         final var password = "password";
         var latch = new CountDownLatch(1);
-        log.info("Username: {}, Password: {}",username,password);
+        log.info("Username: {}, Password: {}", username, password);
         userService.signIn(username, password, result -> {
             log.info("Result: {}", result);
             assertEquals(SignInStatus.INCORRECT, result.status());
@@ -78,7 +78,7 @@ class UserServiceImplTest {
         var email = StringUtils.randomAlphabeticString(13) + "@test.com";
         var firstname = "testFirstname";
         var lastname = "testLastname";
-        var user = new User(0, username, password, email, new UserInfo(firstname, lastname, 0));
+        var user = new User(0, username, password, email, new UserInfo(0, firstname, lastname, 0));
         var latch = new CountDownLatch(1);
         userService.signUp(user, result -> {
             log.info("Result: {}", result);
@@ -99,7 +99,7 @@ class UserServiceImplTest {
         var email = StringUtils.randomAlphabeticString(13) + "@test.com";
         var firstname = "testFirstname";
         var lastname = "testLastname";
-        var user = new User(0, username, password, email, new UserInfo(firstname, lastname, 0));
+        var user = new User(0, username, password, email, new UserInfo(0, firstname, lastname, 0));
         var latch = new CountDownLatch(1);
         userService.signUp(user, result -> {
             log.info("Result: {}", result);
