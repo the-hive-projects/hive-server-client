@@ -1,6 +1,7 @@
 package org.thehive.hiveserverclient.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.impl.client.HttpClients;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -18,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 // Run this test while server is up.
+@Slf4j
 class UserServiceImplTest {
 
     UserServiceImpl userService;
@@ -38,7 +40,9 @@ class UserServiceImplTest {
         final var username = "user";
         final var password = "password";
         var latch = new CountDownLatch(1);
+        log.info("Username: {}, Password: {}",username,password);
         userService.signIn(username, password, result -> {
+            log.info("Result: {}", result);
             assertEquals(SignInStatus.CORRECT, result.status());
             assertTrue(result.entity().isPresent());
             assertTrue(result.message().isEmpty());
@@ -54,7 +58,9 @@ class UserServiceImplTest {
         final var username = "username";
         final var password = "password";
         var latch = new CountDownLatch(1);
+        log.info("Username: {}, Password: {}",username,password);
         userService.signIn(username, password, result -> {
+            log.info("Result: {}", result);
             assertEquals(SignInStatus.INCORRECT, result.status());
             assertTrue(result.message().isPresent());
             assertTrue(result.entity().isEmpty());
@@ -75,6 +81,7 @@ class UserServiceImplTest {
         var user = new User(0, username, password, email, new UserInfo(firstname, lastname, 0));
         var latch = new CountDownLatch(1);
         userService.signUp(user, result -> {
+            log.info("Result: {}", result);
             assertEquals(SignUpStatus.VALID, result.status());
             assertTrue(result.entity().isPresent());
             assertTrue(result.message().isEmpty());
@@ -95,6 +102,7 @@ class UserServiceImplTest {
         var user = new User(0, username, password, email, new UserInfo(firstname, lastname, 0));
         var latch = new CountDownLatch(1);
         userService.signUp(user, result -> {
+            log.info("Result: {}", result);
             assertEquals(SignUpStatus.INVALID, result.status());
             assertTrue(result.message().isPresent());
             assertTrue(result.entity().isEmpty());

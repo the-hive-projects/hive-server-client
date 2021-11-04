@@ -5,39 +5,36 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.thehive</groupId>
-    <artifactId>hiveserverclient</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <artifactId>hive-server-client</artifactId>
+    <version>1.0.0</version>
 
-    <name>hive-server-client</name>
+    <name>Hive Server Client</name>
     <description>Server client project of Hive</description>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
-        <lombok.version>1.18.22</lombok.version>
-        <spring-websocket.version>5.3.6</spring-websocket.version>
-        <spring-messaging.version>5.3.6</spring-messaging.version>
-        <slf4j-api.version>2.0.0-alpha3</slf4j-api.version>
         <httpclient.version>4.5.13</httpclient.version>
+        <spring-framework-bom.version>5.3.12</spring-framework-bom.version>
         <jackson-bom.version>2.12.5</jackson-bom.version>
+        <slf4j.version>1.7.30</slf4j.version>
+        <lombok.version>1.18.22</lombok.version>
         <junit-jupiter-api.version>5.8.0-RC1</junit-jupiter-api.version>
     </properties>
 
     <dependencies>
         <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>${httpclient.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-websocket</artifactId>
-            <version>${spring-websocket.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-messaging</artifactId>
-            <version>${spring-messaging.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>${httpclient.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -48,27 +45,47 @@
             <artifactId>jackson-databind</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>${slf4j.version}</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
             <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
             <version>${junit-jupiter-api.version}</version>
             <scope>test</scope>
+            <optional>true</optional>
         </dependency>
     </dependencies>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-framework-bom</artifactId>
+                <version>${spring-framework-bom.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
                 <groupId>com.fasterxml.jackson</groupId>
                 <artifactId>jackson-bom</artifactId>
                 <version>${jackson-bom.version}</version>
-                <scope>import</scope>
                 <type>pom</type>
+                <scope>import</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>

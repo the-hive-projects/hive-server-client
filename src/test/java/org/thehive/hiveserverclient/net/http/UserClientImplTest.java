@@ -1,6 +1,7 @@
 package org.thehive.hiveserverclient.net.http;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.impl.client.HttpClients;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -18,6 +19,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import static org.junit.jupiter.api.Assertions.fail;
 
 // Run this test while server is up.
+@Slf4j
 class UserClientImplTest {
 
     UserClientImpl userClient;
@@ -41,17 +43,20 @@ class UserClientImplTest {
         userClient.get(new RequestCallback<>() {
             @Override
             public void onRequest(User entity) {
+                log.info("Entity: {}", entity);
                 latch.countDown();
             }
 
             @Override
             public void onError(Error e) {
+                log.warn("Error: {}", e);
                 fail(e.getMessage());
                 latch.countDown();
             }
 
             @Override
             public void onFail(Throwable t) {
+                log.warn(t.getMessage());
                 fail(t);
                 latch.countDown();
             }
@@ -69,17 +74,20 @@ class UserClientImplTest {
         userClient.get(new RequestCallback<>() {
             @Override
             public void onRequest(User entity) {
+                log.warn("Entity: {}", entity);
                 fail("'get' was successful with unsuccessful authentication");
                 latch.countDown();
             }
 
             @Override
             public void onError(Error e) {
+                log.info("Error: {}", e);
                 latch.countDown();
             }
 
             @Override
             public void onFail(Throwable t) {
+                log.warn(t.getMessage());
                 fail(t);
                 latch.countDown();
             }
@@ -100,17 +108,20 @@ class UserClientImplTest {
         userClient.save(user, new RequestCallback<>() {
             @Override
             public void onRequest(User entity) {
+                log.info("Entity: {}", entity);
                 latch.countDown();
             }
 
             @Override
             public void onError(Error e) {
+                log.warn("Error: {}", e);
                 fail(e.getMessage());
                 latch.countDown();
             }
 
             @Override
             public void onFail(Throwable t) {
+                log.warn(t.getMessage());
                 fail(t);
                 latch.countDown();
             }
@@ -131,17 +142,20 @@ class UserClientImplTest {
         userClient.save(user, new RequestCallback<>() {
             @Override
             public void onRequest(User entity) {
+                log.warn("Entity: {}", entity);
                 fail("'save' invalidated user was successful");
                 latch.countDown();
             }
 
             @Override
             public void onError(Error e) {
+                log.info("Error: {}", e);
                 latch.countDown();
             }
 
             @Override
             public void onFail(Throwable t) {
+                log.warn(t.getMessage());
                 fail(t);
                 latch.countDown();
             }
