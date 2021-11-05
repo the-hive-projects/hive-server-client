@@ -2,15 +2,12 @@ package org.thehive.hiveserverclient.model;
 
 import lombok.*;
 
-@Getter
-@Setter
-@EqualsAndHashCode
-@ToString
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class User implements Entity {
 
-    private int id;
+    private Integer id;
     private String username;
     private String email;
     private String password;

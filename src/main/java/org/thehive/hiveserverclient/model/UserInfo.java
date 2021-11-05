@@ -10,9 +10,9 @@ import lombok.*;
 @AllArgsConstructor
 public class UserInfo {
 
-    private int id;
+    private Integer id;
     private String firstname;
     private String lastname;
-    private long createdAt;
+    private Long createdAt;
 
 }
