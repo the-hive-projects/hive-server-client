@@ -1,4 +1,4 @@
-package org.thehive.hiveserverclient.service;
+package org.thehive.hiveserverclient.service.result;
 
 import lombok.*;
 import org.thehive.hiveserverclient.model.Entity;

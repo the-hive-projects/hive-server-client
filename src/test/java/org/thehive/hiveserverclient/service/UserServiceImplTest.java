@@ -2,6 +2,7 @@ package org.thehive.hiveserverclient.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.http.impl.client.HttpClients;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -9,7 +10,8 @@ import org.junit.jupiter.api.Test;
 import org.thehive.hiveserverclient.model.User;
 import org.thehive.hiveserverclient.model.UserInfo;
 import org.thehive.hiveserverclient.net.http.UserClientImpl;
-import org.thehive.hiveserverclient.test.util.StringUtils;
+import org.thehive.hiveserverclient.service.status.SignInStatus;
+import org.thehive.hiveserverclient.service.status.SignUpStatus;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
@@ -73,9 +75,9 @@ class UserServiceImplTest {
     @DisplayName("Sign-up with invalid credentials")
     @Test
     void signUpWithValidCredentials() throws InterruptedException {
-        var username = StringUtils.randomAlphabeticString(11);
+        var username = RandomStringUtils.randomAlphabetic(11);
         var password = "password";
-        var email = StringUtils.randomAlphabeticString(13) + "@test.com";
+        var email = RandomStringUtils.randomAlphabetic(13) + "@test.com";
         var firstname = "testFirstname";
         var lastname = "testLastname";
         var user = new User(0, username, password, email, new UserInfo(0, firstname, lastname, 0));
@@ -96,7 +98,7 @@ class UserServiceImplTest {
     void signUpWithInvalidCredentials() throws InterruptedException {
         var username = "user-name";
         var password = "password";
-        var email = StringUtils.randomAlphabeticString(13) + "@test.com";
+        var email = RandomStringUtils.randomAlphabetic(13) + "@test.com";
         var firstname = "testFirstname";
         var lastname = "testLastname";
         var user = new User(0, username, password, email, new UserInfo(0, firstname, lastname, 0));

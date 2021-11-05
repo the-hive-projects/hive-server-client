@@ -1,4 +1,4 @@
-package org.thehive.hiveserverclient.service;
+package org.thehive.hiveserverclient.service.status;
 
 public enum SignInStatus {
 

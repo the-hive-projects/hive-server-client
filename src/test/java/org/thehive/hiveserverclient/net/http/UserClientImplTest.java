@@ -2,6 +2,7 @@ package org.thehive.hiveserverclient.net.http;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.http.impl.client.HttpClients;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -9,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.thehive.hiveserverclient.model.Error;
 import org.thehive.hiveserverclient.model.User;
 import org.thehive.hiveserverclient.model.UserInfo;
-import org.thehive.hiveserverclient.test.util.StringUtils;
 import org.thehive.hiveserverclient.util.HeaderUtils;
 
 import java.util.concurrent.CountDownLatch;
@@ -98,9 +98,9 @@ class UserClientImplTest {
     @DisplayName("Save validated user")
     @Test
     void saveValidatedUser() throws InterruptedException {
-        var username = StringUtils.randomAlphabeticString(11);
+        var username = RandomStringUtils.randomAlphabetic(11);
         var password = "password";
-        var email = StringUtils.randomAlphabeticString(13) + "@test.com";
+        var email = RandomStringUtils.randomAlphabetic(13) + "@test.com";
         var firstname = "testFirstname";
         var lastname = "testLastname";
         var user = new User(0, username, password, email, new UserInfo(0, firstname, lastname, 0));
@@ -134,7 +134,7 @@ class UserClientImplTest {
     void saveInvalidUser() throws InterruptedException {
         var username = "user-name";
         var password = "password";
-        var email = StringUtils.randomAlphabeticString(13) + "@test.com";
+        var email = RandomStringUtils.randomAlphabetic(13) + "@test.com";
         var firstname = "testFirstname";
         var lastname = "testLastname";
         var user = new User(0, username, password, email, new UserInfo(0, firstname, lastname, 0));

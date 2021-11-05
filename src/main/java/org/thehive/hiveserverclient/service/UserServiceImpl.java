@@ -9,6 +9,9 @@ import org.thehive.hiveserverclient.model.Error;
 import org.thehive.hiveserverclient.model.User;
 import org.thehive.hiveserverclient.net.http.RequestCallback;
 import org.thehive.hiveserverclient.net.http.UserClient;
+import org.thehive.hiveserverclient.service.result.Result;
+import org.thehive.hiveserverclient.service.status.SignInStatus;
+import org.thehive.hiveserverclient.service.status.SignUpStatus;
 import org.thehive.hiveserverclient.util.HeaderUtils;
 
 import java.util.function.Consumer;
@@ -19,59 +22,59 @@ public class UserServiceImpl implements UserService {
     protected final UserClient userClient;
 
     @Override
-    public void signIn(@NonNull String username, @NonNull String password, @NonNull Consumer<? super Result<SignInStatus, User>> consumer) {
+    public void signIn(@NonNull String username, @NonNull String password, @NonNull Consumer<? super Result<SignInStatus, ? extends User>> consumer) {
         var authHeader = new BasicHeader(HeaderUtils.HTTP_BASIC_AUTHENTICATION_HEADER_NAME, HeaderUtils.httpBasicAuthenticationToken(username, password));
         userClient.get(new RequestCallback<>() {
             @Override
             public void onRequest(User entity) {
                 Session.SESSION.authenticate(authHeader.getValue());
                 Session.SESSION.addArgument("header", authHeader);
-                var user = Result.initWithEntity(SignInStatus.CORRECT, entity);
-                consumer.accept(user);
+                var result = Result.of(SignInStatus.CORRECT, entity);
+                consumer.accept(result);
             }
 
             @Override
             public void onError(Error e) {
                 Result<SignInStatus, User> result;
                 if (e.getStatus() == HttpStatus.SC_UNAUTHORIZED) {
-                    result = Result.initWithMessage(SignInStatus.INCORRECT, e.getMessage());
+                    result = Result.of(SignInStatus.INCORRECT, e.getMessage());
                 } else {
-                    result = Result.initWithMessage(SignInStatus.ERROR, e.getMessage());
+                    result = Result.of(SignInStatus.ERROR, e.getMessage());
                 }
                 consumer.accept(result);
             }
 
             @Override
             public void onFail(Throwable t) {
-                var result = Result.<SignInStatus, User>initWithException(SignInStatus.FAIL, t);
+                var result = Result.<SignInStatus, User>of(SignInStatus.FAIL, t);
                 consumer.accept(result);
             }
         }, authHeader);
     }
 
     @Override
-    public void signUp(User user, Consumer<? super Result<SignUpStatus, User>> consumer) {
-        userClient.save(user, new RequestCallback<User>() {
+    public void signUp(User user, Consumer<? super Result<SignUpStatus, ? extends User>> consumer) {
+        userClient.save(user, new RequestCallback<>() {
             @Override
             public void onRequest(User entity) {
-                var user = Result.initWithEntity(SignUpStatus.VALID, entity);
-                consumer.accept(user);
+                var result = Result.of(SignUpStatus.VALID, entity);
+                consumer.accept(result);
             }
 
             @Override
             public void onError(Error e) {
                 Result<SignUpStatus, User> result;
                 if (e.getStatus() == HttpStatus.SC_BAD_REQUEST) {
-                    result = Result.initWithMessage(SignUpStatus.INVALID, e.getMessage());
+                    result = Result.of(SignUpStatus.INVALID, e.getMessage());
                 } else {
-                    result = Result.initWithMessage(SignUpStatus.ERROR, e.getMessage());
+                    result = Result.of(SignUpStatus.ERROR, e.getMessage());
                 }
                 consumer.accept(result);
             }
 
             @Override
             public void onFail(Throwable t) {
-                var result = Result.<SignUpStatus, User>initWithException(SignUpStatus.FAIL, t);
+                var result = Result.<SignUpStatus, User>of(SignUpStatus.FAIL, t);
                 consumer.accept(result);
             }
         });
