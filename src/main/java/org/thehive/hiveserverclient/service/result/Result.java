@@ -6,21 +6,21 @@ import java.util.Optional;
 
 public interface Result<S extends Enum<?>, E extends Entity> {
 
-    static <S extends Enum<?>, E extends Entity> Result<S, E> initWithEntity(S status, E entity) {
+    static <S extends Enum<?>, E extends Entity> Result<S, E> of(S status, E entity) {
         return ResultImpl.<S, E>builder()
                 .status(status)
                 .entity(entity)
                 .build();
     }
 
-    static <S extends Enum<?>, E extends Entity> Result<S, E> initWithMessage(S status, String message) {
+    static <S extends Enum<?>, E extends Entity> Result<S, E> of(S status, String message) {
         return ResultImpl.<S, E>builder()
                 .status(status)
                 .message(message)
                 .build();
     }
 
-    static <S extends Enum<?>, E extends Entity> Result<S, E> initWithException(S status, Throwable exception) {
+    static <S extends Enum<?>, E extends Entity> Result<S, E> of(S status, Throwable exception) {
         return ResultImpl.<S, E>builder()
                 .status(status)
                 .exception(exception)
