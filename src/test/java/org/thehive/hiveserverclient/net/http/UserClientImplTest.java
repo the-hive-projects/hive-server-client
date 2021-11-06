@@ -105,7 +105,7 @@ class UserClientImplTest {
         var email = RandomStringUtils.randomAlphabetic(9,17) + "@test.com";
         var firstname = "testFirstname";
         var lastname = "testLastname";
-        var user = new User(0, username, email, password, new UserInfo(0, firstname, lastname, 0));
+        var user = new User(0, username, email, password, new UserInfo(0, firstname, lastname, 0L));
         var latch = new CountDownLatch(1);
         log.info("User: {}",user);
         userClient.save(user, new RequestCallback<>() {
@@ -140,7 +140,7 @@ class UserClientImplTest {
         var email = RandomStringUtils.randomAlphabetic(9,17) + "@test.com";
         var firstname = "testFirstname";
         var lastname = "testLastname";
-        var user = new User(0, username, email, password, new UserInfo(0, firstname, lastname, 0));
+        var user = new User(0, username, email, password, new UserInfo(0, firstname, lastname, 0L));
         var latch = new CountDownLatch(1);
         log.info("User: {}",user);
         userClient.save(user, new RequestCallback<>() {
