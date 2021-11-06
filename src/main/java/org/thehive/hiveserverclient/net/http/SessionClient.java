@@ -5,7 +5,7 @@ import org.thehive.hiveserverclient.model.Session;
 
 public interface SessionClient {
 
-    void get(int id, RequestCallback<Session> callback, Header... headers);
+    void get(String id, RequestCallback<Session> callback, Header... headers);
 
     void save(Session session, RequestCallback<Session> callback, Header... headers);
 

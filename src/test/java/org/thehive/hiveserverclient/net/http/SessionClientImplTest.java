@@ -1,6 +1,7 @@
 package org.thehive.hiveserverclient.net.http;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.http.impl.client.HttpClients;
@@ -8,8 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.thehive.hiveserverclient.model.Error;
-import org.thehive.hiveserverclient.model.User;
-import org.thehive.hiveserverclient.model.UserInfo;
+import org.thehive.hiveserverclient.model.Session;
 import org.thehive.hiveserverclient.util.HeaderUtils;
 
 import java.util.concurrent.CountDownLatch;
@@ -20,30 +20,33 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 // Run this test while server is up.
 @Slf4j
-class UserClientImplTest {
+class SessionClientImplTest {
 
-    UserClientImpl userClient;
+    SessionClient sessionClient;
 
     @BeforeEach
     void initialize() {
-        var url = "http://localhost:8080/user";
+        var url = "http://localhost:8080/session";
         var httpClient = HttpClients.createSystem();
         var objectMapper = new ObjectMapper();
+        objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
         var threadPoolExecutor = (ThreadPoolExecutor) Executors.newCachedThreadPool();
-        this.userClient = new UserClientImpl(url, httpClient, objectMapper, threadPoolExecutor);
+        this.sessionClient = new SessionClientImpl(url, httpClient, objectMapper, threadPoolExecutor);
     }
 
-    @DisplayName("Get with successful authentication")
+    @DisplayName("Get existing session with successful authentication")
     @Test
-    void getWithSuccessfulAuthentication() throws InterruptedException {
+    void getExistingSessionWithSuccessfulAuthentication() throws InterruptedException {
+        final var id = "00000000000";
         final var username = "user";
         final var password = "password";
         var authHeader = HeaderUtils.httpBasicAuthenticationHeader(username, password);
         var latch = new CountDownLatch(1);
         log.info("Username: {}, Password: {}", username, password);
-        userClient.get(new RequestCallback<>() {
+        sessionClient.get(id, new RequestCallback<>() {
+
             @Override
-            public void onRequest(User entity) {
+            public void onRequest(Session entity) {
                 log.info("Entity: {}", entity);
                 latch.countDown();
             }
@@ -65,17 +68,51 @@ class UserClientImplTest {
         latch.await();
     }
 
+    @DisplayName("Get non-existing session with successful authentication")
+    @Test
+    void getNonExistingSessionWithSuccessfulAuthentication() throws InterruptedException {
+        final var id = "00000000001";
+        final var username = "user";
+        final var password = "password";
+        var authHeader = HeaderUtils.httpBasicAuthenticationHeader(username, password);
+        var latch = new CountDownLatch(1);
+        log.info("Username: {}, Password: {}", username, password);
+        sessionClient.get(id, new RequestCallback<>() {
+            @Override
+            public void onRequest(Session entity) {
+                log.warn("Entity: {}", entity);
+                fail("'get' request must get error when session does not exist");
+                latch.countDown();
+            }
+
+            @Override
+            public void onError(Error e) {
+                log.info("Error: {}", e);
+                latch.countDown();
+            }
+
+            @Override
+            public void onFail(Throwable t) {
+                log.warn(t.getMessage());
+                fail(t);
+                latch.countDown();
+            }
+        }, authHeader);
+        latch.await();
+    }
+
     @DisplayName("Get with unsuccessful authentication")
     @Test
     void getWithUnsuccessfulAuthentication() throws InterruptedException {
+        final var id = "00000000000";
         final var username = "username";
         final var password = "password";
         var authHeader = HeaderUtils.httpBasicAuthenticationHeader(username, password);
         var latch = new CountDownLatch(1);
         log.info("Username: {}, Password: {}", username, password);
-        userClient.get(new RequestCallback<>() {
+        sessionClient.get(id, new RequestCallback<>() {
             @Override
-            public void onRequest(User entity) {
+            public void onRequest(Session entity) {
                 log.warn("Entity: {}", entity);
                 fail("'get' request must get error when authentication is unsuccessful");
                 latch.countDown();
@@ -97,20 +134,19 @@ class UserClientImplTest {
         latch.await();
     }
 
-    @DisplayName("Save validated user")
+    @DisplayName("Save with successful authentication")
     @Test
-    void saveValidatedUser() throws InterruptedException {
-        var username = RandomStringUtils.randomAlphabetic(7,11);
-        var password = "password";
-        var email = RandomStringUtils.randomAlphabetic(9,17) + "@test.com";
-        var firstname = "testFirstname";
-        var lastname = "testLastname";
-        var user = new User(0, username, email, password, new UserInfo(0, firstname, lastname, 0L));
+    void saveWithSuccessfulAuthentication() throws InterruptedException {
+        final var name = RandomStringUtils.randomAlphabetic(9, 17);
+        var session = new Session(null, name, null, null);
+        final var username = "user";
+        final var password = "password";
+        var authHeader = HeaderUtils.httpBasicAuthenticationHeader(username, password);
         var latch = new CountDownLatch(1);
-        log.info("User: {}",user);
-        userClient.save(user, new RequestCallback<>() {
+        log.info("Username: {}, Password: {}", username, password);
+        sessionClient.save(session, new RequestCallback<>() {
             @Override
-            public void onRequest(User entity) {
+            public void onRequest(Session entity) {
                 log.info("Entity: {}", entity);
                 latch.countDown();
             }
@@ -128,26 +164,25 @@ class UserClientImplTest {
                 fail(t);
                 latch.countDown();
             }
-        });
+        }, authHeader);
         latch.await();
     }
 
-    @DisplayName("Save invalidated user")
+    @DisplayName("Save with unsuccessful authentication")
     @Test
-    void saveInvalidUser() throws InterruptedException {
-        var username = "user-name";
-        var password = "password";
-        var email = RandomStringUtils.randomAlphabetic(9,17) + "@test.com";
-        var firstname = "testFirstname";
-        var lastname = "testLastname";
-        var user = new User(0, username, email, password, new UserInfo(0, firstname, lastname, 0L));
+    void saveWithUnsuccessfulAuthentication() throws InterruptedException {
+        final var name = RandomStringUtils.randomAlphabetic(9, 17);
+        var session = new Session(null, name, null, null);
+        final var username = "username";
+        final var password = "password";
+        var authHeader = HeaderUtils.httpBasicAuthenticationHeader(username, password);
         var latch = new CountDownLatch(1);
-        log.info("User: {}",user);
-        userClient.save(user, new RequestCallback<>() {
+        log.info("Username: {}, Password: {}", username, password);
+        sessionClient.save(session, new RequestCallback<>() {
             @Override
-            public void onRequest(User entity) {
+            public void onRequest(Session entity) {
                 log.warn("Entity: {}", entity);
-                fail("'save' invalidated user was successful");
+                fail("'save' request must get error when authentication is unsuccessful");
                 latch.countDown();
             }
 
@@ -163,8 +198,9 @@ class UserClientImplTest {
                 fail(t);
                 latch.countDown();
             }
-        });
+        }, authHeader);
         latch.await();
     }
+
 
 }

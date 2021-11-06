@@ -22,7 +22,7 @@ public class SessionClientImpl implements SessionClient {
     protected final ThreadPoolExecutor executor;
 
     @Override
-    public void get(int id, RequestCallback<Session> callback, Header... headers) {
+    public void get(String id, RequestCallback<Session> callback, Header... headers) {
         var reqUrl = RequestUtils.concatUrlVariables(url, id);
         var req = RequestUtils.getRequestOf(reqUrl, headers);
         executeRequest(req, callback);
