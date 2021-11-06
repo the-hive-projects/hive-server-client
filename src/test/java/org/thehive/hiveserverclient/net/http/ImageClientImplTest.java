@@ -40,6 +40,7 @@ class ImageClientImplTest {
         var authHeader = HeaderUtils.httpBasicAuthenticationHeader(username, password);
         var latch = new CountDownLatch(1);
         log.info("Username: {}, Password: {}", username, password);
+        log.info("ImageUsername: {}",imageUsername);
         imageClient.get(imageUsername, new RequestCallback<>() {
             @Override
             public void onRequest(Image entity) {
