@@ -55,7 +55,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void signUp(User user, Consumer<? super Result<SignUpStatus, ? extends User>> consumer) {
+    public void signUp(@NonNull User user, @NonNull Consumer<? super Result<SignUpStatus, ? extends User>> consumer) {
         userClient.save(user, new RequestCallback<>() {
             @Override
             public void onRequest(User entity) {
@@ -83,7 +83,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void profile(Consumer<? super Result<ProfileStatus, ? extends User>> consumer) {
+    public void profile(@NonNull Consumer<? super Result<ProfileStatus, ? extends User>> consumer) {
         userClient.get(new RequestCallback<>() {
             @Override
             public void onRequest(User entity) {
@@ -102,11 +102,11 @@ public class UserServiceImpl implements UserService {
                 var result = Result.<ProfileStatus, User>of(ProfileStatus.FAIL, t);
                 consumer.accept(result);
             }
-        }, Session.SESSION.getArgument("header",Header.class));
+        }, Session.SESSION.getArgument("header", Header.class));
     }
 
     @Override
-    public void profile(int id, Consumer<? super Result<ProfileStatus, ? extends User>> consumer) {
+    public void profile(int id, @NonNull Consumer<? super Result<ProfileStatus, ? extends User>> consumer) {
         userClient.get(id, new RequestCallback<>() {
             @Override
             public void onRequest(User entity) {

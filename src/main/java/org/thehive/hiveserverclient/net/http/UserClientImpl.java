@@ -29,6 +29,8 @@ public class UserClientImpl implements UserClient {
 
     @Override
     public void get(int id, RequestCallback<? super User> callback, Header... headers) {
+        if (id < 1)
+            throw new IllegalArgumentException("Id must be positive value");
         var reqUrl = RequestUtils.concatUrlVariables(url, id);
         var req = RequestUtils.getRequestOf(reqUrl, headers);
         executeRequest(req, callback);
@@ -45,6 +47,8 @@ public class UserClientImpl implements UserClient {
     @SneakyThrows
     @Override
     public void update(int id, User user, RequestCallback<? super User> callback, Header... headers) {
+        if (id < 1)
+            throw new IllegalArgumentException("Id must be positive value");
         var reqUrl = RequestUtils.concatUrlVariables(url, id);
         var userStr = objectMapper.writeValueAsString(user);
         var req = RequestUtils.putRequestOf(reqUrl, userStr, headers);
