@@ -22,13 +22,13 @@ public class UserClientImpl implements UserClient {
     protected final ThreadPoolExecutor executor;
 
     @Override
-    public void get(RequestCallback<User> callback, Header... headers) {
+    public void get(RequestCallback<? super User> callback, Header... headers) {
         var req = RequestUtils.getRequestOf(url, headers);
         executeRequest(req, callback);
     }
 
     @Override
-    public void get(int id, RequestCallback<User> callback, Header... headers) {
+    public void get(int id, RequestCallback<? super User> callback, Header... headers) {
         var reqUrl = RequestUtils.concatUrlVariables(url, id);
         var req = RequestUtils.getRequestOf(reqUrl, headers);
         executeRequest(req, callback);
@@ -36,7 +36,7 @@ public class UserClientImpl implements UserClient {
 
     @SneakyThrows
     @Override
-    public void save(User user, RequestCallback<User> callback, Header... headers) {
+    public void save(User user, RequestCallback<? super User> callback, Header... headers) {
         var userStr = objectMapper.writeValueAsString(user);
         var req = RequestUtils.postRequestOf(url, userStr, headers);
         executeRequest(req, callback);
@@ -44,7 +44,7 @@ public class UserClientImpl implements UserClient {
 
     @SneakyThrows
     @Override
-    public void update(int id, User user, RequestCallback<User> callback, Header... headers) {
+    public void update(int id, User user, RequestCallback<? super User> callback, Header... headers) {
         var reqUrl = RequestUtils.concatUrlVariables(url, id);
         var userStr = objectMapper.writeValueAsString(user);
         var req = RequestUtils.putRequestOf(reqUrl, userStr, headers);
