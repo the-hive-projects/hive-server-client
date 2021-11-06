@@ -1,5 +1,6 @@
 package org.thehive.hiveserverclient.net.http;
 
+import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,7 @@ import org.apache.http.util.EntityUtils;
 import org.thehive.hiveserverclient.model.Error;
 import org.thehive.hiveserverclient.model.User;
 
+import java.io.IOException;
 import java.util.concurrent.ThreadPoolExecutor;
 
 @RequiredArgsConstructor
@@ -57,16 +59,23 @@ public class UserClientImpl implements UserClient {
 
     private void executeRequest(@NonNull HttpRequestBase request, @NonNull RequestCallback<? super User> callback) {
         executor.execute(() -> {
+            var executeFail = true;
             try {
                 try (var response = httpClient.execute(request)) {
                     var responseBody = EntityUtils.toString(response.getEntity());
+                    executeFail = false;
                     if (response.getStatusLine().getStatusCode() / 100 == 2)
                         callback.onRequest(objectMapper.readValue(responseBody, User.class));
                     else
                         callback.onError(objectMapper.readValue(responseBody, Error.class));
                 }
-            } catch (Throwable t) {
-                callback.onFail(t);
+            } catch (JacksonException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                if (executeFail)
+                    callback.onFail(e);
+                else
+                    e.printStackTrace();
             }
         });
     }
