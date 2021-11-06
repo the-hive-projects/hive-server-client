@@ -62,7 +62,7 @@ public class SessionServiceImpl implements SessionService {
 
             @Override
             public void onFail(Throwable t) {
-                var result = Result.<CreateSessionStatus, Session>of(CreateSessionStatus.ERROR, t);
+                var result = Result.<CreateSessionStatus, Session>of(CreateSessionStatus.FAIL, t);
                 consumer.accept(result);
             }
         }, org.thehive.hiveserverclient.Session.SESSION.getArgument("header", Header.class));

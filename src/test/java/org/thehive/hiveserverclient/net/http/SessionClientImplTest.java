@@ -144,6 +144,7 @@ class SessionClientImplTest {
         var authHeader = HeaderUtils.httpBasicAuthenticationHeader(username, password);
         var latch = new CountDownLatch(1);
         log.info("Username: {}, Password: {}", username, password);
+        log.info("Session: {}",session);
         sessionClient.save(session, new RequestCallback<>() {
             @Override
             public void onRequest(Session entity) {
@@ -178,6 +179,7 @@ class SessionClientImplTest {
         var authHeader = HeaderUtils.httpBasicAuthenticationHeader(username, password);
         var latch = new CountDownLatch(1);
         log.info("Username: {}, Password: {}", username, password);
+        log.info("Session: {}",session);
         sessionClient.save(session, new RequestCallback<>() {
             @Override
             public void onRequest(Session entity) {
