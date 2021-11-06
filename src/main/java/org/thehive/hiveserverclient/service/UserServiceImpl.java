@@ -2,10 +2,9 @@ package org.thehive.hiveserverclient.service;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.apache.http.Header;
 import org.apache.http.HttpStatus;
 import org.apache.http.message.BasicHeader;
-import org.thehive.hiveserverclient.Session;
+import org.thehive.hiveserverclient.Authentication;
 import org.thehive.hiveserverclient.model.Error;
 import org.thehive.hiveserverclient.model.User;
 import org.thehive.hiveserverclient.net.http.RequestCallback;
@@ -25,12 +24,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void signIn(@NonNull String username, @NonNull String password, @NonNull Consumer<? super Result<SignInStatus, ? extends User>> consumer) {
-        var authHeader = new BasicHeader(HeaderUtils.HTTP_BASIC_AUTHENTICATION_HEADER_NAME, HeaderUtils.httpBasicAuthenticationToken(username, password));
+        if (Authentication.INSTANCE.isAuthenticated())
+            throw new IllegalStateException("Authentication instance has already been authenticated");
+        var authenticationHeader = new BasicHeader(HeaderUtils.HTTP_BASIC_AUTHENTICATION_HEADER_NAME, HeaderUtils.httpBasicAuthenticationToken(username, password));
         userClient.get(new RequestCallback<>() {
             @Override
             public void onRequest(User entity) {
-                Session.SESSION.authenticate(authHeader.getValue());
-                Session.SESSION.addArgument("header", authHeader);
+                Authentication.INSTANCE.authenticate(authenticationHeader.getValue());
                 var result = Result.of(SignInStatus.CORRECT, entity);
                 consumer.accept(result);
             }
@@ -51,11 +51,13 @@ public class UserServiceImpl implements UserService {
                 var result = Result.<SignInStatus, User>of(SignInStatus.FAIL, t);
                 consumer.accept(result);
             }
-        }, authHeader);
+        }, authenticationHeader);
     }
 
     @Override
     public void signUp(@NonNull User user, @NonNull Consumer<? super Result<SignUpStatus, ? extends User>> consumer) {
+        if (Authentication.INSTANCE.isAuthenticated())
+            throw new IllegalStateException("Authentication instance has already been authenticated");
         userClient.save(user, new RequestCallback<>() {
             @Override
             public void onRequest(User entity) {
@@ -84,6 +86,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void profile(@NonNull Consumer<? super Result<ProfileStatus, ? extends User>> consumer) {
+        if (!Authentication.INSTANCE.isAuthenticated())
+            throw new IllegalStateException("Authentication instance has not been authenticated");
         userClient.get(new RequestCallback<>() {
             @Override
             public void onRequest(User entity) {
@@ -102,11 +106,13 @@ public class UserServiceImpl implements UserService {
                 var result = Result.<ProfileStatus, User>of(ProfileStatus.FAIL, t);
                 consumer.accept(result);
             }
-        }, Session.SESSION.getArgument("header", Header.class));
+        }, HeaderUtils.httpBasicAuthenticationHeader(Authentication.INSTANCE.getToken()));
     }
 
     @Override
     public void profile(int id, @NonNull Consumer<? super Result<ProfileStatus, ? extends User>> consumer) {
+        if (!Authentication.INSTANCE.isAuthenticated())
+            throw new IllegalStateException("Authentication instance has not been authenticated");
         userClient.get(id, new RequestCallback<>() {
             @Override
             public void onRequest(User entity) {
@@ -125,7 +131,7 @@ public class UserServiceImpl implements UserService {
                 var result = Result.<ProfileStatus, User>of(ProfileStatus.FAIL, t);
                 consumer.accept(result);
             }
-        }, Session.SESSION.getArgument("header", Header.class));
+        }, HeaderUtils.httpBasicAuthenticationHeader(Authentication.INSTANCE.getToken()));
     }
 
 }

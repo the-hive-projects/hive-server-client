@@ -8,6 +8,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.thehive.hiveserverclient.Authentication;
 import org.thehive.hiveserverclient.net.http.SessionClientImpl;
 import org.thehive.hiveserverclient.service.status.CreateSessionStatus;
 import org.thehive.hiveserverclient.service.status.TakeSessionStatus;
@@ -38,20 +39,18 @@ class SessionServiceImplTest {
     }
 
     @BeforeEach
-    void resetSession() {
-        org.thehive.hiveserverclient.Session.SESSION.unauthenticate();
-        org.thehive.hiveserverclient.Session.SESSION.clear();
+    void unauthenticate() {
+        Authentication.INSTANCE.unauthenticate();
     }
 
-    @DisplayName("Take existing session after session is authenticated")
+    @DisplayName("Take existing session when authentication is correct")
     @Test
-    void takeExistingSessionAfterSessionIsAuthenticated() throws InterruptedException {
+    void takeExistingSessionWhenAuthenticationIsCorrect() throws InterruptedException {
         final var id = "00000000000";
         final var username = "user";
         final var password = "password";
         var token = HeaderUtils.httpBasicAuthenticationToken(username, password);
-        org.thehive.hiveserverclient.Session.SESSION.authenticate(token);
-        org.thehive.hiveserverclient.Session.SESSION.addArgument("header", HeaderUtils.httpBasicAuthenticationHeader(token));
+        Authentication.INSTANCE.authenticate(token);
         var latch = new CountDownLatch(1);
         log.info("Username: {}, Password: {}", username, password);
         sessionService.take(id, result -> {
@@ -65,15 +64,14 @@ class SessionServiceImplTest {
         latch.await();
     }
 
-    @DisplayName("Take non-existing session after session is authenticated")
+    @DisplayName("Take non-existing session when authentication is correct")
     @Test
-    void takeNonExistingSessionAfterSessionIsAuthenticated() throws InterruptedException {
+    void takeNonExistingSessionWhenAuthenticationIsCorrect() throws InterruptedException {
         final var id = "00000000001";
         final var username = "user";
         final var password = "password";
         var token = HeaderUtils.httpBasicAuthenticationToken(username, password);
-        org.thehive.hiveserverclient.Session.SESSION.authenticate(token);
-        org.thehive.hiveserverclient.Session.SESSION.addArgument("header", HeaderUtils.httpBasicAuthenticationHeader(token));
+        Authentication.INSTANCE.authenticate(token);
         var latch = new CountDownLatch(1);
         log.info("Username: {}, Password: {}", username, password);
         sessionService.take(id, result -> {
@@ -87,11 +85,16 @@ class SessionServiceImplTest {
         latch.await();
     }
 
-    @DisplayName("Take session when session is not authenticated")
+    @DisplayName("Take session when authentication is incorrect")
     @Test
-    void takeSessionWhenSessionIsNotAuthenticated() throws InterruptedException {
+    void takeSessionWhenAuthenticationIsIncorrect() throws InterruptedException {
         final var id = "00000000000";
+        final var username = "username";
+        final var password = "password";
+        var token = HeaderUtils.httpBasicAuthenticationToken(username, password);
+        Authentication.INSTANCE.authenticate(token);
         var latch = new CountDownLatch(1);
+        log.info("Username: {}, Password: {}", username, password);
         sessionService.take(id, result -> {
             log.info("Result: {}", result);
             assertEquals(TakeSessionStatus.ERROR, result.status());
@@ -103,16 +106,15 @@ class SessionServiceImplTest {
         latch.await();
     }
 
-    @DisplayName("Create session after session is authenticated")
+    @DisplayName("Create session when authenticated is correct")
     @Test
-    void createSessionAfterSessionIsAuthenticated() throws InterruptedException {
+    void createSessionWhenAuthenticationIsCorrect() throws InterruptedException {
         final var name = RandomStringUtils.randomAlphanumeric(9, 17);
         var session = new org.thehive.hiveserverclient.model.Session(null, name, null, null);
         final var username = "user";
         final var password = "password";
         var token = HeaderUtils.httpBasicAuthenticationToken(username, password);
-        org.thehive.hiveserverclient.Session.SESSION.authenticate(token);
-        org.thehive.hiveserverclient.Session.SESSION.addArgument("header", HeaderUtils.httpBasicAuthenticationHeader(token));
+        Authentication.INSTANCE.authenticate(token);
         var latch = new CountDownLatch(1);
         log.info("Username: {}, Password: {}", username, password);
         log.info("Session: {}", session);
@@ -127,12 +129,17 @@ class SessionServiceImplTest {
         latch.await();
     }
 
-    @DisplayName("Create session when session is not authenticated")
+    @DisplayName("Create session when authentication is incorrect")
     @Test
-    void createSessionWhenSessionIsNotAuthenticated() throws InterruptedException {
+    void createSessionWhenAuthenticationIsIncorrect() throws InterruptedException {
         final var name = RandomStringUtils.randomAlphanumeric(9, 17);
         var session = new org.thehive.hiveserverclient.model.Session(null, name, null, null);
+        final var username = "username";
+        final var password = "password";
+        var token = HeaderUtils.httpBasicAuthenticationToken(username, password);
+        Authentication.INSTANCE.authenticate(token);
         var latch = new CountDownLatch(1);
+        log.info("Username: {}, Password: {}", username, password);
         log.info("Session: {}", session);
         sessionService.create(session, result -> {
             log.info("Result: {}", result);

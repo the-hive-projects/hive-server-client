@@ -2,7 +2,7 @@ package org.thehive.hiveserverclient.service;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.apache.http.Header;
+import org.thehive.hiveserverclient.Authentication;
 import org.thehive.hiveserverclient.model.Error;
 import org.thehive.hiveserverclient.model.Session;
 import org.thehive.hiveserverclient.net.http.RequestCallback;
@@ -10,6 +10,7 @@ import org.thehive.hiveserverclient.net.http.SessionClient;
 import org.thehive.hiveserverclient.service.result.Result;
 import org.thehive.hiveserverclient.service.status.CreateSessionStatus;
 import org.thehive.hiveserverclient.service.status.TakeSessionStatus;
+import org.thehive.hiveserverclient.util.HeaderUtils;
 
 import java.util.function.Consumer;
 
@@ -20,6 +21,8 @@ public class SessionServiceImpl implements SessionService {
 
     @Override
     public void take(@NonNull String id, @NonNull Consumer<? super Result<TakeSessionStatus, ? extends Session>> consumer) {
+        if (!Authentication.INSTANCE.isAuthenticated())
+            throw new IllegalStateException("Authentication instance has not been authenticated");
         sessionClient.get(id, new RequestCallback<>() {
             @Override
             public void onRequest(Session entity) {
@@ -42,11 +45,13 @@ public class SessionServiceImpl implements SessionService {
                 var result = Result.<TakeSessionStatus, Session>of(TakeSessionStatus.FAIL, t);
                 consumer.accept(result);
             }
-        }, org.thehive.hiveserverclient.Session.SESSION.getArgument("header", Header.class));
+        }, HeaderUtils.httpBasicAuthenticationHeader(Authentication.INSTANCE.getToken()));
     }
 
     @Override
     public void create(@NonNull Session session, @NonNull Consumer<? super Result<CreateSessionStatus, ? extends Session>> consumer) {
+        if (!Authentication.INSTANCE.isAuthenticated())
+            throw new IllegalStateException("Authentication instance has not been authenticated");
         sessionClient.save(session, new RequestCallback<>() {
             @Override
             public void onRequest(Session entity) {
@@ -65,7 +70,7 @@ public class SessionServiceImpl implements SessionService {
                 var result = Result.<CreateSessionStatus, Session>of(CreateSessionStatus.FAIL, t);
                 consumer.accept(result);
             }
-        }, org.thehive.hiveserverclient.Session.SESSION.getArgument("header", Header.class));
+        }, HeaderUtils.httpBasicAuthenticationHeader(Authentication.INSTANCE.getToken()));
     }
 
 }

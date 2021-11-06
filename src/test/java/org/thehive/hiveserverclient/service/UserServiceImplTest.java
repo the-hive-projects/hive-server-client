@@ -1,14 +1,13 @@
 package org.thehive.hiveserverclient.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.http.impl.client.HttpClients;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.thehive.hiveserverclient.Session;
+import org.thehive.hiveserverclient.Authentication;
 import org.thehive.hiveserverclient.model.User;
 import org.thehive.hiveserverclient.model.UserInfo;
 import org.thehive.hiveserverclient.net.http.UserClientImpl;
@@ -41,9 +40,8 @@ class UserServiceImplTest {
     }
 
     @BeforeEach
-    void resetSession() {
-        Session.SESSION.unauthenticate();
-        Session.SESSION.clear();
+    void unauthenticate() {
+        Authentication.INSTANCE.unauthenticate();
     }
 
     @DisplayName("Sign-in with correct credentials")
@@ -85,9 +83,9 @@ class UserServiceImplTest {
     @DisplayName("Sign-up with invalid credentials")
     @Test
     void signUpWithValidCredentials() throws InterruptedException {
-        var username = RandomStringUtils.randomAlphabetic(7,11);
+        var username = RandomStringUtils.randomAlphabetic(7, 11);
         var password = "password";
-        var email = RandomStringUtils.randomAlphabetic(9,17) + "@test.com";
+        var email = RandomStringUtils.randomAlphabetic(9, 17) + "@test.com";
         var firstname = "testFirstname";
         var lastname = "testLastname";
         var user = new User(0, username, email, password, new UserInfo(0, firstname, lastname, 0L));
@@ -109,7 +107,7 @@ class UserServiceImplTest {
     void signUpWithInvalidCredentials() throws InterruptedException {
         var username = "user-name";
         var password = "password";
-        var email = RandomStringUtils.randomAlphabetic(9,17) + "@test.com";
+        var email = RandomStringUtils.randomAlphabetic(9, 17) + "@test.com";
         var firstname = "testFirstname";
         var lastname = "testLastname";
         var user = new User(0, username, email, password, new UserInfo(0, firstname, lastname, 0L));
@@ -126,14 +124,13 @@ class UserServiceImplTest {
         latch.await();
     }
 
-    @DisplayName("Profile after session is authenticated")
+    @DisplayName("Profile when authentication is correct")
     @Test
-    void profileAfterSessionIsAuthenticated() throws InterruptedException {
+    void profileWhenAuthenticationIsCorrect() throws InterruptedException {
         final var username = "user";
         final var password = "password";
         var token = HeaderUtils.httpBasicAuthenticationToken(username, password);
-        Session.SESSION.authenticate(token);
-        Session.SESSION.addArgument("header", HeaderUtils.httpBasicAuthenticationHeader(token));
+        Authentication.INSTANCE.authenticate(token);
         var latch = new CountDownLatch(1);
         log.info("Username: {}, Password: {}", username, password);
         userService.profile(result -> {
@@ -147,10 +144,15 @@ class UserServiceImplTest {
         latch.await();
     }
 
-    @DisplayName("Profile when session is not authenticated")
+    @DisplayName("Profile when authentication is incorrect")
     @Test
-    void profileWhenSessionIsNotAuthenticated() throws InterruptedException {
+    void profileWhenAuthenticationIsIncorrect() throws InterruptedException {
+        final var username = "username";
+        final var password = "password";
+        var token = HeaderUtils.httpBasicAuthenticationToken(username, password);
+        Authentication.INSTANCE.authenticate(token);
         var latch = new CountDownLatch(1);
+        log.info("Username: {}, Password: {}", username, password);
         userService.profile(result -> {
             log.info("Result: {}", result);
             assertEquals(ProfileStatus.ERROR, result.status());
@@ -162,14 +164,13 @@ class UserServiceImplTest {
         latch.await();
     }
 
-    @DisplayName("Profile with id after session is authenticated")
+    @DisplayName("Profile with id when authentication is correct")
     @Test
-    void profileWithIdAfterSessionIsAuthenticated() throws InterruptedException {
+    void profileWithIdWhenAuthenticationIsCorrect() throws InterruptedException {
         final var username = "user";
         final var password = "password";
         var token = HeaderUtils.httpBasicAuthenticationToken(username, password);
-        Session.SESSION.authenticate(token);
-        Session.SESSION.addArgument("header", HeaderUtils.httpBasicAuthenticationHeader(token));
+        Authentication.INSTANCE.authenticate(token);
         var latch = new CountDownLatch(1);
         log.info("Username: {}, Password: {}", username, password);
         userService.profile(1, result -> {
@@ -183,10 +184,15 @@ class UserServiceImplTest {
         latch.await();
     }
 
-    @DisplayName("Profile with id when session is not authenticated")
+    @DisplayName("Profile with id when authentication is incorrect")
     @Test
-    void profileWithIdWhenSessionIsNotAuthenticated() throws InterruptedException {
+    void profileWithIdWhenAuthenticationIsIncorrect() throws InterruptedException {
+        final var username = "username";
+        final var password = "password";
+        var token = HeaderUtils.httpBasicAuthenticationToken(username, password);
+        Authentication.INSTANCE.authenticate(token);
         var latch = new CountDownLatch(1);
+        log.info("Username: {}, Password: {}", username, password);
         userService.profile(1, result -> {
             log.info("Result: {}", result);
             assertEquals(ProfileStatus.ERROR, result.status());
