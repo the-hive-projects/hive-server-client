@@ -1,12 +1,15 @@
 package org.thehive.hiveserverclient.net.websocket.message;
 
 import lombok.NonNull;
+import org.thehive.hiveserverclient.net.websocket.message.payload.Chat;
+import org.thehive.hiveserverclient.net.websocket.message.payload.Information;
 import org.thehive.hiveserverclient.net.websocket.message.payload.Payload;
 
 
 public enum MessageType {
 
-    ;
+    INFO (Information.class),
+    CHAT(Chat.class);
 
     public final Class<? extends Payload> payloadType;
 
