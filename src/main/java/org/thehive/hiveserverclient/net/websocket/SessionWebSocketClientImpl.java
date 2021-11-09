@@ -18,17 +18,16 @@ public class SessionWebSocketClientImpl implements SessionWebSocketClient {
     private final WebSocketStompClient webSocketStompClient;
 
     @Override
-    public SessionConnectionContext connect(String destination,
-                                            WebSocketHttpHeaders handshakeHeaders,
-                                            StompHeaders connectHeaders,
-                                            SessionConnectionListener listener) {
+    public SessionConnectionContext connect(String id, WebSocketHttpHeaders handshakeHeaders,
+                                            StompHeaders connectHeaders, SessionConnectionListener listener) {
         var connectionContext = new SessionConnectionContextImpl(listener);
         webSocketStompClient.connect(connectionUrl, handshakeHeaders, connectHeaders, new StompSessionHandlerAdapter() {
             @Override
             public void afterConnected(StompSession session, StompHeaders connectedHeaders) {
                 connectionContext.connect(session);
                 listener.onConnect();
-                session.subscribe(destination, new StompFrameHandler() {
+                var endpoint=subscriptionEndpoint+"/"+id;
+                session.subscribe(endpoint, new StompFrameHandler() {
                     @Override
                     public Type getPayloadType(StompHeaders headers) {
                         var appStompHeaders = new AppStompHeaders(headers);

@@ -5,9 +5,7 @@ import org.springframework.web.socket.WebSocketHttpHeaders;
 
 public interface SessionWebSocketClient {
 
-    SessionConnectionContext connect(String destination,
-                                     WebSocketHttpHeaders handshakeHeaders,
-                                     StompHeaders connectHeaders,
-                                     SessionConnectionListener listener);
+    SessionConnectionContext connect(String id, WebSocketHttpHeaders handshakeHeaders,
+                                     StompHeaders connectHeaders, SessionConnectionListener listener);
 
 }
