@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 // Run this test while server is up.
 @Slf4j
-class SessionClientImplTest {
+class SessionWebSocketClientImplTest {
 
     SessionClient sessionClient;
 

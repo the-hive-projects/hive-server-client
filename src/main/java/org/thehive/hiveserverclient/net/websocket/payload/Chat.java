@@ -1,4 +1,4 @@
-package org.thehive.hiveserverclient.net.websocket.message.payload;
+package org.thehive.hiveserverclient.net.websocket.payload;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,7 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public final class Chat implements Payload {
 
-    private long timestamp;
+    private String from;
     private String text;
+    private long timestamp;
 
 }
