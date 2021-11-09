@@ -12,8 +12,8 @@ public class AppStompHeaders extends StompHeadersProxy implements AppHeaders {
     }
 
     @Override
-    public String getPayloadType() {
-        return get(PAYLOAD_TYPE).get(0);
+    public PayloadType getPayloadType() {
+        return PayloadType.byValue(get(PAYLOAD_TYPE).get(0));
     }
 
 }
