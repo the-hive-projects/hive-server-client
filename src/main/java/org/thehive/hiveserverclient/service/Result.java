@@ -1,4 +1,4 @@
-package org.thehive.hiveserverclient.service.result;
+package org.thehive.hiveserverclient.service;
 
 import org.thehive.hiveserverclient.model.Entity;
 

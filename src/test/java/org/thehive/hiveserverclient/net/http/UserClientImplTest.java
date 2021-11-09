@@ -100,14 +100,14 @@ class UserClientImplTest {
     @DisplayName("Save validated user")
     @Test
     void saveValidatedUser() throws InterruptedException {
-        var username = RandomStringUtils.randomAlphabetic(7,11);
+        var username = RandomStringUtils.randomAlphabetic(7, 11);
         var password = "password";
-        var email = RandomStringUtils.randomAlphabetic(9,17) + "@test.com";
+        var email = RandomStringUtils.randomAlphabetic(9, 17) + "@test.com";
         var firstname = "testFirstname";
         var lastname = "testLastname";
         var user = new User(0, username, email, password, new UserInfo(0, firstname, lastname, 0L));
         var latch = new CountDownLatch(1);
-        log.info("User: {}",user);
+        log.info("User: {}", user);
         userClient.save(user, new RequestCallback<>() {
             @Override
             public void onRequest(User entity) {
@@ -137,12 +137,12 @@ class UserClientImplTest {
     void saveInvalidUser() throws InterruptedException {
         var username = "user-name";
         var password = "password";
-        var email = RandomStringUtils.randomAlphabetic(9,17) + "@test.com";
+        var email = RandomStringUtils.randomAlphabetic(9, 17) + "@test.com";
         var firstname = "testFirstname";
         var lastname = "testLastname";
         var user = new User(0, username, email, password, new UserInfo(0, firstname, lastname, 0L));
         var latch = new CountDownLatch(1);
-        log.info("User: {}",user);
+        log.info("User: {}", user);
         userClient.save(user, new RequestCallback<>() {
             @Override
             public void onRequest(User entity) {

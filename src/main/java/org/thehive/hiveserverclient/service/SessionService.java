@@ -2,7 +2,6 @@ package org.thehive.hiveserverclient.service;
 
 
 import org.thehive.hiveserverclient.model.Session;
-import org.thehive.hiveserverclient.service.result.Result;
 import org.thehive.hiveserverclient.service.status.CreateSessionStatus;
 import org.thehive.hiveserverclient.service.status.TakeSessionStatus;
 

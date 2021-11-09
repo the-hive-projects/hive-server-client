@@ -7,7 +7,6 @@ import org.thehive.hiveserverclient.model.Error;
 import org.thehive.hiveserverclient.model.Session;
 import org.thehive.hiveserverclient.net.http.RequestCallback;
 import org.thehive.hiveserverclient.net.http.SessionClient;
-import org.thehive.hiveserverclient.service.result.Result;
 import org.thehive.hiveserverclient.service.status.CreateSessionStatus;
 import org.thehive.hiveserverclient.service.status.TakeSessionStatus;
 import org.thehive.hiveserverclient.util.HeaderUtils;

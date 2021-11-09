@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 // Run this test while server is up.
 @Slf4j
-class SessionWebSocketClientImplTest {
+class SessionClientImplTest {
 
     SessionClient sessionClient;
 
@@ -144,7 +144,7 @@ class SessionWebSocketClientImplTest {
         var authHeader = HeaderUtils.httpBasicAuthenticationHeader(username, password);
         var latch = new CountDownLatch(1);
         log.info("Username: {}, Password: {}", username, password);
-        log.info("Session: {}",session);
+        log.info("Session: {}", session);
         sessionClient.save(session, new RequestCallback<>() {
             @Override
             public void onRequest(Session entity) {
@@ -179,7 +179,7 @@ class SessionWebSocketClientImplTest {
         var authHeader = HeaderUtils.httpBasicAuthenticationHeader(username, password);
         var latch = new CountDownLatch(1);
         log.info("Username: {}, Password: {}", username, password);
-        log.info("Session: {}",session);
+        log.info("Session: {}", session);
         sessionClient.save(session, new RequestCallback<>() {
             @Override
             public void onRequest(Session entity) {

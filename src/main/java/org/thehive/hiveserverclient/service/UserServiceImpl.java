@@ -9,7 +9,6 @@ import org.thehive.hiveserverclient.model.Error;
 import org.thehive.hiveserverclient.model.User;
 import org.thehive.hiveserverclient.net.http.RequestCallback;
 import org.thehive.hiveserverclient.net.http.UserClient;
-import org.thehive.hiveserverclient.service.result.Result;
 import org.thehive.hiveserverclient.service.status.ProfileStatus;
 import org.thehive.hiveserverclient.service.status.SignInStatus;
 import org.thehive.hiveserverclient.service.status.SignUpStatus;
