@@ -60,7 +60,7 @@ public class SessionWebSocketServiceImpl implements SessionWebSocketService {
         }
 
         @Override
-        public void onDisconnected() {
+        public void onDisconnect() {
             sessionListener.onDisconnect();
         }
 

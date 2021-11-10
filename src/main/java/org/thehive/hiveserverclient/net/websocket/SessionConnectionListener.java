@@ -13,6 +13,6 @@ public interface SessionConnectionListener {
 
     void onException(Throwable t);
 
-    void onDisconnected();
+    void onDisconnect();
 
 }

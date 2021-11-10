@@ -9,6 +9,8 @@ import org.thehive.hiveserverclient.net.websocket.header.AppStompHeaders;
 import org.thehive.hiveserverclient.net.websocket.payload.Payload;
 
 import java.lang.reflect.Type;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ThreadPoolExecutor;
 
 @RequiredArgsConstructor
 public class SessionWebSocketClientImpl implements SessionWebSocketClient {
@@ -16,17 +18,25 @@ public class SessionWebSocketClientImpl implements SessionWebSocketClient {
     private final String connectionUrl;
     private final String subscriptionEndpoint;
     private final WebSocketStompClient webSocketStompClient;
+    private final ThreadPoolExecutor executor;
 
     @Override
     public SessionConnectionContext connect(String id, WebSocketHttpHeaders handshakeHeaders,
                                             StompHeaders connectHeaders, SessionConnectionListener listener) {
-        var connectionContext = new SessionConnectionContextImpl(listener);
+        var onExecutorListener = new OnExecutorSessionConnectionListener(listener, executor);
+        return this.connect(id, handshakeHeaders, connectHeaders, onExecutorListener);
+    }
+
+    private SessionConnectionContext connect(String id, WebSocketHttpHeaders handshakeHeaders,
+                                             StompHeaders connectHeaders, OnExecutorSessionConnectionListener listener) {
+
+        var connectionContext = new SessionConnectionContextImpl(id, listener);
         webSocketStompClient.connect(connectionUrl, handshakeHeaders, connectHeaders, new StompSessionHandlerAdapter() {
             @Override
             public void afterConnected(StompSession session, StompHeaders connectedHeaders) {
                 connectionContext.connect(session);
-                listener.onConnect();
-                var endpoint=subscriptionEndpoint+"/"+id;
+                executor.execute(listener::onConnect);
+                var endpoint = subscriptionEndpoint + "/" + id;
                 session.subscribe(endpoint, new StompFrameHandler() {
                     @Override
                     public Type getPayloadType(StompHeaders headers) {
@@ -54,17 +64,57 @@ public class SessionWebSocketClientImpl implements SessionWebSocketClient {
 
         });
         return connectionContext;
+
+    }
+
+    private static class OnExecutorSessionConnectionListener implements SessionConnectionListener {
+
+        private final SessionConnectionListener listener;
+        private final Executor executor;
+
+        public OnExecutorSessionConnectionListener(@NonNull SessionConnectionListener listener, @NonNull Executor executor) {
+            this.listener = listener;
+            this.executor = executor;
+        }
+
+        @Override
+        public void onConnect() {
+            executor.execute(listener::onConnect);
+        }
+
+        @Override
+        public void onReceive(AppStompHeaders headers, Payload payload) {
+            executor.execute(() -> listener.onReceive(headers, payload));
+        }
+
+        @Override
+        public void onSend(Payload payload) {
+            executor.execute(() -> listener.onSend(payload));
+        }
+
+        @Override
+        public void onException(Throwable t) {
+            executor.execute(() -> listener.onException(t));
+        }
+
+        @Override
+        public void onDisconnect() {
+            executor.execute(listener::onDisconnect);
+        }
+
     }
 
     private static class SessionConnectionContextImpl implements SessionConnectionContext {
 
+        private final String id;
         private final SessionConnectionListener listener;
         private volatile Status status;
         private volatile StompSession session;
 
-        private SessionConnectionContextImpl(@NonNull SessionConnectionListener listener) {
+        private SessionConnectionContextImpl(@NonNull String id, @NonNull SessionConnectionListener listener) {
+            this.id = id;
             this.listener = listener;
-            this.status = Status.CONNECTED;
+            this.status = Status.CONNECTING;
             this.session = null;
         }
 
@@ -73,6 +123,11 @@ public class SessionWebSocketClientImpl implements SessionWebSocketClient {
                 throw new IllegalStateException("Session connection status: " + status.name());
             this.status = Status.CONNECTED;
             this.session = session;
+        }
+
+        @Override
+        public String id() {
+            return id;
         }
 
         @Override
@@ -94,7 +149,6 @@ public class SessionWebSocketClientImpl implements SessionWebSocketClient {
                 throw new IllegalStateException("Session connection status: " + status.name());
             this.status = Status.DISCONNECTED;
             session.disconnect();
-            listener.onDisconnected();
         }
 
     }

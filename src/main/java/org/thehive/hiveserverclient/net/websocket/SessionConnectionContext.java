@@ -4,6 +4,8 @@ import org.thehive.hiveserverclient.net.websocket.payload.Payload;
 
 public interface SessionConnectionContext {
 
+    String id();
+
     Status status();
 
     void send(String destination, Payload payload);
