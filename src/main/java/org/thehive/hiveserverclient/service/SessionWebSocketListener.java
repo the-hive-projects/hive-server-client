@@ -1,8 +1,8 @@
 package org.thehive.hiveserverclient.service;
 
-import org.thehive.hiveserverclient.net.websocket.payload.Chat;
-import org.thehive.hiveserverclient.net.websocket.payload.Information;
-import org.thehive.hiveserverclient.net.websocket.payload.Payload;
+import org.thehive.hiveserverclient.payload.Chat;
+import org.thehive.hiveserverclient.payload.Information;
+import org.thehive.hiveserverclient.payload.Payload;
 
 public interface SessionWebSocketListener {
 

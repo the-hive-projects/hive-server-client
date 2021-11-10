@@ -1,4 +1,4 @@
-package org.thehive.hiveserverclient.net.websocket.payload;
+package org.thehive.hiveserverclient.payload;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

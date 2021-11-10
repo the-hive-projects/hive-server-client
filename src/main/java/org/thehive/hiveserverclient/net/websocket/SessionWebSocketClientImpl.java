@@ -6,7 +6,7 @@ import org.springframework.messaging.simp.stomp.*;
 import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 import org.thehive.hiveserverclient.net.websocket.header.AppStompHeaders;
-import org.thehive.hiveserverclient.net.websocket.payload.Payload;
+import org.thehive.hiveserverclient.payload.Payload;
 
 import java.lang.reflect.Type;
 import java.util.concurrent.Executor;

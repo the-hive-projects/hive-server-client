@@ -9,7 +9,7 @@ import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 import org.thehive.hiveserverclient.net.websocket.header.AppStompHeaders;
-import org.thehive.hiveserverclient.net.websocket.payload.Payload;
+import org.thehive.hiveserverclient.payload.Payload;
 import org.thehive.hiveserverclient.util.HeaderUtils;
 
 import java.util.concurrent.CountDownLatch;

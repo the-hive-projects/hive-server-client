@@ -1,4 +1,4 @@
-package org.thehive.hiveserverclient.net.websocket.payload;
+package org.thehive.hiveserverclient.payload;
 
 public final class Information implements Payload {
 

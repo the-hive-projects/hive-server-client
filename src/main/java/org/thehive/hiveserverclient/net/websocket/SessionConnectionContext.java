@@ -1,6 +1,6 @@
 package org.thehive.hiveserverclient.net.websocket;
 
-import org.thehive.hiveserverclient.net.websocket.payload.Payload;
+import org.thehive.hiveserverclient.payload.Payload;
 
 public interface SessionConnectionContext {
 
