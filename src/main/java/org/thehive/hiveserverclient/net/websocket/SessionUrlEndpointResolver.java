@@ -6,7 +6,7 @@ public interface SessionUrlEndpointResolver {
 
     String resolveSubscriptionUrlEndpoint(String id);
 
-    void setDestinationUrlEndpoint(Class<? extends Payload> payloadType, String destinationUrlEndpoint);
+    void addDestinationUrlEndpoint(Class<? extends Payload> payloadType, String destinationUrlEndpoint);
 
     boolean containsDestinationUrlEndpoint(Class<? extends Payload> payloadType);
 

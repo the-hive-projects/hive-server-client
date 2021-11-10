@@ -22,8 +22,8 @@ public class SessionUrlEndpointResolverImpl implements SessionUrlEndpointResolve
     }
 
     @Override
-    public void setDestinationUrlEndpoint(@NonNull Class<? extends Payload> payloadType, @NonNull String destinationUrlEndpoint) {
-        payloadTypeDestinationUrlEndpointMap.put(payloadType, subscriptionUrlEndpoint);
+    public void addDestinationUrlEndpoint(@NonNull Class<? extends Payload> payloadType, @NonNull String destinationUrlEndpoint) {
+        payloadTypeDestinationUrlEndpointMap.put(payloadType, destinationUrlEndpoint);
     }
 
     @Override

@@ -8,7 +8,9 @@ public interface SessionConnectionContext {
 
     Status status();
 
-    void send(String destination, Payload payload);
+    void send(Payload payload);
+
+    SessionUrlEndpointResolver urlEndpointResolver();
 
     void disconnect();
 

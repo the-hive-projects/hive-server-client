@@ -16,7 +16,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 public class SessionWebSocketClientImpl implements SessionWebSocketClient {
 
     private final String connectionUrl;
-    private final String subscriptionEndpoint;
+    private final SessionUrlEndpointResolver urlEndpointResolver;
     private final WebSocketStompClient webSocketStompClient;
     private final ThreadPoolExecutor executor;
 
@@ -30,14 +30,14 @@ public class SessionWebSocketClientImpl implements SessionWebSocketClient {
     private SessionConnectionContext connect(String id, WebSocketHttpHeaders handshakeHeaders,
                                              StompHeaders connectHeaders, OnExecutorSessionConnectionListener listener) {
 
-        var connectionContext = new SessionConnectionContextImpl(id, listener);
+        var connectionContext = new SessionConnectionContextImpl(id, urlEndpointResolver, listener);
         webSocketStompClient.connect(connectionUrl, handshakeHeaders, connectHeaders, new StompSessionHandlerAdapter() {
             @Override
             public void afterConnected(StompSession session, StompHeaders connectedHeaders) {
                 connectionContext.connect(session);
                 executor.execute(listener::onConnect);
-                var endpoint = subscriptionEndpoint + "/" + id;
-                session.subscribe(endpoint, new StompFrameHandler() {
+                var subscriptionUrlEndpoint = urlEndpointResolver.resolveSubscriptionUrlEndpoint(id);
+                session.subscribe(subscriptionUrlEndpoint, new StompFrameHandler() {
                     @Override
                     public Type getPayloadType(StompHeaders headers) {
                         var appStompHeaders = new AppStompHeaders(headers);
@@ -107,12 +107,15 @@ public class SessionWebSocketClientImpl implements SessionWebSocketClient {
     private static class SessionConnectionContextImpl implements SessionConnectionContext {
 
         private final String id;
+        private final SessionUrlEndpointResolver urlEndpointResolver;
         private final SessionConnectionListener listener;
         private volatile Status status;
         private volatile StompSession session;
 
-        private SessionConnectionContextImpl(@NonNull String id, @NonNull SessionConnectionListener listener) {
+        private SessionConnectionContextImpl(@NonNull String id, @NonNull SessionUrlEndpointResolver urlEndpointResolver,
+                                             @NonNull SessionConnectionListener listener) {
             this.id = id;
+            this.urlEndpointResolver = urlEndpointResolver;
             this.listener = listener;
             this.status = Status.CONNECTING;
             this.session = null;
@@ -136,15 +139,21 @@ public class SessionWebSocketClientImpl implements SessionWebSocketClient {
         }
 
         @Override
-        public void send(@NonNull String destination, @NonNull Payload payload) {
+        public synchronized void send(@NonNull Payload payload) {
             if (status != Status.CONNECTED)
                 throw new IllegalStateException("Session connection status: " + status.name());
+            String destination = urlEndpointResolver.resolveDestinationUrlEndpoint(payload.getClass(), id);
             session.send(destination, payload);
             listener.onSend(payload);
         }
 
         @Override
-        public void disconnect() {
+        public SessionUrlEndpointResolver urlEndpointResolver() {
+            return urlEndpointResolver;
+        }
+
+        @Override
+        public synchronized void disconnect() {
             if (status != Status.CONNECTED)
                 throw new IllegalStateException("Session connection status: " + status.name());
             this.status = Status.DISCONNECTED;
