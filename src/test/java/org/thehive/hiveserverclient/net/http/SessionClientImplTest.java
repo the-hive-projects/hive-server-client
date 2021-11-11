@@ -8,19 +8,24 @@ import org.apache.http.impl.client.HttpClients;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.thehive.hiveserverclient.model.Error;
 import org.thehive.hiveserverclient.model.Session;
 import org.thehive.hiveserverclient.util.HeaderUtils;
 
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.Mockito.*;
 
 // Run this test while server is up.
 @Slf4j
+@ExtendWith(MockitoExtension.class)
 class SessionClientImplTest {
+
+    static int TIMEOUT_MS = 5_000;
 
     SessionClient sessionClient;
 
@@ -36,172 +41,169 @@ class SessionClientImplTest {
 
     @DisplayName("Get existing session with successful authentication")
     @Test
-    void getExistingSessionWithSuccessfulAuthentication() throws InterruptedException {
+    void getExistingSessionWithSuccessfulAuthentication() {
         final var id = "00000000000";
         final var username = "user";
         final var password = "password";
         var authHeader = HeaderUtils.httpBasicAuthenticationHeader(username, password);
-        var latch = new CountDownLatch(1);
+        log.info("Id: {}", id);
         log.info("Username: {}, Password: {}", username, password);
-        sessionClient.get(id, new RequestCallback<>() {
-
+        var callback = new RequestCallback<Session>() {
             @Override
             public void onRequest(Session entity) {
                 log.info("Entity: {}", entity);
-                latch.countDown();
             }
 
             @Override
             public void onError(Error e) {
                 log.warn("Error: {}", e);
-                fail(e.getMessage());
-                latch.countDown();
             }
 
             @Override
             public void onFail(Throwable t) {
                 log.warn(t.getMessage());
-                fail(t);
-                latch.countDown();
             }
-        }, authHeader);
-        latch.await();
+        };
+        var spyCallback = spy(callback);
+        sessionClient.get(id, spyCallback, authHeader);
+        verify(spyCallback, timeout(TIMEOUT_MS)).onRequest(ArgumentMatchers.any(Session.class));
+        verify(spyCallback, times(1)).onRequest(ArgumentMatchers.any(Session.class));
+        verify(spyCallback, times(0)).onError(ArgumentMatchers.any(Error.class));
+        verify(spyCallback, times(0)).onFail(ArgumentMatchers.any(Throwable.class));
     }
 
     @DisplayName("Get non-existing session with successful authentication")
     @Test
-    void getNonExistingSessionWithSuccessfulAuthentication() throws InterruptedException {
+    void getNonExistingSessionWithSuccessfulAuthentication() {
         final var id = "00000000001";
         final var username = "user";
         final var password = "password";
         var authHeader = HeaderUtils.httpBasicAuthenticationHeader(username, password);
-        var latch = new CountDownLatch(1);
+        log.info("Id: {}", id);
         log.info("Username: {}, Password: {}", username, password);
-        sessionClient.get(id, new RequestCallback<>() {
-            @Override
-            public void onRequest(Session entity) {
-                log.warn("Entity: {}", entity);
-                fail("'get' request must get error when session does not exist");
-                latch.countDown();
-            }
-
-            @Override
-            public void onError(Error e) {
-                log.info("Error: {}", e);
-                latch.countDown();
-            }
-
-            @Override
-            public void onFail(Throwable t) {
-                log.warn(t.getMessage());
-                fail(t);
-                latch.countDown();
-            }
-        }, authHeader);
-        latch.await();
-    }
-
-    @DisplayName("Get with unsuccessful authentication")
-    @Test
-    void getWithUnsuccessfulAuthentication() throws InterruptedException {
-        final var id = "00000000000";
-        final var username = "username";
-        final var password = "password";
-        var authHeader = HeaderUtils.httpBasicAuthenticationHeader(username, password);
-        var latch = new CountDownLatch(1);
-        log.info("Username: {}, Password: {}", username, password);
-        sessionClient.get(id, new RequestCallback<>() {
-            @Override
-            public void onRequest(Session entity) {
-                log.warn("Entity: {}", entity);
-                fail("'get' request must get error when authentication is unsuccessful");
-                latch.countDown();
-            }
-
-            @Override
-            public void onError(Error e) {
-                log.info("Error: {}", e);
-                latch.countDown();
-            }
-
-            @Override
-            public void onFail(Throwable t) {
-                log.warn(t.getMessage());
-                fail(t);
-                latch.countDown();
-            }
-        }, authHeader);
-        latch.await();
-    }
-
-    @DisplayName("Save with successful authentication")
-    @Test
-    void saveWithSuccessfulAuthentication() throws InterruptedException {
-        final var name = RandomStringUtils.randomAlphabetic(9, 17);
-        var session = new Session(null, name, null, null);
-        final var username = "user";
-        final var password = "password";
-        var authHeader = HeaderUtils.httpBasicAuthenticationHeader(username, password);
-        var latch = new CountDownLatch(1);
-        log.info("Username: {}, Password: {}", username, password);
-        log.info("Session: {}", session);
-        sessionClient.save(session, new RequestCallback<>() {
+        var callback = new RequestCallback<Session>() {
             @Override
             public void onRequest(Session entity) {
                 log.info("Entity: {}", entity);
-                latch.countDown();
             }
 
             @Override
             public void onError(Error e) {
                 log.warn("Error: {}", e);
-                fail(e.getMessage());
-                latch.countDown();
             }
 
             @Override
             public void onFail(Throwable t) {
                 log.warn(t.getMessage());
-                fail(t);
-                latch.countDown();
             }
-        }, authHeader);
-        latch.await();
+        };
+        var spyCallback = spy(callback);
+        sessionClient.get(id, spyCallback, authHeader);
+        verify(spyCallback, timeout(TIMEOUT_MS)).onError(ArgumentMatchers.any(Error.class));
+        verify(spyCallback, times(1)).onError(ArgumentMatchers.any(Error.class));
+        verify(spyCallback, times(0)).onRequest(ArgumentMatchers.any(Session.class));
+        verify(spyCallback, times(0)).onFail(ArgumentMatchers.any(Throwable.class));
+    }
+
+    @DisplayName("Get with unsuccessful authentication")
+    @Test
+    void getWithUnsuccessfulAuthentication() {
+        final var id = "00000000000";
+        final var username = "username";
+        final var password = "password";
+        var authHeader = HeaderUtils.httpBasicAuthenticationHeader(username, password);
+        log.info("Id: {}", id);
+        log.info("Username: {}, Password: {}", username, password);
+        var callback = new RequestCallback<Session>() {
+            @Override
+            public void onRequest(Session entity) {
+                log.info("Entity: {}", entity);
+            }
+
+            @Override
+            public void onError(Error e) {
+                log.warn("Error: {}", e);
+            }
+
+            @Override
+            public void onFail(Throwable t) {
+                log.warn(t.getMessage());
+            }
+        };
+        var spyCallback = spy(callback);
+        sessionClient.get(id, spyCallback, authHeader);
+        verify(spyCallback, timeout(TIMEOUT_MS)).onError(ArgumentMatchers.any(Error.class));
+        verify(spyCallback, times(1)).onError(ArgumentMatchers.any(Error.class));
+        verify(spyCallback, times(0)).onRequest(ArgumentMatchers.any(Session.class));
+        verify(spyCallback, times(0)).onFail(ArgumentMatchers.any(Throwable.class));
+    }
+
+    @DisplayName("Save with successful authentication")
+    @Test
+    void saveWithSuccessfulAuthentication() {
+        final var name = RandomStringUtils.randomAlphabetic(9, 17);
+        var session = new Session(null, name, null, null);
+        final var username = "user";
+        final var password = "password";
+        var authHeader = HeaderUtils.httpBasicAuthenticationHeader(username, password);
+        log.info("Name: {}", name);
+        log.info("Username: {}, Password: {}", username, password);
+        var callback = new RequestCallback<Session>() {
+            @Override
+            public void onRequest(Session entity) {
+                log.info("Entity: {}", entity);
+            }
+
+            @Override
+            public void onError(Error e) {
+                log.warn("Error: {}", e);
+            }
+
+            @Override
+            public void onFail(Throwable t) {
+                log.warn(t.getMessage());
+            }
+        };
+        var spyCallback = spy(callback);
+        sessionClient.save(session, spyCallback, authHeader);
+        verify(spyCallback, timeout(TIMEOUT_MS)).onRequest(ArgumentMatchers.any(Session.class));
+        verify(spyCallback, times(1)).onRequest(ArgumentMatchers.any(Session.class));
+        verify(spyCallback, times(0)).onError(ArgumentMatchers.any(Error.class));
+        verify(spyCallback, times(0)).onFail(ArgumentMatchers.any(Throwable.class));
     }
 
     @DisplayName("Save with unsuccessful authentication")
     @Test
-    void saveWithUnsuccessfulAuthentication() throws InterruptedException {
+    void saveWithUnsuccessfulAuthentication() {
         final var name = RandomStringUtils.randomAlphabetic(9, 17);
         var session = new Session(null, name, null, null);
         final var username = "username";
         final var password = "password";
         var authHeader = HeaderUtils.httpBasicAuthenticationHeader(username, password);
-        var latch = new CountDownLatch(1);
+        log.info("Name: {}", name);
         log.info("Username: {}, Password: {}", username, password);
-        log.info("Session: {}", session);
-        sessionClient.save(session, new RequestCallback<>() {
+        var callback = new RequestCallback<Session>() {
             @Override
             public void onRequest(Session entity) {
-                log.warn("Entity: {}", entity);
-                fail("'save' request must get error when authentication is unsuccessful");
-                latch.countDown();
+                log.info("Entity: {}", entity);
             }
 
             @Override
             public void onError(Error e) {
-                log.info("Error: {}", e);
-                latch.countDown();
+                log.warn("Error: {}", e);
             }
 
             @Override
             public void onFail(Throwable t) {
                 log.warn(t.getMessage());
-                fail(t);
-                latch.countDown();
             }
-        }, authHeader);
-        latch.await();
+        };
+        var spyCallback = spy(callback);
+        sessionClient.save(session, spyCallback, authHeader);
+        verify(spyCallback, timeout(TIMEOUT_MS)).onError(ArgumentMatchers.any(Error.class));
+        verify(spyCallback, times(1)).onError(ArgumentMatchers.any(Error.class));
+        verify(spyCallback, times(0)).onRequest(ArgumentMatchers.any(Session.class));
+        verify(spyCallback, times(0)).onFail(ArgumentMatchers.any(Throwable.class));
     }
 
 
