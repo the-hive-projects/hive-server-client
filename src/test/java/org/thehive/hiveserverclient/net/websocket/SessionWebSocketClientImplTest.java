@@ -10,6 +10,7 @@ import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 import org.thehive.hiveserverclient.net.websocket.header.AppStompHeaders;
+import org.thehive.hiveserverclient.net.websocket.header.PayloadType;
 import org.thehive.hiveserverclient.payload.Chat;
 import org.thehive.hiveserverclient.payload.Payload;
 import org.thehive.hiveserverclient.util.HeaderUtils;
@@ -18,7 +19,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
 // Run this test while server is up.
@@ -31,8 +31,9 @@ class SessionWebSocketClientImplTest {
     void init() {
         var connectionUrl = "ws://localhost:8080/stomp";
         var subscriptionEndpoint = "/topic/{id}";
-        var sessionUrlEndpointResolver = new SessionUrlEndpointResolverImpl(subscriptionEndpoint);
-        sessionUrlEndpointResolver.addDestinationUrlEndpoint(Chat.class, "/websocket/chat/{id}");
+        var destinationPrefix = "/websocket";
+        var sessionUrlEndpointResolver = new SessionUrlEndpointResolverImpl(subscriptionEndpoint, destinationPrefix);
+        sessionUrlEndpointResolver.addDestinationUrlEndpoint(Chat.class, "/chat/{id}");
         var webSocketClient = new StandardWebSocketClient();
         var webSocketStompClient = new WebSocketStompClient(webSocketClient);
         webSocketStompClient.setMessageConverter(new MappingJackson2MessageConverter());
@@ -164,16 +165,13 @@ class SessionWebSocketClientImplTest {
                 log.info("onReceive");
                 log.info("Message was received successfully");
                 log.info("Message: {}", payload);
-                assertEquals(Chat.class, payload.getClass());
-                assertEquals(Chat.class, headers.getPayloadType().type);
-                latch.countDown();
+                if (headers.getPayloadType() == PayloadType.CHAT)
+                    latch.countDown();
             }
 
             @Override
             public void onSend(Payload payload) {
-                log.info("onSend");
-                log.info("Message is being sent");
-                log.info("Message: {}", payload);
+                log.info("onSend\nMessage is being sent\nMessage: {}", payload);
             }
 
             @Override
@@ -195,6 +193,5 @@ class SessionWebSocketClientImplTest {
         connectionCtx.send(chat);
         latch.await();
     }
-
 
 }
