@@ -11,9 +11,6 @@ import org.thehive.hiveserverclient.Authentication;
 import org.thehive.hiveserverclient.model.User;
 import org.thehive.hiveserverclient.model.UserInfo;
 import org.thehive.hiveserverclient.net.http.UserClientImpl;
-import org.thehive.hiveserverclient.service.status.ProfileStatus;
-import org.thehive.hiveserverclient.service.status.SignInStatus;
-import org.thehive.hiveserverclient.service.status.SignUpStatus;
 import org.thehive.hiveserverclient.util.HeaderUtils;
 
 import java.util.concurrent.CountDownLatch;
@@ -53,7 +50,7 @@ class UserServiceImplTest {
         log.info("Username: {}, Password: {}", username, password);
         userService.signIn(username, password, result -> {
             log.info("Result: {}", result);
-            assertEquals(SignInStatus.CORRECT, result.status());
+            assertEquals(Status.CORRECT, result.status());
             assertTrue(result.entity().isPresent());
             assertTrue(result.message().isEmpty());
             assertTrue(result.exception().isEmpty());
@@ -71,7 +68,7 @@ class UserServiceImplTest {
         log.info("Username: {}, Password: {}", username, password);
         userService.signIn(username, password, result -> {
             log.info("Result: {}", result);
-            assertEquals(SignInStatus.INCORRECT, result.status());
+            assertEquals(Status.INCORRECT, result.status());
             assertTrue(result.message().isPresent());
             assertTrue(result.entity().isEmpty());
             assertTrue(result.exception().isEmpty());
@@ -93,7 +90,7 @@ class UserServiceImplTest {
         log.info("User: {}", user);
         userService.signUp(user, result -> {
             log.info("Result: {}", result);
-            assertEquals(SignUpStatus.VALID, result.status());
+            assertEquals(Status.VALID, result.status());
             assertTrue(result.entity().isPresent());
             assertTrue(result.message().isEmpty());
             assertTrue(result.exception().isEmpty());
@@ -115,7 +112,7 @@ class UserServiceImplTest {
         log.info("User: {}", user);
         userService.signUp(user, result -> {
             log.info("Result: {}", result);
-            assertEquals(SignUpStatus.INVALID, result.status());
+            assertEquals(Status.INVALID, result.status());
             assertTrue(result.message().isPresent());
             assertTrue(result.entity().isEmpty());
             assertTrue(result.exception().isEmpty());
@@ -135,7 +132,7 @@ class UserServiceImplTest {
         log.info("Username: {}, Password: {}", username, password);
         userService.profile(result -> {
             log.info("Result: {}", result);
-            assertEquals(ProfileStatus.TAKEN, result.status());
+            assertEquals(Status.TAKEN, result.status());
             assertTrue(result.entity().isPresent());
             assertTrue(result.message().isEmpty());
             assertTrue(result.exception().isEmpty());
@@ -155,7 +152,7 @@ class UserServiceImplTest {
         log.info("Username: {}, Password: {}", username, password);
         userService.profile(result -> {
             log.info("Result: {}", result);
-            assertEquals(ProfileStatus.ERROR, result.status());
+            assertEquals(Status.ERROR, result.status());
             assertTrue(result.message().isPresent());
             assertTrue(result.entity().isEmpty());
             assertTrue(result.exception().isEmpty());
@@ -175,7 +172,7 @@ class UserServiceImplTest {
         log.info("Username: {}, Password: {}", username, password);
         userService.profile(1, result -> {
             log.info("Result: {}", result);
-            assertEquals(ProfileStatus.TAKEN, result.status());
+            assertEquals(Status.TAKEN, result.status());
             assertTrue(result.entity().isPresent());
             assertTrue(result.message().isEmpty());
             assertTrue(result.exception().isEmpty());
@@ -195,7 +192,7 @@ class UserServiceImplTest {
         log.info("Username: {}, Password: {}", username, password);
         userService.profile(1, result -> {
             log.info("Result: {}", result);
-            assertEquals(ProfileStatus.ERROR, result.status());
+            assertEquals(Status.ERROR, result.status());
             assertTrue(result.message().isPresent());
             assertTrue(result.entity().isEmpty());
             assertTrue(result.exception().isEmpty());

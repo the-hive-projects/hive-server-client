@@ -10,8 +10,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.thehive.hiveserverclient.Authentication;
 import org.thehive.hiveserverclient.net.http.SessionClientImpl;
-import org.thehive.hiveserverclient.service.status.CreateSessionStatus;
-import org.thehive.hiveserverclient.service.status.TakeSessionStatus;
 import org.thehive.hiveserverclient.util.HeaderUtils;
 
 import java.util.concurrent.CountDownLatch;
@@ -55,7 +53,7 @@ class SessionServiceImplTest {
         log.info("Username: {}, Password: {}", username, password);
         sessionService.take(id, result -> {
             log.info("Result: {}", result);
-            assertEquals(TakeSessionStatus.TAKEN, result.status());
+            assertEquals(Status.TAKEN, result.status());
             assertTrue(result.entity().isPresent());
             assertTrue(result.message().isEmpty());
             assertTrue(result.exception().isEmpty());
@@ -76,7 +74,7 @@ class SessionServiceImplTest {
         log.info("Username: {}, Password: {}", username, password);
         sessionService.take(id, result -> {
             log.info("Result: {}", result);
-            assertEquals(TakeSessionStatus.UNAVAILABLE, result.status());
+            assertEquals(Status.UNAVAILABLE, result.status());
             assertTrue(result.message().isPresent());
             assertTrue(result.entity().isEmpty());
             assertTrue(result.exception().isEmpty());
@@ -97,7 +95,7 @@ class SessionServiceImplTest {
         log.info("Username: {}, Password: {}", username, password);
         sessionService.take(id, result -> {
             log.info("Result: {}", result);
-            assertEquals(TakeSessionStatus.ERROR, result.status());
+            assertEquals(Status.ERROR, result.status());
             assertTrue(result.message().isPresent());
             assertTrue(result.entity().isEmpty());
             assertTrue(result.exception().isEmpty());
@@ -120,7 +118,7 @@ class SessionServiceImplTest {
         log.info("Session: {}", session);
         sessionService.create(session, result -> {
             log.info("Result: {}", result);
-            assertEquals(CreateSessionStatus.CREATED, result.status());
+            assertEquals(Status.CREATED, result.status());
             assertTrue(result.entity().isPresent());
             assertTrue(result.message().isEmpty());
             assertTrue(result.exception().isEmpty());
@@ -143,7 +141,7 @@ class SessionServiceImplTest {
         log.info("Session: {}", session);
         sessionService.create(session, result -> {
             log.info("Result: {}", result);
-            assertEquals(CreateSessionStatus.ERROR, result.status());
+            assertEquals(Status.ERROR, result.status());
             assertTrue(result.message().isPresent());
             assertTrue(result.entity().isEmpty());
             assertTrue(result.exception().isEmpty());

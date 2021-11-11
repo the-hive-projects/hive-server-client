@@ -8,7 +8,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.thehive.hiveserverclient.Authentication;
 import org.thehive.hiveserverclient.net.http.ImageClientImpl;
-import org.thehive.hiveserverclient.service.status.ImageStatus;
 import org.thehive.hiveserverclient.util.HeaderUtils;
 
 import java.util.concurrent.CountDownLatch;
@@ -52,7 +51,7 @@ class ImageServiceImplTest {
         log.info("ImageUsername: {}", imageUsername);
         imageService.take(imageUsername, result -> {
             log.info("Result: {}", result);
-            assertEquals(ImageStatus.TAKEN, result.status());
+            assertEquals(Status.TAKEN, result.status());
             assertTrue(result.entity().isPresent());
             assertTrue(result.message().isEmpty());
             assertTrue(result.exception().isEmpty());
@@ -74,7 +73,7 @@ class ImageServiceImplTest {
         log.info("ImageUsername: {}", imageUsername);
         imageService.take(imageUsername, result -> {
             log.info("Result: {}", result);
-            assertEquals(ImageStatus.ERROR, result.status());
+            assertEquals(Status.ERROR, result.status());
             assertTrue(result.message().isPresent());
             assertTrue(result.entity().isEmpty());
             assertTrue(result.exception().isEmpty());
