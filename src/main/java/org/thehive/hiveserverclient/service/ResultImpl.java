@@ -9,15 +9,15 @@ import java.util.Optional;
 @EqualsAndHashCode
 @Builder(access = AccessLevel.PACKAGE)
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
-public class ResultImpl<S extends Enum<?>, E extends Entity> implements Result<S, E> {
+public class ResultImpl<E extends Entity> implements Result<E> {
 
-    private final S status;
+    private final ResultStatus status;
     private final E entity;
     private final String message;
     private final Throwable exception;
 
     @Override
-    public S status() {
+    public ResultStatus status() {
         return status;
     }
 

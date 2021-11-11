@@ -53,7 +53,7 @@ class SessionServiceImplTest {
         log.info("Username: {}, Password: {}", username, password);
         sessionService.take(id, result -> {
             log.info("Result: {}", result);
-            assertEquals(Status.TAKEN, result.status());
+            assertEquals(ResultStatus.TAKEN, result.status());
             assertTrue(result.entity().isPresent());
             assertTrue(result.message().isEmpty());
             assertTrue(result.exception().isEmpty());
@@ -74,7 +74,7 @@ class SessionServiceImplTest {
         log.info("Username: {}, Password: {}", username, password);
         sessionService.take(id, result -> {
             log.info("Result: {}", result);
-            assertEquals(Status.UNAVAILABLE, result.status());
+            assertEquals(ResultStatus.UNAVAILABLE, result.status());
             assertTrue(result.message().isPresent());
             assertTrue(result.entity().isEmpty());
             assertTrue(result.exception().isEmpty());
@@ -95,7 +95,7 @@ class SessionServiceImplTest {
         log.info("Username: {}, Password: {}", username, password);
         sessionService.take(id, result -> {
             log.info("Result: {}", result);
-            assertEquals(Status.ERROR, result.status());
+            assertEquals(ResultStatus.ERROR, result.status());
             assertTrue(result.message().isPresent());
             assertTrue(result.entity().isEmpty());
             assertTrue(result.exception().isEmpty());
@@ -118,7 +118,7 @@ class SessionServiceImplTest {
         log.info("Session: {}", session);
         sessionService.create(session, result -> {
             log.info("Result: {}", result);
-            assertEquals(Status.CREATED, result.status());
+            assertEquals(ResultStatus.CREATED, result.status());
             assertTrue(result.entity().isPresent());
             assertTrue(result.message().isEmpty());
             assertTrue(result.exception().isEmpty());
@@ -141,7 +141,7 @@ class SessionServiceImplTest {
         log.info("Session: {}", session);
         sessionService.create(session, result -> {
             log.info("Result: {}", result);
-            assertEquals(Status.ERROR, result.status());
+            assertEquals(ResultStatus.ERROR, result.status());
             assertTrue(result.message().isPresent());
             assertTrue(result.entity().isEmpty());
             assertTrue(result.exception().isEmpty());

@@ -17,25 +17,25 @@ public class ImageServiceImpl implements ImageService {
     private final ImageClient imageClient;
 
     @Override
-    public void take(@NonNull String username, @NonNull Consumer<? super Result<Status, ? extends Image>> consumer) {
+    public void take(@NonNull String username, @NonNull Consumer<? super Result<? extends Image>> consumer) {
         if (!Authentication.INSTANCE.isAuthenticated())
             throw new IllegalStateException("Authentication instance has not been authenticated");
         imageClient.get(username, new RequestCallback<>() {
             @Override
             public void onRequest(Image entity) {
-                var result = Result.of(Status.TAKEN, entity);
+                var result = Result.of(entity);
                 consumer.accept(result);
             }
 
             @Override
             public void onError(Error e) {
-                var result = Result.<Status, Image>of(Status.ERROR, e.getMessage());
+                var result = Result.<Image>of(e.getMessage());
                 consumer.accept(result);
             }
 
             @Override
             public void onFail(Throwable t) {
-                var result = Result.<Status, Image>of(Status.FAIL, t);
+                var result = Result.<Image>of(t);
                 consumer.accept(result);
             }
         }, HeaderUtils.httpBasicAuthenticationHeader(Authentication.INSTANCE.getToken()));

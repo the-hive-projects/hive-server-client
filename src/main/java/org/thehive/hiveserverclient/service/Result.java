@@ -4,30 +4,37 @@ import org.thehive.hiveserverclient.model.Entity;
 
 import java.util.Optional;
 
-public interface Result<S extends Enum<?>, E extends Entity> {
+public interface Result<E extends Entity> {
 
-    static <S extends Enum<?>, E extends Entity> Result<S, E> of(S status, E entity) {
-        return ResultImpl.<S, E>builder()
-                .status(status)
+    static <E extends Entity> Result<E> of(E entity) {
+        return ResultImpl.<E>builder()
+                .status(ResultStatus.SUCCESS)
                 .entity(entity)
                 .build();
     }
 
-    static <S extends Enum<?>, E extends Entity> Result<S, E> of(S status, String message) {
-        return ResultImpl.<S, E>builder()
+    static <E extends Entity> Result<E> of(ResultStatus status, String message) {
+        return ResultImpl.<E>builder()
                 .status(status)
                 .message(message)
                 .build();
     }
 
-    static <S extends Enum<?>, E extends Entity> Result<S, E> of(S status, Throwable exception) {
-        return ResultImpl.<S, E>builder()
-                .status(status)
+    static <E extends Entity> Result<E> of(String message) {
+        return ResultImpl.<E>builder()
+                .status(ResultStatus.ERROR)
+                .message(message)
+                .build();
+    }
+
+    static <E extends Entity> Result<E> of(Throwable exception) {
+        return ResultImpl.<E>builder()
+                .status(ResultStatus.FAIL)
                 .exception(exception)
                 .build();
     }
 
-    S status();
+    ResultStatus status();
 
     Optional<E> entity();
 

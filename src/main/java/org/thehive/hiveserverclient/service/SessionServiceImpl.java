@@ -17,54 +17,54 @@ public class SessionServiceImpl implements SessionService {
     private final SessionClient sessionClient;
 
     @Override
-    public void take(@NonNull String id, @NonNull Consumer<? super Result<Status, ? extends Session>> consumer) {
+    public void take(@NonNull String id, @NonNull Consumer<? super Result<? extends Session>> consumer) {
         if (!Authentication.INSTANCE.isAuthenticated())
             throw new IllegalStateException("Authentication instance has not been authenticated");
         sessionClient.get(id, new RequestCallback<>() {
             @Override
             public void onRequest(Session entity) {
-                var result = Result.of(Status.TAKEN, entity);
+                var result = Result.of(entity);
                 consumer.accept(result);
             }
 
             @Override
             public void onError(Error e) {
-                Result<Status, Session> result;
+                Result<Session> result;
                 if (e.getStatus() == 404)
-                    result = Result.of(Status.UNAVAILABLE, e.getMessage());
+                    result = Result.of(ResultStatus.ERROR_UNAVAILABLE, e.getMessage());
                 else
-                    result = Result.of(Status.ERROR, e.getMessage());
+                    result = Result.of(e.getMessage());
                 consumer.accept(result);
             }
 
             @Override
             public void onFail(Throwable t) {
-                var result = Result.<Status, Session>of(Status.FAIL, t);
+                var result = Result.<Session>of(t);
                 consumer.accept(result);
             }
         }, HeaderUtils.httpBasicAuthenticationHeader(Authentication.INSTANCE.getToken()));
     }
 
     @Override
-    public void create(@NonNull Session session, @NonNull Consumer<? super Result<Status, ? extends Session>> consumer) {
+    public void create(@NonNull Session session, @NonNull Consumer<? super Result<? extends Session>> consumer) {
         if (!Authentication.INSTANCE.isAuthenticated())
             throw new IllegalStateException("Authentication instance has not been authenticated");
         sessionClient.save(session, new RequestCallback<>() {
             @Override
             public void onRequest(Session entity) {
-                var result = Result.of(Status.CREATED, entity);
+                var result = Result.of(entity);
                 consumer.accept(result);
             }
 
             @Override
             public void onError(Error e) {
-                var result = Result.<Status, Session>of(Status.ERROR, e.getMessage());
+                var result = Result.<Session>of(e.getMessage());
                 consumer.accept(result);
             }
 
             @Override
             public void onFail(Throwable t) {
-                var result = Result.<Status, Session>of(Status.FAIL, t);
+                var result = Result.<Session>of(t);
                 consumer.accept(result);
             }
         }, HeaderUtils.httpBasicAuthenticationHeader(Authentication.INSTANCE.getToken()));

@@ -6,6 +6,6 @@ import java.util.function.Consumer;
 
 public interface ImageService {
 
-    void take(String username, Consumer<? super Result<Status, ? extends Image>> consumer);
+    void take(String username, Consumer<? super Result<? extends Image>> consumer);
 
 }
