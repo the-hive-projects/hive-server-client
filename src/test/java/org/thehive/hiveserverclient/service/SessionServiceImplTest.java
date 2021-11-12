@@ -49,16 +49,16 @@ class SessionServiceImplTest {
         Authentication.INSTANCE.unauthenticate();
     }
 
-    @DisplayName("Take existing session when authentication is correct")
     @Test
+    @DisplayName("Take existing session when authentication is correct")
     void takeExistingSessionWhenAuthenticationIsCorrect() throws InterruptedException {
-        final var id = "00000000000";
         final var username = "user";
         final var password = "password";
         var token = HeaderUtils.httpBasicAuthenticationToken(username, password);
         Authentication.INSTANCE.authenticate(token);
-        log.info("Id: {}", id);
         log.info("Username: {}, Password: {}", username, password);
+        final var id = "00000000000";
+        log.info("Id: {}", id);
         var latch = new CountDownLatch(1);
         var resultRef = new AtomicReference<Result<? extends Session>>();
         var consumer = new Consumer<Result<? extends Session>>() {
@@ -81,16 +81,16 @@ class SessionServiceImplTest {
         assertEquals(ResultStatus.SUCCESS, result.status());
     }
 
-    @DisplayName("Take non-existing session when authentication is correct")
     @Test
+    @DisplayName("Take non-existing session when authentication is correct")
     void takeNonExistingSessionWhenAuthenticationIsCorrect() throws InterruptedException {
-        final var id = "11111111111";
         final var username = "user";
         final var password = "password";
         var token = HeaderUtils.httpBasicAuthenticationToken(username, password);
         Authentication.INSTANCE.authenticate(token);
-        log.info("Id: {}", id);
         log.info("Username: {}, Password: {}", username, password);
+        final var id = "11111111111";
+        log.info("Id: {}", id);
         var latch = new CountDownLatch(1);
         var resultRef = new AtomicReference<Result<? extends Session>>();
         var consumer = new Consumer<Result<? extends Session>>() {
@@ -113,16 +113,16 @@ class SessionServiceImplTest {
         assertEquals(ResultStatus.ERROR_UNAVAILABLE, result.status());
     }
 
-    @DisplayName("Take session when authentication is incorrect")
     @Test
+    @DisplayName("Take session when authentication is incorrect")
     void takeSessionWhenAuthenticationIsIncorrect() throws InterruptedException {
-        final var id = "00000000000";
         final var username = "username";
         final var password = "password";
         var token = HeaderUtils.httpBasicAuthenticationToken(username, password);
         Authentication.INSTANCE.authenticate(token);
-        log.info("Id: {}", id);
         log.info("Username: {}, Password: {}", username, password);
+        final var id = "00000000000";
+        log.info("Id: {}", id);
         var latch = new CountDownLatch(1);
         var resultRef = new AtomicReference<Result<? extends Session>>();
         var consumer = new Consumer<Result<? extends Session>>() {
@@ -145,17 +145,17 @@ class SessionServiceImplTest {
         assertEquals(ResultStatus.ERROR, result.status());
     }
 
-    @DisplayName("Create session when authenticated is correct")
     @Test
+    @DisplayName("Create session when authenticated is correct")
     void createSessionWhenAuthenticationIsCorrect() throws InterruptedException {
-        final var name = RandomStringUtils.randomAlphanumeric(9, 17);
-        var session = new org.thehive.hiveserverclient.model.Session(null, name, null, null);
         final var username = "user";
         final var password = "password";
         var token = HeaderUtils.httpBasicAuthenticationToken(username, password);
         Authentication.INSTANCE.authenticate(token);
-        log.info("Session: {}", session);
         log.info("Username: {}, Password: {}", username, password);
+        final var name = RandomStringUtils.randomAlphanumeric(9, 17);
+        var session = new Session(null, name, null, null);
+        log.info("Session: {}", session);
         var latch = new CountDownLatch(1);
         var resultRef = new AtomicReference<Result<? extends Session>>();
         var consumer = new Consumer<Result<? extends Session>>() {
@@ -178,17 +178,17 @@ class SessionServiceImplTest {
         assertEquals(ResultStatus.SUCCESS, result.status());
     }
 
-    @DisplayName("Create session when authentication is incorrect")
     @Test
+    @DisplayName("Create session when authentication is incorrect")
     void createSessionWhenAuthenticationIsIncorrect() throws InterruptedException {
-        final var name = RandomStringUtils.randomAlphanumeric(9, 17);
-        var session = new org.thehive.hiveserverclient.model.Session(null, name, null, null);
         final var username = "username";
         final var password = "password";
         var token = HeaderUtils.httpBasicAuthenticationToken(username, password);
         Authentication.INSTANCE.authenticate(token);
-        log.info("Session: {}", session);
         log.info("Username: {}, Password: {}", username, password);
+        final var name = RandomStringUtils.randomAlphanumeric(9, 17);
+        var session = new Session(null, name, null, null);
+        log.info("Session: {}", session);
         var latch = new CountDownLatch(1);
         var resultRef = new AtomicReference<Result<? extends Session>>();
         var consumer = new Consumer<Result<? extends Session>>() {

@@ -48,8 +48,8 @@ class UserServiceImplTest {
         Authentication.INSTANCE.unauthenticate();
     }
 
-    @DisplayName("Sign-in with correct credentials")
     @Test
+    @DisplayName("Sign-in with correct credentials")
     void signInWithCorrectCredentials() throws InterruptedException {
         final var username = "user";
         final var password = "password";
@@ -76,8 +76,8 @@ class UserServiceImplTest {
         assertEquals(ResultStatus.SUCCESS, result.status());
     }
 
-    @DisplayName("Sign-in with incorrect credentials")
     @Test
+    @DisplayName("Sign-in with incorrect credentials")
     void signInWithIncorrectCredentials() throws InterruptedException {
         final var username = "username";
         final var password = "password";
@@ -104,8 +104,8 @@ class UserServiceImplTest {
         assertEquals(ResultStatus.ERROR_INCORRECT, result.status());
     }
 
-    @DisplayName("Sign-up with invalid credentials")
     @Test
+    @DisplayName("Sign-up with invalid credentials")
     void signUpWithValidCredentials() throws InterruptedException {
         var username = RandomStringUtils.randomAlphabetic(7, 11);
         var password = "password";
@@ -137,8 +137,8 @@ class UserServiceImplTest {
         assertEquals(ResultStatus.SUCCESS, result.status());
     }
 
-    @DisplayName("Sign-up with invalid credentials")
     @Test
+    @DisplayName("Sign-up with invalid credentials")
     void signUpWithInvalidCredentials() throws InterruptedException {
         var username = "user-name";
         var password = "password";
@@ -170,8 +170,8 @@ class UserServiceImplTest {
         assertEquals(ResultStatus.ERROR_INVALID, result.status());
     }
 
-    @DisplayName("Profile when authentication is correct")
     @Test
+    @DisplayName("Profile when authentication is correct")
     void profileWhenAuthenticationIsCorrect() throws InterruptedException {
         final var username = "user";
         final var password = "password";
@@ -200,8 +200,8 @@ class UserServiceImplTest {
         assertEquals(ResultStatus.SUCCESS, result.status());
     }
 
-    @DisplayName("Profile when authentication is incorrect")
     @Test
+    @DisplayName("Profile when authentication is incorrect")
     void profileWhenAuthenticationIsIncorrect() throws InterruptedException {
         final var username = "username";
         final var password = "password";
@@ -230,16 +230,16 @@ class UserServiceImplTest {
         assertEquals(ResultStatus.ERROR, result.status());
     }
 
-    @DisplayName("Profile with id when authentication is correct")
     @Test
-    void profileWithIdWhenAuthenticationIsCorrect() throws InterruptedException {
-        final var id = 1;
+    @DisplayName("Profile existing user with id when authentication is correct")
+    void profileExistingUserWithIdWhenAuthenticationIsCorrect() throws InterruptedException {
         final var username = "user";
         final var password = "password";
         var token = HeaderUtils.httpBasicAuthenticationToken(username, password);
         Authentication.INSTANCE.authenticate(token);
-        log.info("id");
         log.info("Username: {}, Password: {}", username, password);
+        final var id = 1;
+        log.info("Id: {}", id);
         var latch = new CountDownLatch(1);
         var resultRef = new AtomicReference<Result<? extends User>>();
         var consumer = new Consumer<Result<? extends User>>() {
@@ -262,16 +262,16 @@ class UserServiceImplTest {
         assertEquals(ResultStatus.SUCCESS, result.status());
     }
 
-    @DisplayName("Profile with non-existing id when authentication is correct")
     @Test
-    void profileWithNonExistingIdWhenAuthenticationIsCorrect() throws InterruptedException {
-        final var id = 9000;
+    @DisplayName("Profile with non-existing user id when authentication is correct")
+    void profileWithNonExistingUserIdWhenAuthenticationIsCorrect() throws InterruptedException {
         final var username = "user";
         final var password = "password";
         var token = HeaderUtils.httpBasicAuthenticationToken(username, password);
         Authentication.INSTANCE.authenticate(token);
-        log.info("id");
         log.info("Username: {}, Password: {}", username, password);
+        final var id = 9000;
+        log.info("Id: {}", id);
         var latch = new CountDownLatch(1);
         var resultRef = new AtomicReference<Result<? extends User>>();
         var consumer = new Consumer<Result<? extends User>>() {
@@ -297,13 +297,13 @@ class UserServiceImplTest {
     @DisplayName("Profile with id when authentication is incorrect")
     @Test
     void profileWithIdWhenAuthenticationIsIncorrect() throws InterruptedException {
-        final var id = 1;
         final var username = "username";
         final var password = "password";
         var token = HeaderUtils.httpBasicAuthenticationToken(username, password);
         Authentication.INSTANCE.authenticate(token);
-        log.info("id");
         log.info("Username: {}, Password: {}", username, password);
+        final var id = 1;
+        log.info("Id: {}", id);
         var latch = new CountDownLatch(1);
         var resultRef = new AtomicReference<Result<? extends User>>();
         var consumer = new Consumer<Result<? extends User>>() {

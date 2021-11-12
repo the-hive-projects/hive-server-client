@@ -49,16 +49,16 @@ class ImageServiceImplTest {
         Authentication.INSTANCE.unauthenticate();
     }
 
-    @DisplayName("Take when authentication is correct")
     @Test
+    @DisplayName("Take when authentication is correct")
     void takeWhenAuthenticationIsCorrect() throws InterruptedException {
-        final var imageUsername = "username";
         final var username = "user";
         final var password = "password";
         var token = HeaderUtils.httpBasicAuthenticationToken(username, password);
         Authentication.INSTANCE.authenticate(token);
-        log.info("ImageUsername: {}", imageUsername);
         log.info("Username: {}, Password: {}", username, password);
+        final var imageUsername = "username";
+        log.info("ImageUsername: {}", imageUsername);
         var latch = new CountDownLatch(1);
         var resultRef = new AtomicReference<Result<? extends Image>>();
         var consumer = new Consumer<Result<? extends Image>>() {
@@ -81,16 +81,16 @@ class ImageServiceImplTest {
         assertEquals(ResultStatus.SUCCESS, result.status());
     }
 
-    @DisplayName("Take when authentication is incorrect")
     @Test
+    @DisplayName("Take when authentication is incorrect")
     void takeWhenAuthenticationIsInCorrect() throws InterruptedException {
-        final var imageUsername = "username";
         final var username = "username";
         final var password = "password";
         var token = HeaderUtils.httpBasicAuthenticationToken(username, password);
         Authentication.INSTANCE.authenticate(token);
-        log.info("ImageUsername: {}", imageUsername);
         log.info("Username: {}, Password: {}", username, password);
+        final var imageUsername = "username";
+        log.info("ImageUsername: {}", imageUsername);
         var latch = new CountDownLatch(1);
         var resultRef = new AtomicReference<Result<? extends Image>>();
         var consumer = new Consumer<Result<? extends Image>>() {

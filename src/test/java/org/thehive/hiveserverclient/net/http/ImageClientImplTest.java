@@ -28,9 +28,9 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class ImageClientImplTest {
 
-    static String URL = "http://localhost:8080/image";
-    static long TIMEOUT_MS_CALL = 3_000L;
-    static long TIMEOUT_MS_EXECUTE = 1_000L;
+    static final String URL = "http://localhost:8080/image";
+    static final long TIMEOUT_MS_CALL = 3_000L;
+    static final long TIMEOUT_MS_EXECUTE = 1_000L;
 
     ImageClient imageClient;
 
@@ -42,15 +42,15 @@ class ImageClientImplTest {
         this.imageClient = new ImageClientImpl(URL, objectMapper, httpClient, executorService);
     }
 
-    @DisplayName("Get image with successful authentication")
     @Test
+    @DisplayName("Get image with successful authentication")
     void getImageWithSuccessfulAuthentication() throws InterruptedException {
-        final var imageUsername = RandomStringUtils.randomAlphabetic(9, 17);
         final var username = "user";
         final var password = "password";
         var authHeader = HeaderUtils.httpBasicAuthenticationHeader(username, password);
-        log.info("ImageUsername: {}", imageUsername);
         log.info("Username: {}, Password: {}", username, password);
+        final var imageUsername = RandomStringUtils.randomAlphabetic(9, 17);
+        log.info("Image username: {}", imageUsername);
         var latch = new CountDownLatch(1);
         var imgRef = new AtomicReference<Image>();
         var callback = new RequestCallback<Image>() {
@@ -73,26 +73,26 @@ class ImageClientImplTest {
         };
         var callbackSpy = spy(callback);
         imageClient.get(imageUsername, callbackSpy, authHeader);
-        verify(callbackSpy, timeout(TIMEOUT_MS_CALL)).onRequest(ArgumentMatchers.any(Image.class));
+        verify(callbackSpy, timeout(TIMEOUT_MS_CALL)).onRequest(ArgumentMatchers.any());
         var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
         if (!completed)
             fail(new IllegalStateException("Callback execution timed out"));
-        verify(callbackSpy, only()).onRequest(ArgumentMatchers.any(Image.class));
-        verify(callbackSpy, never()).onError(ArgumentMatchers.any(Error.class));
-        verify(callbackSpy, never()).onFail(ArgumentMatchers.any(Throwable.class));
+        verify(callbackSpy, only()).onRequest(ArgumentMatchers.any());
+        verify(callbackSpy, never()).onError(ArgumentMatchers.any());
+        verify(callbackSpy, never()).onFail(ArgumentMatchers.any());
         var image = imgRef.get();
         assertNotNull(image);
     }
 
-    @DisplayName("Get image with unsuccessful authentication")
     @Test
+    @DisplayName("Get image with unsuccessful authentication")
     void getImageWithUnsuccessfulAuthentication() throws InterruptedException {
-        final var imageUsername = RandomStringUtils.randomAlphabetic(9, 17);
         final var username = "username";
         final var password = "password";
         var authHeader = HeaderUtils.httpBasicAuthenticationHeader(username, password);
-        log.info("ImageUsername: {}", imageUsername);
         log.info("Username: {}, Password: {}", username, password);
+        final var imageUsername = RandomStringUtils.randomAlphabetic(9, 17);
+        log.info("Image username: {}", imageUsername);
         var latch = new CountDownLatch(1);
         var errRef = new AtomicReference<Error>();
         var callback = new RequestCallback<Image>() {
@@ -115,13 +115,13 @@ class ImageClientImplTest {
         };
         var callbackSpy = spy(callback);
         imageClient.get(imageUsername, callbackSpy, authHeader);
-        verify(callbackSpy, timeout(TIMEOUT_MS_CALL)).onError(ArgumentMatchers.any(Error.class));
+        verify(callbackSpy, timeout(TIMEOUT_MS_CALL)).onError(ArgumentMatchers.any());
         var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
         if (!completed)
             fail(new IllegalStateException("Callback execution timed out"));
-        verify(callbackSpy, only()).onError(ArgumentMatchers.any(Error.class));
-        verify(callbackSpy, never()).onRequest(ArgumentMatchers.any(Image.class));
-        verify(callbackSpy, never()).onFail(ArgumentMatchers.any(Throwable.class));
+        verify(callbackSpy, only()).onError(ArgumentMatchers.any());
+        verify(callbackSpy, never()).onRequest(ArgumentMatchers.any());
+        verify(callbackSpy, never()).onFail(ArgumentMatchers.any());
         var error = errRef.get();
         assertNotNull(error);
     }

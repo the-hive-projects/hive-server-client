@@ -29,9 +29,9 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class SessionClientImplTest {
 
-    static String URL = "http://localhost:8080/session";
-    static long TIMEOUT_MS_CALL = 3_000L;
-    static long TIMEOUT_MS_EXECUTE = 1_000L;
+    static final String URL = "http://localhost:8080/session";
+    static final long TIMEOUT_MS_CALL = 3_000L;
+    static final long TIMEOUT_MS_EXECUTE = 1_000L;
 
     SessionClient sessionClient;
 
@@ -44,15 +44,15 @@ class SessionClientImplTest {
         this.sessionClient = new SessionClientImpl(URL, objectMapper, httpClient, executorService);
     }
 
-    @DisplayName("Get existing session with successful authentication")
     @Test
+    @DisplayName("Get existing session with successful authentication")
     void getExistingSessionWithSuccessfulAuthentication() throws InterruptedException {
-        final var id = "00000000000";
         final var username = "user";
         final var password = "password";
         var authHeader = HeaderUtils.httpBasicAuthenticationHeader(username, password);
-        log.info("Id: {}", id);
         log.info("Username: {}, Password: {}", username, password);
+        final var id = "00000000000";
+        log.info("Id: {}", id);
         var latch = new CountDownLatch(1);
         var sessionRef = new AtomicReference<Session>();
         var callback = new RequestCallback<Session>() {
@@ -75,26 +75,26 @@ class SessionClientImplTest {
         };
         var callbackSpy = spy(callback);
         sessionClient.get(id, callbackSpy, authHeader);
-        verify(callbackSpy, timeout(TIMEOUT_MS_CALL)).onRequest(ArgumentMatchers.any(Session.class));
+        verify(callbackSpy, timeout(TIMEOUT_MS_CALL)).onRequest(ArgumentMatchers.any());
         var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
         if (!completed)
             fail(new IllegalStateException("Callback execution timed out"));
-        verify(callbackSpy, only()).onRequest(ArgumentMatchers.any(Session.class));
-        verify(callbackSpy, never()).onError(ArgumentMatchers.any(Error.class));
-        verify(callbackSpy, never()).onFail(ArgumentMatchers.any(Throwable.class));
+        verify(callbackSpy, only()).onRequest(ArgumentMatchers.any());
+        verify(callbackSpy, never()).onError(ArgumentMatchers.any());
+        verify(callbackSpy, never()).onFail(ArgumentMatchers.any());
         var session = sessionRef.get();
         assertNotNull(session);
     }
 
-    @DisplayName("Get non-existing session with successful authentication")
     @Test
+    @DisplayName("Get non-existing session with successful authentication")
     void getNonExistingSessionWithSuccessfulAuthentication() throws InterruptedException {
-        final var id = "00000000001";
         final var username = "user";
         final var password = "password";
         var authHeader = HeaderUtils.httpBasicAuthenticationHeader(username, password);
-        log.info("Id: {}", id);
         log.info("Username: {}, Password: {}", username, password);
+        final var id = "11111111111";
+        log.info("Id: {}", id);
         var latch = new CountDownLatch(1);
         var errRef = new AtomicReference<Error>();
         var callback = new RequestCallback<Session>() {
@@ -117,26 +117,26 @@ class SessionClientImplTest {
         };
         var callbackSpy = spy(callback);
         sessionClient.get(id, callbackSpy, authHeader);
-        verify(callbackSpy, timeout(TIMEOUT_MS_CALL)).onError(ArgumentMatchers.any(Error.class));
+        verify(callbackSpy, timeout(TIMEOUT_MS_CALL)).onError(ArgumentMatchers.any());
         var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
         if (!completed)
             fail(new IllegalStateException("Callback execution timed out"));
-        verify(callbackSpy, only()).onError(ArgumentMatchers.any(Error.class));
-        verify(callbackSpy, never()).onRequest(ArgumentMatchers.any(Session.class));
-        verify(callbackSpy, never()).onFail(ArgumentMatchers.any(Throwable.class));
+        verify(callbackSpy, only()).onError(ArgumentMatchers.any());
+        verify(callbackSpy, never()).onRequest(ArgumentMatchers.any());
+        verify(callbackSpy, never()).onFail(ArgumentMatchers.any());
         var error = errRef.get();
         assertNotNull(error);
     }
 
-    @DisplayName("Get with unsuccessful authentication")
     @Test
+    @DisplayName("Get with unsuccessful authentication")
     void getWithUnsuccessfulAuthentication() throws InterruptedException {
-        final var id = "00000000000";
         final var username = "username";
         final var password = "password";
         var authHeader = HeaderUtils.httpBasicAuthenticationHeader(username, password);
-        log.info("Id: {}", id);
         log.info("Username: {}, Password: {}", username, password);
+        final var id = "00000000000";
+        log.info("Id: {}", id);
         var latch = new CountDownLatch(1);
         var errRef = new AtomicReference<Error>();
         var callback = new RequestCallback<Session>() {
@@ -159,27 +159,27 @@ class SessionClientImplTest {
         };
         var callbackSpy = spy(callback);
         sessionClient.get(id, callbackSpy, authHeader);
-        verify(callbackSpy, timeout(TIMEOUT_MS_CALL)).onError(ArgumentMatchers.any(Error.class));
+        verify(callbackSpy, timeout(TIMEOUT_MS_CALL)).onError(ArgumentMatchers.any());
         var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
         if (!completed)
             fail(new IllegalStateException("Callback execution timed out"));
-        verify(callbackSpy, only()).onError(ArgumentMatchers.any(Error.class));
-        verify(callbackSpy, never()).onRequest(ArgumentMatchers.any(Session.class));
-        verify(callbackSpy, never()).onFail(ArgumentMatchers.any(Throwable.class));
+        verify(callbackSpy, only()).onError(ArgumentMatchers.any());
+        verify(callbackSpy, never()).onRequest(ArgumentMatchers.any());
+        verify(callbackSpy, never()).onFail(ArgumentMatchers.any());
         var error = errRef.get();
         assertNotNull(error);
     }
 
-    @DisplayName("Save with successful authentication")
     @Test
+    @DisplayName("Save with successful authentication")
     void saveWithSuccessfulAuthentication() throws InterruptedException {
-        final var name = RandomStringUtils.randomAlphabetic(9, 17);
-        var session = new Session(null, name, null, null);
         final var username = "user";
         final var password = "password";
         var authHeader = HeaderUtils.httpBasicAuthenticationHeader(username, password);
-        log.info("Name: {}", name);
         log.info("Username: {}, Password: {}", username, password);
+        final var name = RandomStringUtils.randomAlphabetic(9, 17);
+        var session = new Session(null, name, null, null);
+        log.info("Session: {}", session);
         var latch = new CountDownLatch(1);
         var sessionRef = new AtomicReference<Session>();
         var callback = new RequestCallback<Session>() {
@@ -202,27 +202,27 @@ class SessionClientImplTest {
         };
         var callbackSpy = spy(callback);
         sessionClient.save(session, callbackSpy, authHeader);
-        verify(callbackSpy, timeout(TIMEOUT_MS_CALL)).onRequest(ArgumentMatchers.any(Session.class));
+        verify(callbackSpy, timeout(TIMEOUT_MS_CALL)).onRequest(ArgumentMatchers.any());
         var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
         if (!completed)
             fail(new IllegalStateException("Callback execution timed out"));
-        verify(callbackSpy, only()).onRequest(ArgumentMatchers.any(Session.class));
-        verify(callbackSpy, never()).onError(ArgumentMatchers.any(Error.class));
-        verify(callbackSpy, never()).onFail(ArgumentMatchers.any(Throwable.class));
+        verify(callbackSpy, only()).onRequest(ArgumentMatchers.any());
+        verify(callbackSpy, never()).onError(ArgumentMatchers.any());
+        verify(callbackSpy, never()).onFail(ArgumentMatchers.any());
         var responseSession = sessionRef.get();
         assertNotNull(responseSession);
     }
 
-    @DisplayName("Save with unsuccessful authentication")
     @Test
+    @DisplayName("Save with unsuccessful authentication")
     void saveWithUnsuccessfulAuthentication() throws InterruptedException {
-        final var name = RandomStringUtils.randomAlphabetic(9, 17);
-        var session = new Session(null, name, null, null);
         final var username = "username";
         final var password = "password";
         var authHeader = HeaderUtils.httpBasicAuthenticationHeader(username, password);
-        log.info("Name: {}", name);
         log.info("Username: {}, Password: {}", username, password);
+        final var name = RandomStringUtils.randomAlphabetic(9, 17);
+        var session = new Session(null, name, null, null);
+        log.info("Name: {}", name);
         var latch = new CountDownLatch(1);
         var errRef = new AtomicReference<>();
         var callback = new RequestCallback<Session>() {
@@ -245,13 +245,13 @@ class SessionClientImplTest {
         };
         var callbackSpy = spy(callback);
         sessionClient.save(session, callbackSpy, authHeader);
-        verify(callbackSpy, timeout(TIMEOUT_MS_CALL)).onError(ArgumentMatchers.any(Error.class));
+        verify(callbackSpy, timeout(TIMEOUT_MS_CALL)).onError(ArgumentMatchers.any());
         var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
         if (!completed)
             fail(new IllegalStateException("Callback execution timed out"));
-        verify(callbackSpy, only()).onError(ArgumentMatchers.any(Error.class));
-        verify(callbackSpy, never()).onRequest(ArgumentMatchers.any(Session.class));
-        verify(callbackSpy, never()).onFail(ArgumentMatchers.any(Throwable.class));
+        verify(callbackSpy, only()).onError(ArgumentMatchers.any());
+        verify(callbackSpy, never()).onRequest(ArgumentMatchers.any());
+        verify(callbackSpy, never()).onFail(ArgumentMatchers.any());
         var err = errRef.get();
         assertNotNull(err);
     }
