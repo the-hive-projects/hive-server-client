@@ -7,6 +7,9 @@ import org.apache.http.impl.client.HttpClients;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.thehive.hiveserverclient.model.Error;
 import org.thehive.hiveserverclient.model.User;
 import org.thehive.hiveserverclient.model.UserInfo;
@@ -15,22 +18,30 @@ import org.thehive.hiveserverclient.util.HeaderUtils;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.Mockito.*;
 
 // Run this test while server is up.
 @Slf4j
+@ExtendWith(MockitoExtension.class)
 class UserClientImplTest {
+
+    static String URL = "http://localhost:8080/user";
+    static long TIMEOUT_MS_CALL = 3_000L;
+    static long TIMEOUT_MS_EXECUTE = 1_000L;
 
     UserClientImpl userClient;
 
     @BeforeEach
-    void initialize() {
-        var url = "http://localhost:8080/user";
+    void init() {
         var httpClient = HttpClients.createSystem();
         var objectMapper = new ObjectMapper();
         var threadPoolExecutor = (ThreadPoolExecutor) Executors.newCachedThreadPool();
-        this.userClient = new UserClientImpl(url, httpClient, objectMapper, threadPoolExecutor);
+        this.userClient = new UserClientImpl(URL, httpClient, objectMapper, threadPoolExecutor);
     }
 
     @DisplayName("Get with successful authentication")
@@ -39,30 +50,38 @@ class UserClientImplTest {
         final var username = "user";
         final var password = "password";
         var authHeader = HeaderUtils.httpBasicAuthenticationHeader(username, password);
-        var latch = new CountDownLatch(1);
         log.info("Username: {}, Password: {}", username, password);
-        userClient.get(new RequestCallback<>() {
+        var latch = new CountDownLatch(1);
+        var userRef = new AtomicReference<User>();
+        var callback = new RequestCallback<User>() {
             @Override
             public void onRequest(User entity) {
-                log.info("Entity: {}", entity);
+                log.info("User: {}", entity);
+                userRef.set(entity);
                 latch.countDown();
             }
 
             @Override
             public void onError(Error e) {
-                log.warn("Error: {}", e);
-                fail(e.getMessage());
-                latch.countDown();
+                log.error("Error: {}", e);
             }
 
             @Override
             public void onFail(Throwable t) {
-                log.warn(t.getMessage());
-                fail(t);
-                latch.countDown();
+                log.error(t.getMessage());
             }
-        }, authHeader);
-        latch.await();
+        };
+        var callbackSpy = spy(callback);
+        userClient.get(callbackSpy, authHeader);
+        verify(callbackSpy, timeout(TIMEOUT_MS_CALL)).onRequest(ArgumentMatchers.any(User.class));
+        var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
+        if (!completed)
+            fail(new IllegalStateException("Callback execution timed out"));
+        verify(callbackSpy, only()).onRequest(ArgumentMatchers.any(User.class));
+        verify(callbackSpy, never()).onError(ArgumentMatchers.any(Error.class));
+        verify(callbackSpy, never()).onFail(ArgumentMatchers.any(Throwable.class));
+        var user = userRef.get();
+        assertNotNull(user);
     }
 
     @DisplayName("Get with unsuccessful authentication")
@@ -71,31 +90,166 @@ class UserClientImplTest {
         final var username = "username";
         final var password = "password";
         var authHeader = HeaderUtils.httpBasicAuthenticationHeader(username, password);
-        var latch = new CountDownLatch(1);
         log.info("Username: {}, Password: {}", username, password);
-        userClient.get(new RequestCallback<>() {
+        var latch = new CountDownLatch(1);
+        var errRef = new AtomicReference<Error>();
+        var callback = new RequestCallback<User>() {
             @Override
             public void onRequest(User entity) {
-                log.warn("Entity: {}", entity);
-                fail("'get' request must get error when authentication is unsuccessful");
-                latch.countDown();
+                log.error("User: {}", entity);
             }
 
             @Override
             public void onError(Error e) {
                 log.info("Error: {}", e);
+                errRef.set(e);
                 latch.countDown();
             }
 
             @Override
             public void onFail(Throwable t) {
-                log.warn(t.getMessage());
-                fail(t);
+                log.error(t.getMessage());
+            }
+        };
+        var callbackSpy = spy(callback);
+        userClient.get(callbackSpy, authHeader);
+        verify(callbackSpy, timeout(TIMEOUT_MS_CALL)).onError(ArgumentMatchers.any(Error.class));
+        var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
+        if (!completed)
+            fail(new IllegalStateException("Callback execution timed out"));
+        verify(callbackSpy, only()).onError(ArgumentMatchers.any(Error.class));
+        verify(callbackSpy, never()).onRequest(ArgumentMatchers.any(User.class));
+        verify(callbackSpy, never()).onFail(ArgumentMatchers.any(Throwable.class));
+        var error = errRef.get();
+        assertNotNull(error);
+    }
+
+    @DisplayName("Get exiting user by id with successful authentication")
+    @Test
+    void getExistingUserByIdWithSuccessfulAuthentication() throws InterruptedException {
+        final var id = 1;
+        final var username = "user";
+        final var password = "password";
+        var authHeader = HeaderUtils.httpBasicAuthenticationHeader(username, password);
+        log.info("Id: {}", id);
+        log.info("Username: {}, Password: {}", username, password);
+        var latch = new CountDownLatch(1);
+        var userRef = new AtomicReference<User>();
+        var callback = new RequestCallback<User>() {
+            @Override
+            public void onRequest(User entity) {
+                log.info("User: {}", entity);
+                userRef.set(entity);
                 latch.countDown();
             }
-        }, authHeader);
-        latch.await();
+
+            @Override
+            public void onError(Error e) {
+                log.error("Error: {}", e);
+            }
+
+            @Override
+            public void onFail(Throwable t) {
+                log.error(t.getMessage());
+            }
+        };
+        var callbackSpy = spy(callback);
+        userClient.get(id, callbackSpy, authHeader);
+        verify(callbackSpy, timeout(TIMEOUT_MS_CALL)).onRequest(ArgumentMatchers.any(User.class));
+        var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
+        if (!completed)
+            fail(new IllegalStateException("Callback execution timed out"));
+        verify(callbackSpy, only()).onRequest(ArgumentMatchers.any(User.class));
+        verify(callbackSpy, never()).onError(ArgumentMatchers.any(Error.class));
+        verify(callbackSpy, never()).onFail(ArgumentMatchers.any(Throwable.class));
+        var user = userRef.get();
+        assertNotNull(user);
     }
+
+    @DisplayName("Get non-existing user by id with successful authentication")
+    @Test
+    void getNonExistingUserByIdWithSuccessfulAuthentication() throws InterruptedException {
+        final var id = 9000;
+        final var username = "user";
+        final var password = "password";
+        var authHeader = HeaderUtils.httpBasicAuthenticationHeader(username, password);
+        log.info("Id: {}", id);
+        log.info("Username: {}, Password: {}", username, password);
+        var latch = new CountDownLatch(1);
+        var errRef = new AtomicReference<Error>();
+        var callback = new RequestCallback<User>() {
+            @Override
+            public void onRequest(User entity) {
+                log.error("User: {}", entity);
+            }
+
+            @Override
+            public void onError(Error e) {
+                log.info("Error: {}", e);
+                errRef.set(e);
+                latch.countDown();
+            }
+
+            @Override
+            public void onFail(Throwable t) {
+                log.error(t.getMessage());
+            }
+        };
+        var callbackSpy = spy(callback);
+        userClient.get(id, callbackSpy, authHeader);
+        verify(callbackSpy, timeout(TIMEOUT_MS_CALL)).onError(ArgumentMatchers.any(Error.class));
+        var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
+        if (!completed)
+            fail(new IllegalStateException("Callback execution timed out"));
+        verify(callbackSpy, only()).onError(ArgumentMatchers.any(Error.class));
+        verify(callbackSpy, never()).onRequest(ArgumentMatchers.any(User.class));
+        verify(callbackSpy, never()).onFail(ArgumentMatchers.any(Throwable.class));
+        var error = errRef.get();
+        assertNotNull(error);
+    }
+
+    @DisplayName("Get by id with unsuccessful authentication")
+    @Test
+    void getByIdWithUnsuccessfulAuthentication() throws InterruptedException {
+        final var id = 1;
+        final var username = "username";
+        final var password = "password";
+        var authHeader = HeaderUtils.httpBasicAuthenticationHeader(username, password);
+        log.info("Id: {}", id);
+        log.info("Username: {}, Password: {}", username, password);
+        var latch = new CountDownLatch(1);
+        var errRef = new AtomicReference<Error>();
+        var callback = new RequestCallback<User>() {
+            @Override
+            public void onRequest(User entity) {
+                log.error("User: {}", entity);
+            }
+
+            @Override
+            public void onError(Error e) {
+                log.info("Error: {}", e);
+                errRef.set(e);
+                latch.countDown();
+            }
+
+            @Override
+            public void onFail(Throwable t) {
+                log.error(t.getMessage());
+            }
+        };
+        var callbackSpy = spy(callback);
+        userClient.get(id, callbackSpy, authHeader);
+        verify(callbackSpy, timeout(TIMEOUT_MS_CALL)).onError(ArgumentMatchers.any(Error.class));
+        var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
+        if (!completed)
+            fail(new IllegalStateException("Callback execution timed out"));
+        verify(callbackSpy, only()).onError(ArgumentMatchers.any(Error.class));
+        verify(callbackSpy, never()).onRequest(ArgumentMatchers.any(User.class));
+        verify(callbackSpy, never()).onFail(ArgumentMatchers.any(Throwable.class));
+        var error = errRef.get();
+        assertNotNull(error);
+    }
+
 
     @DisplayName("Save validated user")
     @Test
@@ -103,33 +257,42 @@ class UserClientImplTest {
         var username = RandomStringUtils.randomAlphabetic(7, 11);
         var password = "password";
         var email = RandomStringUtils.randomAlphabetic(9, 17) + "@test.com";
-        var firstname = "testFirstname";
-        var lastname = "testLastname";
-        var user = new User(0, username, email, password, new UserInfo(0, firstname, lastname, 0L));
-        var latch = new CountDownLatch(1);
+        var firstname = RandomStringUtils.randomAlphabetic(7, 11);
+        var lastname = RandomStringUtils.randomAlphabetic(7, 11);
+        var userInfo = new UserInfo(0, firstname, lastname, 0L);
+        var user = new User(0, username, email, password, userInfo);
         log.info("User: {}", user);
-        userClient.save(user, new RequestCallback<>() {
+        var latch = new CountDownLatch(1);
+        var userRef = new AtomicReference<User>();
+        var callback = new RequestCallback<User>() {
             @Override
             public void onRequest(User entity) {
-                log.info("Entity: {}", entity);
+                log.info("User: {}", entity);
+                userRef.set(entity);
                 latch.countDown();
             }
 
             @Override
             public void onError(Error e) {
-                log.warn("Error: {}", e);
-                fail(e.getMessage());
-                latch.countDown();
+                log.error("Error: {}", e);
             }
 
             @Override
             public void onFail(Throwable t) {
-                log.warn(t.getMessage());
-                fail(t);
-                latch.countDown();
+                log.error(t.getMessage());
             }
-        });
-        latch.await();
+        };
+        var callbackSpy = spy(callback);
+        userClient.save(user, callbackSpy);
+        verify(callbackSpy, timeout(TIMEOUT_MS_CALL)).onRequest(ArgumentMatchers.any(User.class));
+        var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
+        if (!completed)
+            fail(new IllegalStateException("Callback execution timed out"));
+        verify(callbackSpy, only()).onRequest(ArgumentMatchers.any(User.class));
+        verify(callbackSpy, never()).onError(ArgumentMatchers.any(Error.class));
+        verify(callbackSpy, never()).onFail(ArgumentMatchers.any(Throwable.class));
+        var responseUser = userRef.get();
+        assertNotNull(responseUser);
     }
 
     @DisplayName("Save invalidated user")
@@ -138,33 +301,42 @@ class UserClientImplTest {
         var username = "user-name";
         var password = "password";
         var email = RandomStringUtils.randomAlphabetic(9, 17) + "@test.com";
-        var firstname = "testFirstname";
-        var lastname = "testLastname";
-        var user = new User(0, username, email, password, new UserInfo(0, firstname, lastname, 0L));
-        var latch = new CountDownLatch(1);
+        var firstname = RandomStringUtils.randomAlphabetic(7, 11);
+        var lastname = RandomStringUtils.randomAlphabetic(7, 11);
+        var userInfo = new UserInfo(0, firstname, lastname, 0L);
+        var user = new User(0, username, email, password, userInfo);
         log.info("User: {}", user);
-        userClient.save(user, new RequestCallback<>() {
+        var latch = new CountDownLatch(1);
+        var errRef = new AtomicReference<Error>();
+        var callback = new RequestCallback<User>() {
             @Override
             public void onRequest(User entity) {
-                log.warn("Entity: {}", entity);
-                fail("'save' invalidated user was successful");
-                latch.countDown();
+                log.error("User: {}", entity);
             }
 
             @Override
             public void onError(Error e) {
                 log.info("Error: {}", e);
+                errRef.set(e);
                 latch.countDown();
             }
 
             @Override
             public void onFail(Throwable t) {
-                log.warn(t.getMessage());
-                fail(t);
-                latch.countDown();
+                log.error(t.getMessage());
             }
-        });
-        latch.await();
+        };
+        var callbackSpy = spy(callback);
+        userClient.save(user, callbackSpy);
+        verify(callbackSpy, timeout(TIMEOUT_MS_CALL)).onError(ArgumentMatchers.any(Error.class));
+        var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
+        if (!completed)
+            fail(new IllegalStateException("Callback execution timed out"));
+        verify(callbackSpy, only()).onError(ArgumentMatchers.any(Error.class));
+        verify(callbackSpy, never()).onRequest(ArgumentMatchers.any(User.class));
+        verify(callbackSpy, never()).onFail(ArgumentMatchers.any(Throwable.class));
+        var error = errRef.get();
+        assertNotNull(error);
     }
 
 }

@@ -39,7 +39,7 @@ class ImageClientImplTest {
     void init() {
         var httpClient = HttpClients.createSystem();
         var objectMapper = new ObjectMapper();
-        var threadPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(1);
+        var threadPoolExecutor = (ThreadPoolExecutor) Executors.newCachedThreadPool();
         this.imageClient = new ImageClientImpl(URL, httpClient, objectMapper, threadPoolExecutor);
     }
 
@@ -72,15 +72,15 @@ class ImageClientImplTest {
                 log.error(t.getMessage());
             }
         };
-        var spyCallback = spy(callback);
-        imageClient.get(imageUsername, spyCallback, authHeader);
-        verify(spyCallback, timeout(TIMEOUT_MS_CALL)).onRequest(ArgumentMatchers.any(Image.class));
+        var callbackSpy = spy(callback);
+        imageClient.get(imageUsername, callbackSpy, authHeader);
+        verify(callbackSpy, timeout(TIMEOUT_MS_CALL)).onRequest(ArgumentMatchers.any(Image.class));
         var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
         if (!completed)
             fail(new IllegalStateException("Callback execution timed out"));
-        verify(spyCallback, only()).onRequest(ArgumentMatchers.any(Image.class));
-        verify(spyCallback, never()).onError(ArgumentMatchers.any(Error.class));
-        verify(spyCallback, never()).onFail(ArgumentMatchers.any(Throwable.class));
+        verify(callbackSpy, only()).onRequest(ArgumentMatchers.any(Image.class));
+        verify(callbackSpy, never()).onError(ArgumentMatchers.any(Error.class));
+        verify(callbackSpy, never()).onFail(ArgumentMatchers.any(Throwable.class));
         var image = imgRef.get();
         assertNotNull(image);
     }
@@ -94,7 +94,7 @@ class ImageClientImplTest {
         var authHeader = HeaderUtils.httpBasicAuthenticationHeader(username, password);
         log.info("ImageUsername: {}", imageUsername);
         log.info("Username: {}, Password: {}", username, password);
-        var latch=new CountDownLatch(1);
+        var latch = new CountDownLatch(1);
         var errRef = new AtomicReference<Error>();
         var callback = new RequestCallback<Image>() {
             @Override
@@ -114,15 +114,15 @@ class ImageClientImplTest {
                 log.error(t.getMessage());
             }
         };
-        var spyCallback = spy(callback);
-        imageClient.get(imageUsername, spyCallback, authHeader);
-        verify(spyCallback, after(TIMEOUT_MS_CALL)).onError(ArgumentMatchers.any(Error.class));
+        var callbackSpy = spy(callback);
+        imageClient.get(imageUsername, callbackSpy, authHeader);
+        verify(callbackSpy, timeout(TIMEOUT_MS_CALL)).onError(ArgumentMatchers.any(Error.class));
         var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
         if (!completed)
             fail(new IllegalStateException("Callback execution timed out"));
-        verify(spyCallback, only()).onError(ArgumentMatchers.any(Error.class));
-        verify(spyCallback, never()).onRequest(ArgumentMatchers.any(Image.class));
-        verify(spyCallback, never()).onFail(ArgumentMatchers.any(Throwable.class));
+        verify(callbackSpy, only()).onError(ArgumentMatchers.any(Error.class));
+        verify(callbackSpy, never()).onRequest(ArgumentMatchers.any(Image.class));
+        verify(callbackSpy, never()).onFail(ArgumentMatchers.any(Throwable.class));
         var error = errRef.get();
         assertNotNull(error);
     }
