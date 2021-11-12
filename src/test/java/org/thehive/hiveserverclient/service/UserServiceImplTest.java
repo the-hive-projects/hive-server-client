@@ -7,6 +7,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 import org.thehive.hiveserverclient.Authentication;
 import org.thehive.hiveserverclient.model.User;
 import org.thehive.hiveserverclient.model.UserInfo;
@@ -16,23 +17,29 @@ import org.thehive.hiveserverclient.util.HeaderUtils;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 // Run this test while server is up.
 @Slf4j
 class UserServiceImplTest {
 
+    static final String URL = "http://localhost:8080/user";
+    static final long TIMEOUT_MS_CALL = 3_000L;
+    static final long TIMEOUT_MS_EXECUTE = 1_000L;
+
     UserServiceImpl userService;
 
     @BeforeEach
     void initialize() {
-        var url = "http://localhost:8080/user";
         var httpClient = HttpClients.createSystem();
         var objectMapper = new ObjectMapper();
         var threadPoolExecutor = (ThreadPoolExecutor) Executors.newCachedThreadPool();
-        var userClient = new UserClientImpl(url, objectMapper, httpClient, threadPoolExecutor);
+        var userClient = new UserClientImpl(URL, objectMapper, httpClient, threadPoolExecutor);
         this.userService = new UserServiceImpl(userClient);
     }
 
@@ -46,17 +53,27 @@ class UserServiceImplTest {
     void signInWithCorrectCredentials() throws InterruptedException {
         final var username = "user";
         final var password = "password";
-        var latch = new CountDownLatch(1);
         log.info("Username: {}, Password: {}", username, password);
-        userService.signIn(username, password, result -> {
-            log.info("Result: {}", result);
-            assertEquals(ResultStatus.SUCCESS, result.status());
-            assertTrue(result.entity().isPresent());
-            assertTrue(result.message().isEmpty());
-            assertTrue(result.exception().isEmpty());
-            latch.countDown();
-        });
-        latch.await();
+        var latch = new CountDownLatch(1);
+        var resultRef = new AtomicReference<Result<? extends User>>();
+        var consumer = new Consumer<Result<? extends User>>() {
+            @Override
+            public void accept(Result<? extends User> result) {
+                log.info("Result: {}", result);
+                resultRef.set(result);
+                latch.countDown();
+            }
+        };
+        var consumerSpy = spy(consumer);
+        userService.signIn(username, password, consumerSpy);
+        verify(consumerSpy, timeout(TIMEOUT_MS_CALL)).accept(ArgumentMatchers.any());
+        var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
+        if (!completed)
+            fail(new IllegalStateException("Callback execution timed out"));
+        verify(consumerSpy, only()).accept(ArgumentMatchers.any());
+        var result = resultRef.get();
+        assertNotNull(result);
+        assertEquals(ResultStatus.SUCCESS, result.status());
     }
 
     @DisplayName("Sign-in with incorrect credentials")
@@ -64,17 +81,27 @@ class UserServiceImplTest {
     void signInWithIncorrectCredentials() throws InterruptedException {
         final var username = "username";
         final var password = "password";
-        var latch = new CountDownLatch(1);
         log.info("Username: {}, Password: {}", username, password);
-        userService.signIn(username, password, result -> {
-            log.info("Result: {}", result);
-            assertEquals(ResultStatus.ERROR_INCORRECT, result.status());
-            assertTrue(result.message().isPresent());
-            assertTrue(result.entity().isEmpty());
-            assertTrue(result.exception().isEmpty());
-            latch.countDown();
-        });
-        latch.await();
+        var latch = new CountDownLatch(1);
+        var resultRef = new AtomicReference<Result<? extends User>>();
+        var consumer = new Consumer<Result<? extends User>>() {
+            @Override
+            public void accept(Result<? extends User> result) {
+                log.info("Result: {}", result);
+                resultRef.set(result);
+                latch.countDown();
+            }
+        };
+        var consumerSpy = spy(consumer);
+        userService.signIn(username, password, consumerSpy);
+        verify(consumerSpy, timeout(TIMEOUT_MS_CALL)).accept(ArgumentMatchers.any());
+        var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
+        if (!completed)
+            fail(new IllegalStateException("Callback execution timed out"));
+        verify(consumerSpy, only()).accept(ArgumentMatchers.any());
+        var result = resultRef.get();
+        assertNotNull(result);
+        assertEquals(ResultStatus.ERROR_INCORRECT, result.status());
     }
 
     @DisplayName("Sign-up with invalid credentials")
@@ -83,20 +110,31 @@ class UserServiceImplTest {
         var username = RandomStringUtils.randomAlphabetic(7, 11);
         var password = "password";
         var email = RandomStringUtils.randomAlphabetic(9, 17) + "@test.com";
-        var firstname = "testFirstname";
-        var lastname = "testLastname";
-        var user = new User(0, username, email, password, new UserInfo(0, firstname, lastname, 0L));
-        var latch = new CountDownLatch(1);
+        var firstname = RandomStringUtils.randomAlphabetic(7, 11);
+        var lastname = RandomStringUtils.randomAlphabetic(7, 11);
+        var userInfo = new UserInfo(0, firstname, lastname, 0L);
+        var user = new User(0, username, email, password, userInfo);
         log.info("User: {}", user);
-        userService.signUp(user, result -> {
-            log.info("Result: {}", result);
-            assertEquals(ResultStatus.SUCCESS, result.status());
-            assertTrue(result.entity().isPresent());
-            assertTrue(result.message().isEmpty());
-            assertTrue(result.exception().isEmpty());
-            latch.countDown();
-        });
-        latch.await();
+        var latch = new CountDownLatch(1);
+        var resultRef = new AtomicReference<Result<? extends User>>();
+        var consumer = new Consumer<Result<? extends User>>() {
+            @Override
+            public void accept(Result<? extends User> result) {
+                log.info("Result: {}", result);
+                resultRef.set(result);
+                latch.countDown();
+            }
+        };
+        var consumerSpy = spy(consumer);
+        userService.signUp(user, consumerSpy);
+        verify(consumerSpy, timeout(TIMEOUT_MS_CALL)).accept(ArgumentMatchers.any());
+        var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
+        if (!completed)
+            fail(new IllegalStateException("Callback execution timed out"));
+        verify(consumerSpy, only()).accept(ArgumentMatchers.any());
+        var result = resultRef.get();
+        assertNotNull(result);
+        assertEquals(ResultStatus.SUCCESS, result.status());
     }
 
     @DisplayName("Sign-up with invalid credentials")
@@ -105,20 +143,31 @@ class UserServiceImplTest {
         var username = "user-name";
         var password = "password";
         var email = RandomStringUtils.randomAlphabetic(9, 17) + "@test.com";
-        var firstname = "testFirstname";
-        var lastname = "testLastname";
-        var user = new User(0, username, email, password, new UserInfo(0, firstname, lastname, 0L));
-        var latch = new CountDownLatch(1);
+        var firstname = RandomStringUtils.randomAlphabetic(7, 11);
+        var lastname = RandomStringUtils.randomAlphabetic(7, 11);
+        var userInfo = new UserInfo(0, firstname, lastname, 0L);
+        var user = new User(0, username, email, password, userInfo);
         log.info("User: {}", user);
-        userService.signUp(user, result -> {
-            log.info("Result: {}", result);
-            assertEquals(ResultStatus.ERROR_INVALID, result.status());
-            assertTrue(result.message().isPresent());
-            assertTrue(result.entity().isEmpty());
-            assertTrue(result.exception().isEmpty());
-            latch.countDown();
-        });
-        latch.await();
+        var latch = new CountDownLatch(1);
+        var resultRef = new AtomicReference<Result<? extends User>>();
+        var consumer = new Consumer<Result<? extends User>>() {
+            @Override
+            public void accept(Result<? extends User> result) {
+                log.info("Result: {}", result);
+                resultRef.set(result);
+                latch.countDown();
+            }
+        };
+        var consumerSpy = spy(consumer);
+        userService.signUp(user, consumerSpy);
+        verify(consumerSpy, timeout(TIMEOUT_MS_CALL)).accept(ArgumentMatchers.any());
+        var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
+        if (!completed)
+            fail(new IllegalStateException("Callback execution timed out"));
+        verify(consumerSpy, only()).accept(ArgumentMatchers.any());
+        var result = resultRef.get();
+        assertNotNull(result);
+        assertEquals(ResultStatus.ERROR_INVALID, result.status());
     }
 
     @DisplayName("Profile when authentication is correct")
@@ -128,17 +177,27 @@ class UserServiceImplTest {
         final var password = "password";
         var token = HeaderUtils.httpBasicAuthenticationToken(username, password);
         Authentication.INSTANCE.authenticate(token);
-        var latch = new CountDownLatch(1);
         log.info("Username: {}, Password: {}", username, password);
-        userService.profile(result -> {
-            log.info("Result: {}", result);
-            assertEquals(ResultStatus.SUCCESS, result.status());
-            assertTrue(result.entity().isPresent());
-            assertTrue(result.message().isEmpty());
-            assertTrue(result.exception().isEmpty());
-            latch.countDown();
-        });
-        latch.await();
+        var latch = new CountDownLatch(1);
+        var resultRef = new AtomicReference<Result<? extends User>>();
+        var consumer = new Consumer<Result<? extends User>>() {
+            @Override
+            public void accept(Result<? extends User> result) {
+                log.info("Result: {}", result);
+                resultRef.set(result);
+                latch.countDown();
+            }
+        };
+        var consumerSpy = spy(consumer);
+        userService.profile(consumerSpy);
+        verify(consumerSpy, timeout(TIMEOUT_MS_CALL)).accept(ArgumentMatchers.any());
+        var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
+        if (!completed)
+            fail(new IllegalStateException("Callback execution timed out"));
+        verify(consumerSpy, only()).accept(ArgumentMatchers.any());
+        var result = resultRef.get();
+        assertNotNull(result);
+        assertEquals(ResultStatus.SUCCESS, result.status());
     }
 
     @DisplayName("Profile when authentication is incorrect")
@@ -148,58 +207,123 @@ class UserServiceImplTest {
         final var password = "password";
         var token = HeaderUtils.httpBasicAuthenticationToken(username, password);
         Authentication.INSTANCE.authenticate(token);
-        var latch = new CountDownLatch(1);
         log.info("Username: {}, Password: {}", username, password);
-        userService.profile(result -> {
-            log.info("Result: {}", result);
-            assertEquals(ResultStatus.ERROR, result.status());
-            assertTrue(result.message().isPresent());
-            assertTrue(result.entity().isEmpty());
-            assertTrue(result.exception().isEmpty());
-            latch.countDown();
-        });
-        latch.await();
+        var latch = new CountDownLatch(1);
+        var resultRef = new AtomicReference<Result<? extends User>>();
+        var consumer = new Consumer<Result<? extends User>>() {
+            @Override
+            public void accept(Result<? extends User> result) {
+                log.info("Result: {}", result);
+                resultRef.set(result);
+                latch.countDown();
+            }
+        };
+        var consumerSpy = spy(consumer);
+        userService.profile(consumerSpy);
+        verify(consumerSpy, timeout(TIMEOUT_MS_CALL)).accept(ArgumentMatchers.any());
+        var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
+        if (!completed)
+            fail(new IllegalStateException("Callback execution timed out"));
+        verify(consumerSpy, only()).accept(ArgumentMatchers.any());
+        var result = resultRef.get();
+        assertNotNull(result);
+        assertEquals(ResultStatus.ERROR, result.status());
     }
 
     @DisplayName("Profile with id when authentication is correct")
     @Test
     void profileWithIdWhenAuthenticationIsCorrect() throws InterruptedException {
+        final var id = 1;
         final var username = "user";
         final var password = "password";
         var token = HeaderUtils.httpBasicAuthenticationToken(username, password);
         Authentication.INSTANCE.authenticate(token);
-        var latch = new CountDownLatch(1);
+        log.info("id");
         log.info("Username: {}, Password: {}", username, password);
-        userService.profile(1, result -> {
-            log.info("Result: {}", result);
-            assertEquals(ResultStatus.SUCCESS, result.status());
-            assertTrue(result.entity().isPresent());
-            assertTrue(result.message().isEmpty());
-            assertTrue(result.exception().isEmpty());
-            latch.countDown();
-        });
-        latch.await();
+        var latch = new CountDownLatch(1);
+        var resultRef = new AtomicReference<Result<? extends User>>();
+        var consumer = new Consumer<Result<? extends User>>() {
+            @Override
+            public void accept(Result<? extends User> result) {
+                log.info("Result: {}", result);
+                resultRef.set(result);
+                latch.countDown();
+            }
+        };
+        var consumerSpy = spy(consumer);
+        userService.profile(id, consumerSpy);
+        verify(consumerSpy, timeout(TIMEOUT_MS_CALL)).accept(ArgumentMatchers.any());
+        var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
+        if (!completed)
+            fail(new IllegalStateException("Callback execution timed out"));
+        verify(consumerSpy, only()).accept(ArgumentMatchers.any());
+        var result = resultRef.get();
+        assertNotNull(result);
+        assertEquals(ResultStatus.SUCCESS, result.status());
+    }
+
+    @DisplayName("Profile with non-existing id when authentication is correct")
+    @Test
+    void profileWithNonExistingIdWhenAuthenticationIsCorrect() throws InterruptedException {
+        final var id = 9000;
+        final var username = "user";
+        final var password = "password";
+        var token = HeaderUtils.httpBasicAuthenticationToken(username, password);
+        Authentication.INSTANCE.authenticate(token);
+        log.info("id");
+        log.info("Username: {}, Password: {}", username, password);
+        var latch = new CountDownLatch(1);
+        var resultRef = new AtomicReference<Result<? extends User>>();
+        var consumer = new Consumer<Result<? extends User>>() {
+            @Override
+            public void accept(Result<? extends User> result) {
+                log.info("Result: {}", result);
+                resultRef.set(result);
+                latch.countDown();
+            }
+        };
+        var consumerSpy = spy(consumer);
+        userService.profile(id, consumerSpy);
+        verify(consumerSpy, timeout(TIMEOUT_MS_CALL)).accept(ArgumentMatchers.any());
+        var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
+        if (!completed)
+            fail(new IllegalStateException("Callback execution timed out"));
+        verify(consumerSpy, only()).accept(ArgumentMatchers.any());
+        var result = resultRef.get();
+        assertNotNull(result);
+        assertEquals(ResultStatus.ERROR_UNAVAILABLE, result.status());
     }
 
     @DisplayName("Profile with id when authentication is incorrect")
     @Test
     void profileWithIdWhenAuthenticationIsIncorrect() throws InterruptedException {
+        final var id = 1;
         final var username = "username";
         final var password = "password";
         var token = HeaderUtils.httpBasicAuthenticationToken(username, password);
         Authentication.INSTANCE.authenticate(token);
-        var latch = new CountDownLatch(1);
+        log.info("id");
         log.info("Username: {}, Password: {}", username, password);
-        userService.profile(1, result -> {
-            log.info("Result: {}", result);
-            assertEquals(ResultStatus.ERROR, result.status());
-            assertTrue(result.message().isPresent());
-            assertTrue(result.entity().isEmpty());
-            assertTrue(result.exception().isEmpty());
-            latch.countDown();
-        });
-        latch.await();
+        var latch = new CountDownLatch(1);
+        var resultRef = new AtomicReference<Result<? extends User>>();
+        var consumer = new Consumer<Result<? extends User>>() {
+            @Override
+            public void accept(Result<? extends User> result) {
+                log.info("Result: {}", result);
+                resultRef.set(result);
+                latch.countDown();
+            }
+        };
+        var consumerSpy = spy(consumer);
+        userService.profile(id, consumerSpy);
+        verify(consumerSpy, timeout(TIMEOUT_MS_CALL)).accept(ArgumentMatchers.any());
+        var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
+        if (!completed)
+            fail(new IllegalStateException("Callback execution timed out"));
+        verify(consumerSpy, only()).accept(ArgumentMatchers.any());
+        var result = resultRef.get();
+        assertNotNull(result);
+        assertEquals(ResultStatus.ERROR, result.status());
     }
-
 
 }

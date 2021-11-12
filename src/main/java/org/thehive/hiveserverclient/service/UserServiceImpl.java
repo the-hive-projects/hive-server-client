@@ -118,7 +118,12 @@ public class UserServiceImpl implements UserService {
 
             @Override
             public void onError(Error error) {
-                var result = Result.<User>of(error.getMessage());
+                Result<User> result;
+                if (error.getStatus() == HttpStatus.SC_NOT_FOUND) {
+                    result = Result.of(ResultStatus.ERROR_UNAVAILABLE, error.getMessage());
+                } else {
+                    result = Result.of(error.getMessage());
+                }
                 consumer.accept(result);
             }
 
