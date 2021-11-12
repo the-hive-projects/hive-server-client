@@ -32,7 +32,7 @@ public class UserClientImpl implements UserClient {
     @Override
     public void get(RequestCallback<? super User> callback, Header... headers) {
         var req = RequestUtils.getRequestOf(url, headers);
-        log.info("#get");
+        log.debug("#get");
         executeRequest(req, callback);
     }
 
@@ -40,7 +40,7 @@ public class UserClientImpl implements UserClient {
     public void get(int id, RequestCallback<? super User> callback, Header... headers) {
         var reqUrl = RequestUtils.concatUrlVariables(url, id);
         var req = RequestUtils.getRequestOf(reqUrl, headers);
-        log.info("#get id: {}", id);
+        log.debug("#get id: {}", id);
         executeRequest(req, callback);
     }
 
@@ -54,7 +54,7 @@ public class UserClientImpl implements UserClient {
             return;
         }
         var req = RequestUtils.postRequestOf(url, userStr, headers);
-        log.info("#save user: {}", user);
+        log.debug("#save user: {}", user);
         executeRequest(req, callback);
     }
 
@@ -69,6 +69,7 @@ public class UserClientImpl implements UserClient {
         }
         var reqUrl = RequestUtils.concatUrlVariables(url, id);
         var req = RequestUtils.putRequestOf(reqUrl, userStr, headers);
+        log.debug("#update id: {} user: {}",id, user);
         executeRequest(req, callback);
     }
 

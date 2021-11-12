@@ -31,7 +31,7 @@ public class ImageClientImpl implements ImageClient {
     public void get(String username, RequestCallback<? super Image> callback, Header... headers) {
         var reqUrl = RequestUtils.concatUrlVariables(url, username);
         var req = RequestUtils.getRequestOf(reqUrl, headers);
-        log.info("#get username: {}", username);
+        log.debug("#get username: {}", username);
         executorService.execute(() -> {
             log.debug("Request is being sent, path: {}, method: {}", req.getURI().getPath(), req.getMethod());
             var executeCallbackFail = true;

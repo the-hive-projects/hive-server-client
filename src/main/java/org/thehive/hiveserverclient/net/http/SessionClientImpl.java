@@ -33,7 +33,7 @@ public class SessionClientImpl implements SessionClient {
     public void get(String id, RequestCallback<? super Session> callback, Header... headers) {
         var reqUrl = RequestUtils.concatUrlVariables(url, id);
         var req = RequestUtils.getRequestOf(reqUrl, headers);
-        log.info("#get id: {}", id);
+        log.debug("#get id: {}", id);
         executeRequest(req, callback);
     }
 
@@ -47,7 +47,7 @@ public class SessionClientImpl implements SessionClient {
             return;
         }
         var req = RequestUtils.postRequestOf(url, userStr, headers);
-        log.info("#save session: {}", session);
+        log.debug("#save session: {}", session);
         executeRequest(req, callback);
     }
 
