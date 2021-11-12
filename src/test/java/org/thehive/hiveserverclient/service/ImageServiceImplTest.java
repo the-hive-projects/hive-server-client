@@ -51,7 +51,7 @@ class ImageServiceImplTest {
         log.info("ImageUsername: {}", imageUsername);
         imageService.take(imageUsername, result -> {
             log.info("Result: {}", result);
-            assertEquals(ResultStatus.TAKEN, result.status());
+            assertEquals(ResultStatus.SUCCESS, result.status());
             assertTrue(result.entity().isPresent());
             assertTrue(result.message().isEmpty());
             assertTrue(result.exception().isEmpty());

@@ -50,7 +50,7 @@ class UserServiceImplTest {
         log.info("Username: {}, Password: {}", username, password);
         userService.signIn(username, password, result -> {
             log.info("Result: {}", result);
-            assertEquals(ResultStatus.CORRECT, result.status());
+            assertEquals(ResultStatus.SUCCESS, result.status());
             assertTrue(result.entity().isPresent());
             assertTrue(result.message().isEmpty());
             assertTrue(result.exception().isEmpty());
@@ -68,7 +68,7 @@ class UserServiceImplTest {
         log.info("Username: {}, Password: {}", username, password);
         userService.signIn(username, password, result -> {
             log.info("Result: {}", result);
-            assertEquals(ResultStatus.INCORRECT, result.status());
+            assertEquals(ResultStatus.ERROR_INCORRECT, result.status());
             assertTrue(result.message().isPresent());
             assertTrue(result.entity().isEmpty());
             assertTrue(result.exception().isEmpty());
@@ -90,7 +90,7 @@ class UserServiceImplTest {
         log.info("User: {}", user);
         userService.signUp(user, result -> {
             log.info("Result: {}", result);
-            assertEquals(ResultStatus.VALID, result.status());
+            assertEquals(ResultStatus.SUCCESS, result.status());
             assertTrue(result.entity().isPresent());
             assertTrue(result.message().isEmpty());
             assertTrue(result.exception().isEmpty());
@@ -112,7 +112,7 @@ class UserServiceImplTest {
         log.info("User: {}", user);
         userService.signUp(user, result -> {
             log.info("Result: {}", result);
-            assertEquals(ResultStatus.INVALID, result.status());
+            assertEquals(ResultStatus.ERROR_INVALID, result.status());
             assertTrue(result.message().isPresent());
             assertTrue(result.entity().isEmpty());
             assertTrue(result.exception().isEmpty());
@@ -132,7 +132,7 @@ class UserServiceImplTest {
         log.info("Username: {}, Password: {}", username, password);
         userService.profile(result -> {
             log.info("Result: {}", result);
-            assertEquals(ResultStatus.TAKEN, result.status());
+            assertEquals(ResultStatus.SUCCESS, result.status());
             assertTrue(result.entity().isPresent());
             assertTrue(result.message().isEmpty());
             assertTrue(result.exception().isEmpty());
@@ -172,7 +172,7 @@ class UserServiceImplTest {
         log.info("Username: {}, Password: {}", username, password);
         userService.profile(1, result -> {
             log.info("Result: {}", result);
-            assertEquals(ResultStatus.TAKEN, result.status());
+            assertEquals(ResultStatus.SUCCESS, result.status());
             assertTrue(result.entity().isPresent());
             assertTrue(result.message().isEmpty());
             assertTrue(result.exception().isEmpty());

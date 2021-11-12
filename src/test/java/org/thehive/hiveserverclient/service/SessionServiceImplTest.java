@@ -53,7 +53,7 @@ class SessionServiceImplTest {
         log.info("Username: {}, Password: {}", username, password);
         sessionService.take(id, result -> {
             log.info("Result: {}", result);
-            assertEquals(ResultStatus.TAKEN, result.status());
+            assertEquals(ResultStatus.SUCCESS, result.status());
             assertTrue(result.entity().isPresent());
             assertTrue(result.message().isEmpty());
             assertTrue(result.exception().isEmpty());
@@ -74,7 +74,7 @@ class SessionServiceImplTest {
         log.info("Username: {}, Password: {}", username, password);
         sessionService.take(id, result -> {
             log.info("Result: {}", result);
-            assertEquals(ResultStatus.UNAVAILABLE, result.status());
+            assertEquals(ResultStatus.ERROR_UNAVAILABLE, result.status());
             assertTrue(result.message().isPresent());
             assertTrue(result.entity().isEmpty());
             assertTrue(result.exception().isEmpty());
@@ -118,7 +118,7 @@ class SessionServiceImplTest {
         log.info("Session: {}", session);
         sessionService.create(session, result -> {
             log.info("Result: {}", result);
-            assertEquals(ResultStatus.CREATED, result.status());
+            assertEquals(ResultStatus.SUCCESS, result.status());
             assertTrue(result.entity().isPresent());
             assertTrue(result.message().isEmpty());
             assertTrue(result.exception().isEmpty());
