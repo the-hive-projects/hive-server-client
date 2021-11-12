@@ -28,8 +28,8 @@ public class ImageServiceImpl implements ImageService {
             }
 
             @Override
-            public void onError(Error e) {
-                var result = Result.<Image>of(e.getMessage());
+            public void onError(Error error) {
+                var result = Result.<Image>of(error.getMessage());
                 consumer.accept(result);
             }
 

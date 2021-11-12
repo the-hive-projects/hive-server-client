@@ -13,6 +13,7 @@ import org.thehive.hiveserverclient.model.Error;
 import org.thehive.hiveserverclient.model.User;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 
 @RequiredArgsConstructor
@@ -21,7 +22,7 @@ public class UserClientImpl implements UserClient {
     protected final String url;
     protected final CloseableHttpClient httpClient;
     protected final ObjectMapper objectMapper;
-    protected final ThreadPoolExecutor executor;
+    protected final ExecutorService executorService;
 
     @Override
     public void get(RequestCallback<? super User> callback, Header... headers) {
@@ -58,7 +59,7 @@ public class UserClientImpl implements UserClient {
     }
 
     private void executeRequest(@NonNull HttpRequestBase request, @NonNull RequestCallback<? super User> callback) {
-        executor.execute(() -> {
+        executorService.execute(() -> {
             var executeFail = true;
             try {
                 try (var response = httpClient.execute(request)) {

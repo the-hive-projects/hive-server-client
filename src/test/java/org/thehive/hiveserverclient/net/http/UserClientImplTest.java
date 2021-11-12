@@ -17,7 +17,6 @@ import org.thehive.hiveserverclient.util.HeaderUtils;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -40,8 +39,8 @@ class UserClientImplTest {
     void init() {
         var httpClient = HttpClients.createSystem();
         var objectMapper = new ObjectMapper();
-        var threadPoolExecutor = (ThreadPoolExecutor) Executors.newCachedThreadPool();
-        this.userClient = new UserClientImpl(URL, httpClient, objectMapper, threadPoolExecutor);
+        var executorService = Executors.newSingleThreadExecutor();
+        this.userClient = new UserClientImpl(URL, httpClient, objectMapper, executorService);
     }
 
     @DisplayName("Get with successful authentication")
@@ -62,8 +61,8 @@ class UserClientImplTest {
             }
 
             @Override
-            public void onError(Error e) {
-                log.error("Error: {}", e);
+            public void onError(Error error) {
+                log.error("Error: {}", error);
             }
 
             @Override
@@ -100,9 +99,9 @@ class UserClientImplTest {
             }
 
             @Override
-            public void onError(Error e) {
-                log.info("Error: {}", e);
-                errRef.set(e);
+            public void onError(Error error) {
+                log.info("Error: {}", error);
+                errRef.set(error);
                 latch.countDown();
             }
 
@@ -144,8 +143,8 @@ class UserClientImplTest {
             }
 
             @Override
-            public void onError(Error e) {
-                log.error("Error: {}", e);
+            public void onError(Error error) {
+                log.error("Error: {}", error);
             }
 
             @Override
@@ -184,9 +183,9 @@ class UserClientImplTest {
             }
 
             @Override
-            public void onError(Error e) {
-                log.info("Error: {}", e);
-                errRef.set(e);
+            public void onError(Error error) {
+                log.info("Error: {}", error);
+                errRef.set(error);
                 latch.countDown();
             }
 
@@ -226,9 +225,9 @@ class UserClientImplTest {
             }
 
             @Override
-            public void onError(Error e) {
-                log.info("Error: {}", e);
-                errRef.set(e);
+            public void onError(Error error) {
+                log.info("Error: {}", error);
+                errRef.set(error);
                 latch.countDown();
             }
 
@@ -273,8 +272,8 @@ class UserClientImplTest {
             }
 
             @Override
-            public void onError(Error e) {
-                log.error("Error: {}", e);
+            public void onError(Error error) {
+                log.error("Error: {}", error);
             }
 
             @Override
@@ -315,9 +314,9 @@ class UserClientImplTest {
             }
 
             @Override
-            public void onError(Error e) {
-                log.info("Error: {}", e);
-                errRef.set(e);
+            public void onError(Error error) {
+                log.info("Error: {}", error);
+                errRef.set(error);
                 latch.countDown();
             }
 

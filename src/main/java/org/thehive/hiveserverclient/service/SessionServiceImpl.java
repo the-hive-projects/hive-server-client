@@ -28,12 +28,12 @@ public class SessionServiceImpl implements SessionService {
             }
 
             @Override
-            public void onError(Error e) {
+            public void onError(Error error) {
                 Result<Session> result;
-                if (e.getStatus() == 404)
-                    result = Result.of(ResultStatus.ERROR_UNAVAILABLE, e.getMessage());
+                if (error.getStatus() == 404)
+                    result = Result.of(ResultStatus.ERROR_UNAVAILABLE, error.getMessage());
                 else
-                    result = Result.of(e.getMessage());
+                    result = Result.of(error.getMessage());
                 consumer.accept(result);
             }
 
@@ -57,8 +57,8 @@ public class SessionServiceImpl implements SessionService {
             }
 
             @Override
-            public void onError(Error e) {
-                var result = Result.<Session>of(e.getMessage());
+            public void onError(Error error) {
+                var result = Result.<Session>of(error.getMessage());
                 consumer.accept(result);
             }
 

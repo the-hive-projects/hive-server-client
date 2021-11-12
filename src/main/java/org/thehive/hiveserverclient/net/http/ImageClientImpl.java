@@ -10,7 +10,7 @@ import org.thehive.hiveserverclient.model.Error;
 import org.thehive.hiveserverclient.model.Image;
 
 import java.io.IOException;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.ExecutorService;
 
 @RequiredArgsConstructor
 public class ImageClientImpl implements ImageClient {
@@ -18,13 +18,13 @@ public class ImageClientImpl implements ImageClient {
     protected final String url;
     protected final CloseableHttpClient httpClient;
     protected final ObjectMapper objectMapper;
-    protected final ThreadPoolExecutor executor;
+    protected final ExecutorService executorService;
 
     @Override
     public void get(String username, RequestCallback<? super Image> callback, Header... headers) {
         var reqUrl = RequestUtils.concatUrlVariables(url, username);
         var req = RequestUtils.getRequestOf(reqUrl, headers);
-        executor.execute(() -> {
+        executorService.execute(() -> {
             var executeFail = true;
             try {
                 try (var response = httpClient.execute(req)) {

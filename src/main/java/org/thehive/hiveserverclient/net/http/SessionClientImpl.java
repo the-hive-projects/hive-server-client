@@ -13,6 +13,7 @@ import org.thehive.hiveserverclient.model.Error;
 import org.thehive.hiveserverclient.model.Session;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 
 @RequiredArgsConstructor
@@ -21,7 +22,7 @@ public class SessionClientImpl implements SessionClient {
     protected final String url;
     protected final CloseableHttpClient httpClient;
     protected final ObjectMapper objectMapper;
-    protected final ThreadPoolExecutor executor;
+    protected final ExecutorService executorService;
 
     @Override
     public void get(String id, RequestCallback<? super Session> callback, Header... headers) {
@@ -39,7 +40,7 @@ public class SessionClientImpl implements SessionClient {
     }
 
     private void executeRequest(@NonNull HttpRequestBase request, @NonNull RequestCallback<? super Session> callback) {
-        executor.execute(() -> {
+        executorService.execute(() -> {
             boolean executeFail = true;
             try {
                 try (var response = httpClient.execute(request)) {

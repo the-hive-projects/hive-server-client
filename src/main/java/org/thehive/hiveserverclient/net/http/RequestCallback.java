@@ -6,7 +6,7 @@ public interface RequestCallback<E> {
 
     void onRequest(E entity);
 
-    void onError(Error e);
+    void onError(Error error);
 
     void onFail(Throwable t);
 

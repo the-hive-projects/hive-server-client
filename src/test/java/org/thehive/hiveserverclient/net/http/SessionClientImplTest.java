@@ -17,7 +17,6 @@ import org.thehive.hiveserverclient.util.HeaderUtils;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -41,8 +40,8 @@ class SessionClientImplTest {
         var httpClient = HttpClients.createSystem();
         var objectMapper = new ObjectMapper();
         objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
-        var threadPoolExecutor = (ThreadPoolExecutor) Executors.newCachedThreadPool();
-        this.sessionClient = new SessionClientImpl(URL, httpClient, objectMapper, threadPoolExecutor);
+        var executorService = Executors.newSingleThreadExecutor();
+        this.sessionClient = new SessionClientImpl(URL, httpClient, objectMapper, executorService);
     }
 
     @DisplayName("Get existing session with successful authentication")
@@ -65,8 +64,8 @@ class SessionClientImplTest {
             }
 
             @Override
-            public void onError(Error e) {
-                log.error("Error: {}", e);
+            public void onError(Error error) {
+                log.error("Error: {}", error);
             }
 
             @Override
@@ -105,9 +104,9 @@ class SessionClientImplTest {
             }
 
             @Override
-            public void onError(Error e) {
-                log.info("Error: {}", e);
-                errRef.set(e);
+            public void onError(Error error) {
+                log.info("Error: {}", error);
+                errRef.set(error);
                 latch.countDown();
             }
 
@@ -147,9 +146,9 @@ class SessionClientImplTest {
             }
 
             @Override
-            public void onError(Error e) {
-                log.info("Error: {}", e);
-                errRef.set(e);
+            public void onError(Error error) {
+                log.info("Error: {}", error);
+                errRef.set(error);
                 latch.countDown();
             }
 
@@ -192,8 +191,8 @@ class SessionClientImplTest {
             }
 
             @Override
-            public void onError(Error e) {
-                log.error("Error: {}", e);
+            public void onError(Error error) {
+                log.error("Error: {}", error);
             }
 
             @Override
@@ -233,9 +232,9 @@ class SessionClientImplTest {
             }
 
             @Override
-            public void onError(Error e) {
-                log.info("Error: {}", e);
-                errRef.set(e);
+            public void onError(Error error) {
+                log.info("Error: {}", error);
+                errRef.set(error);
                 latch.countDown();
             }
 

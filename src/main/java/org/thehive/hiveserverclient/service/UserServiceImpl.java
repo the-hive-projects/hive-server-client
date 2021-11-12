@@ -32,12 +32,12 @@ public class UserServiceImpl implements UserService {
             }
 
             @Override
-            public void onError(Error e) {
+            public void onError(Error error) {
                 Result<User> result;
-                if (e.getStatus() == HttpStatus.SC_UNAUTHORIZED) {
-                    result = Result.of(ResultStatus.ERROR_INCORRECT, e.getMessage());
+                if (error.getStatus() == HttpStatus.SC_UNAUTHORIZED) {
+                    result = Result.of(ResultStatus.ERROR_INCORRECT, error.getMessage());
                 } else {
-                    result = Result.of(e.getMessage());
+                    result = Result.of(error.getMessage());
                 }
                 consumer.accept(result);
             }
@@ -62,12 +62,12 @@ public class UserServiceImpl implements UserService {
             }
 
             @Override
-            public void onError(Error e) {
+            public void onError(Error error) {
                 Result<User> result;
-                if (e.getStatus() == HttpStatus.SC_BAD_REQUEST) {
-                    result = Result.of(ResultStatus.ERROR_INVALID, e.getMessage());
+                if (error.getStatus() == HttpStatus.SC_BAD_REQUEST) {
+                    result = Result.of(ResultStatus.ERROR_INVALID, error.getMessage());
                 } else {
-                    result = Result.of(e.getMessage());
+                    result = Result.of(error.getMessage());
                 }
                 consumer.accept(result);
             }
@@ -92,8 +92,8 @@ public class UserServiceImpl implements UserService {
             }
 
             @Override
-            public void onError(Error e) {
-                var result = Result.<User>of(e.getMessage());
+            public void onError(Error error) {
+                var result = Result.<User>of(error.getMessage());
                 consumer.accept(result);
             }
 
@@ -117,8 +117,8 @@ public class UserServiceImpl implements UserService {
             }
 
             @Override
-            public void onError(Error e) {
-                var result = Result.<User>of(e.getMessage());
+            public void onError(Error error) {
+                var result = Result.<User>of(error.getMessage());
                 consumer.accept(result);
             }
 
