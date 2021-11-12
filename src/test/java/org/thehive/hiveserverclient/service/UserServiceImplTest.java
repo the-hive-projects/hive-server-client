@@ -32,7 +32,7 @@ class UserServiceImplTest {
         var httpClient = HttpClients.createSystem();
         var objectMapper = new ObjectMapper();
         var threadPoolExecutor = (ThreadPoolExecutor) Executors.newCachedThreadPool();
-        var userClient = new UserClientImpl(url, httpClient, objectMapper, threadPoolExecutor);
+        var userClient = new UserClientImpl(url, objectMapper, httpClient, threadPoolExecutor);
         this.userService = new UserServiceImpl(userClient);
     }
 

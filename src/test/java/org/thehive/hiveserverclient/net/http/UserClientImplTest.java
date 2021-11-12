@@ -40,7 +40,7 @@ class UserClientImplTest {
         var httpClient = HttpClients.createSystem();
         var objectMapper = new ObjectMapper();
         var executorService = Executors.newSingleThreadExecutor();
-        this.userClient = new UserClientImpl(URL, httpClient, objectMapper, executorService);
+        this.userClient = new UserClientImpl(URL, objectMapper, httpClient, executorService);
     }
 
     @DisplayName("Get with successful authentication")

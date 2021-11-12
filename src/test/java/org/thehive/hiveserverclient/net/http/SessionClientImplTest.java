@@ -41,7 +41,7 @@ class SessionClientImplTest {
         var objectMapper = new ObjectMapper();
         objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
         var executorService = Executors.newSingleThreadExecutor();
-        this.sessionClient = new SessionClientImpl(URL, httpClient, objectMapper, executorService);
+        this.sessionClient = new SessionClientImpl(URL, objectMapper, httpClient, executorService);
     }
 
     @DisplayName("Get existing session with successful authentication")

@@ -1,10 +1,9 @@
 package org.thehive.hiveserverclient.net.http;
 
-import com.fasterxml.jackson.core.JacksonException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.Header;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -12,70 +11,92 @@ import org.apache.http.util.EntityUtils;
 import org.thehive.hiveserverclient.model.Error;
 import org.thehive.hiveserverclient.model.User;
 
-import java.io.IOException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ThreadPoolExecutor;
 
-@RequiredArgsConstructor
+@Slf4j
 public class UserClientImpl implements UserClient {
 
-    protected final String url;
-    protected final CloseableHttpClient httpClient;
-    protected final ObjectMapper objectMapper;
-    protected final ExecutorService executorService;
+    private final String url;
+    private final ObjectMapper objectMapper;
+    private final CloseableHttpClient httpClient;
+    private final ExecutorService executorService;
+
+    public UserClientImpl(@NonNull String url, @NonNull ObjectMapper objectMapper,
+                          @NonNull CloseableHttpClient httpClient, @NonNull ExecutorService executorService) {
+        this.url = url;
+        this.objectMapper = objectMapper;
+        this.httpClient = httpClient;
+        this.executorService = executorService;
+    }
 
     @Override
     public void get(RequestCallback<? super User> callback, Header... headers) {
         var req = RequestUtils.getRequestOf(url, headers);
+        log.info("#get");
         executeRequest(req, callback);
     }
 
     @Override
     public void get(int id, RequestCallback<? super User> callback, Header... headers) {
-        if (id < 1)
-            throw new IllegalArgumentException("Id must be positive value");
         var reqUrl = RequestUtils.concatUrlVariables(url, id);
         var req = RequestUtils.getRequestOf(reqUrl, headers);
+        log.info("#get id: {}", id);
         executeRequest(req, callback);
     }
 
-    @SneakyThrows
     @Override
     public void save(User user, RequestCallback<? super User> callback, Header... headers) {
-        var userStr = objectMapper.writeValueAsString(user);
+        String userStr;
+        try {
+            userStr = objectMapper.writeValueAsString(user);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return;
+        }
         var req = RequestUtils.postRequestOf(url, userStr, headers);
+        log.info("#save user: {}", user);
         executeRequest(req, callback);
     }
 
-    @SneakyThrows
     @Override
     public void update(int id, User user, RequestCallback<? super User> callback, Header... headers) {
-        if (id < 1)
-            throw new IllegalArgumentException("Id must be positive value");
+        String userStr;
+        try {
+            userStr = objectMapper.writeValueAsString(user);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return;
+        }
         var reqUrl = RequestUtils.concatUrlVariables(url, id);
-        var userStr = objectMapper.writeValueAsString(user);
         var req = RequestUtils.putRequestOf(reqUrl, userStr, headers);
         executeRequest(req, callback);
     }
 
-    private void executeRequest(@NonNull HttpRequestBase request, @NonNull RequestCallback<? super User> callback) {
+    private void executeRequest(@NonNull HttpRequestBase req, @NonNull RequestCallback<? super User> callback) {
         executorService.execute(() -> {
-            var executeFail = true;
+            log.debug("Request is being sent, path: {}, method: {}", req.getURI().getPath(), req.getMethod());
+            var executeCallbackFail = true;
             try {
-                try (var response = httpClient.execute(request)) {
+                try (var response = httpClient.execute(req)) {
+                    var statusCode = response.getStatusLine().getStatusCode();
                     var responseBody = EntityUtils.toString(response.getEntity());
-                    executeFail = false;
-                    if (response.getStatusLine().getStatusCode() / 100 == 2)
-                        callback.onRequest(objectMapper.readValue(responseBody, User.class));
-                    else
-                        callback.onError(objectMapper.readValue(responseBody, Error.class));
+                    log.debug("Request has been received, path: {}, method: {}, statusCode: {}, body: {}", req.getURI().getPath(), req.getMethod(), statusCode, responseBody);
+                    executeCallbackFail = false;
+                    if (statusCode / 100 == 2) {
+                        var user = objectMapper.readValue(responseBody, User.class);
+                        log.debug("Executing callback onRequest, user: {}", user);
+                        callback.onRequest(user);
+                    } else {
+                        var error = objectMapper.readValue(responseBody, Error.class);
+                        log.debug("Executing callback onError, error: {}", error);
+                        callback.onError(error);
+                    }
                 }
-            } catch (JacksonException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                if (executeFail)
+            } catch (Exception e) {
+                if (executeCallbackFail) {
+                    log.debug("Executing callback onFail, exception: {}", e.getClass().getName());
                     callback.onFail(e);
-                else
+                } else
                     e.printStackTrace();
             }
         });

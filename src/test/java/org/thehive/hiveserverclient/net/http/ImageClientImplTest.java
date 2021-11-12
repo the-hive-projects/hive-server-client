@@ -39,7 +39,7 @@ class ImageClientImplTest {
         var httpClient = HttpClients.createSystem();
         var objectMapper = new ObjectMapper();
         var executorService = Executors.newSingleThreadExecutor();
-        this.imageClient = new ImageClientImpl(URL, httpClient, objectMapper, executorService);
+        this.imageClient = new ImageClientImpl(URL, objectMapper, httpClient, executorService);
     }
 
     @DisplayName("Get image with successful authentication")

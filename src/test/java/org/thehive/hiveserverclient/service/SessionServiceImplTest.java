@@ -32,7 +32,7 @@ class SessionServiceImplTest {
         var objectMapper = new ObjectMapper();
         objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
         var threadPoolExecutor = (ThreadPoolExecutor) Executors.newCachedThreadPool();
-        var sessionClient = new SessionClientImpl(url, httpClient, objectMapper, threadPoolExecutor);
+        var sessionClient = new SessionClientImpl(url, objectMapper, httpClient, threadPoolExecutor);
         this.sessionService = new SessionServiceImpl(sessionClient);
     }
 

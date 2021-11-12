@@ -29,7 +29,7 @@ class ImageServiceImplTest {
         var httpClient = HttpClients.createSystem();
         var objectMapper = new ObjectMapper();
         var threadPoolExecutor = (ThreadPoolExecutor) Executors.newCachedThreadPool();
-        var imageClient = new ImageClientImpl(url, httpClient, objectMapper, threadPoolExecutor);
+        var imageClient = new ImageClientImpl(url, objectMapper, httpClient, threadPoolExecutor);
         this.imageService = new ImageServiceImpl(imageClient);
     }
 
