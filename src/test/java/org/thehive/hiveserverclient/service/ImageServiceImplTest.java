@@ -37,8 +37,8 @@ class ImageServiceImplTest {
 
     @BeforeEach
     void initialize() {
-        var httpClient = HttpClients.createSystem();
         var objectMapper = new ObjectMapper();
+        var httpClient = HttpClients.createSystem();
         var threadPoolExecutor = (ThreadPoolExecutor) Executors.newCachedThreadPool();
         var imageClient = new ImageClientImpl(URL, objectMapper, httpClient, threadPoolExecutor);
         this.imageService = new ImageServiceImpl(imageClient);
@@ -75,10 +75,11 @@ class ImageServiceImplTest {
         var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
         if (!completed)
             fail(new IllegalStateException("Callback execution timed out"));
-        verify(consumerSpy, only()).accept(ArgumentMatchers.any());
         var result = resultRef.get();
         assertNotNull(result);
         assertEquals(ResultStatus.SUCCESS, result.status());
+        verify(consumerSpy).accept(ArgumentMatchers.any());
+        verify(consumerSpy, only()).accept(ArgumentMatchers.any());
     }
 
     @Test
@@ -107,10 +108,11 @@ class ImageServiceImplTest {
         var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
         if (!completed)
             fail(new IllegalStateException("Callback execution timed out"));
-        verify(consumerSpy, only()).accept(ArgumentMatchers.any());
         var result = resultRef.get();
         assertNotNull(result);
         assertEquals(ResultStatus.ERROR, result.status());
+        verify(consumerSpy).accept(ArgumentMatchers.any());
+        verify(consumerSpy, only()).accept(ArgumentMatchers.any());
     }
 
 }

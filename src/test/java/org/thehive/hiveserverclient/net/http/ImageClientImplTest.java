@@ -36,8 +36,8 @@ class ImageClientImplTest {
 
     @BeforeEach
     void init() {
-        var httpClient = HttpClients.createSystem();
         var objectMapper = new ObjectMapper();
+        var httpClient = HttpClients.createSystem();
         var executorService = Executors.newSingleThreadExecutor();
         this.imageClient = new ImageClientImpl(URL, objectMapper, httpClient, executorService);
     }
@@ -77,11 +77,10 @@ class ImageClientImplTest {
         var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
         if (!completed)
             fail(new IllegalStateException("Callback execution timed out"));
-        verify(callbackSpy, only()).onRequest(ArgumentMatchers.any());
-        verify(callbackSpy, never()).onError(ArgumentMatchers.any());
-        verify(callbackSpy, never()).onFail(ArgumentMatchers.any());
         var image = imgRef.get();
         assertNotNull(image);
+        verify(callbackSpy).onRequest(ArgumentMatchers.any());
+        verify(callbackSpy, only()).onRequest(ArgumentMatchers.any());
     }
 
     @Test
@@ -119,11 +118,10 @@ class ImageClientImplTest {
         var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
         if (!completed)
             fail(new IllegalStateException("Callback execution timed out"));
-        verify(callbackSpy, only()).onError(ArgumentMatchers.any());
-        verify(callbackSpy, never()).onRequest(ArgumentMatchers.any());
-        verify(callbackSpy, never()).onFail(ArgumentMatchers.any());
         var error = errRef.get();
         assertNotNull(error);
+        verify(callbackSpy).onError(ArgumentMatchers.any());
+        verify(callbackSpy, only()).onError(ArgumentMatchers.any());
     }
 
 }

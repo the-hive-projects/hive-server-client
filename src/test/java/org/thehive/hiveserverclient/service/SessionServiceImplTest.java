@@ -8,7 +8,9 @@ import org.apache.http.impl.client.HttpClients;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.thehive.hiveserverclient.Authentication;
 import org.thehive.hiveserverclient.model.Session;
 import org.thehive.hiveserverclient.net.http.SessionClientImpl;
@@ -26,6 +28,7 @@ import static org.mockito.Mockito.*;
 
 // Run this test while server is up.
 @Slf4j
+@ExtendWith(MockitoExtension.class)
 class SessionServiceImplTest {
 
     static final String URL = "http://localhost:8080/session";
@@ -36,8 +39,8 @@ class SessionServiceImplTest {
 
     @BeforeEach
     void initialize() {
-        var httpClient = HttpClients.createSystem();
         var objectMapper = new ObjectMapper();
+        var httpClient = HttpClients.createSystem();
         objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
         var threadPoolExecutor = (ThreadPoolExecutor) Executors.newCachedThreadPool();
         var sessionClient = new SessionClientImpl(URL, objectMapper, httpClient, threadPoolExecutor);
@@ -75,10 +78,11 @@ class SessionServiceImplTest {
         var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
         if (!completed)
             fail(new IllegalStateException("Callback execution timed out"));
-        verify(consumerSpy, only()).accept(ArgumentMatchers.any());
         var result = resultRef.get();
         assertNotNull(result);
         assertEquals(ResultStatus.SUCCESS, result.status());
+        verify(consumerSpy).accept(ArgumentMatchers.any());
+        verify(consumerSpy, only()).accept(ArgumentMatchers.any());
     }
 
     @Test
@@ -107,10 +111,11 @@ class SessionServiceImplTest {
         var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
         if (!completed)
             fail(new IllegalStateException("Callback execution timed out"));
-        verify(consumerSpy, only()).accept(ArgumentMatchers.any());
         var result = resultRef.get();
         assertNotNull(result);
         assertEquals(ResultStatus.ERROR_UNAVAILABLE, result.status());
+        verify(consumerSpy).accept(ArgumentMatchers.any());
+        verify(consumerSpy, only()).accept(ArgumentMatchers.any());
     }
 
     @Test
@@ -139,10 +144,11 @@ class SessionServiceImplTest {
         var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
         if (!completed)
             fail(new IllegalStateException("Callback execution timed out"));
-        verify(consumerSpy, only()).accept(ArgumentMatchers.any());
         var result = resultRef.get();
         assertNotNull(result);
         assertEquals(ResultStatus.ERROR, result.status());
+        verify(consumerSpy).accept(ArgumentMatchers.any());
+        verify(consumerSpy, only()).accept(ArgumentMatchers.any());
     }
 
     @Test
@@ -172,10 +178,11 @@ class SessionServiceImplTest {
         var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
         if (!completed)
             fail(new IllegalStateException("Callback execution timed out"));
-        verify(consumerSpy, only()).accept(ArgumentMatchers.any());
         var result = resultRef.get();
         assertNotNull(result);
         assertEquals(ResultStatus.SUCCESS, result.status());
+        verify(consumerSpy).accept(ArgumentMatchers.any());
+        verify(consumerSpy, only()).accept(ArgumentMatchers.any());
     }
 
     @Test
@@ -205,10 +212,11 @@ class SessionServiceImplTest {
         var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
         if (!completed)
             fail(new IllegalStateException("Callback execution timed out"));
-        verify(consumerSpy, only()).accept(ArgumentMatchers.any());
         var result = resultRef.get();
         assertNotNull(result);
         assertEquals(ResultStatus.ERROR, result.status());
+        verify(consumerSpy).accept(ArgumentMatchers.any());
+        verify(consumerSpy, only()).accept(ArgumentMatchers.any());
     }
 
 }

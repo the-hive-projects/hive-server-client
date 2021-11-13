@@ -37,8 +37,8 @@ class UserClientImplTest {
 
     @BeforeEach
     void init() {
-        var httpClient = HttpClients.createSystem();
         var objectMapper = new ObjectMapper();
+        var httpClient = HttpClients.createSystem();
         var executorService = Executors.newSingleThreadExecutor();
         this.userClient = new UserClientImpl(URL, objectMapper, httpClient, executorService);
     }
@@ -76,11 +76,10 @@ class UserClientImplTest {
         var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
         if (!completed)
             fail(new IllegalStateException("Callback execution timed out"));
-        verify(callbackSpy, only()).onRequest(ArgumentMatchers.any());
-        verify(callbackSpy, never()).onError(ArgumentMatchers.any());
-        verify(callbackSpy, never()).onFail(ArgumentMatchers.any());
         var user = userRef.get();
         assertNotNull(user);
+        verify(callbackSpy).onRequest(ArgumentMatchers.any());
+        verify(callbackSpy, only()).onRequest(ArgumentMatchers.any());
     }
 
     @Test
@@ -116,11 +115,10 @@ class UserClientImplTest {
         var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
         if (!completed)
             fail(new IllegalStateException("Callback execution timed out"));
-        verify(callbackSpy, only()).onError(ArgumentMatchers.any());
-        verify(callbackSpy, never()).onRequest(ArgumentMatchers.any());
-        verify(callbackSpy, never()).onFail(ArgumentMatchers.any());
         var error = errRef.get();
         assertNotNull(error);
+        verify(callbackSpy).onError(ArgumentMatchers.any());
+        verify(callbackSpy, only()).onError(ArgumentMatchers.any());
     }
 
     @Test
@@ -158,11 +156,10 @@ class UserClientImplTest {
         var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
         if (!completed)
             fail(new IllegalStateException("Callback execution timed out"));
-        verify(callbackSpy, only()).onRequest(ArgumentMatchers.any());
-        verify(callbackSpy, never()).onError(ArgumentMatchers.any());
-        verify(callbackSpy, never()).onFail(ArgumentMatchers.any());
         var user = userRef.get();
         assertNotNull(user);
+        verify(callbackSpy).onRequest(ArgumentMatchers.any());
+        verify(callbackSpy, only()).onRequest(ArgumentMatchers.any());
     }
 
     @Test
@@ -200,11 +197,10 @@ class UserClientImplTest {
         var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
         if (!completed)
             fail(new IllegalStateException("Callback execution timed out"));
-        verify(callbackSpy, only()).onError(ArgumentMatchers.any());
-        verify(callbackSpy, never()).onRequest(ArgumentMatchers.any());
-        verify(callbackSpy, never()).onFail(ArgumentMatchers.any());
         var error = errRef.get();
         assertNotNull(error);
+        verify(callbackSpy).onError(ArgumentMatchers.any());
+        verify(callbackSpy, only()).onError(ArgumentMatchers.any());
     }
 
     @Test
@@ -242,11 +238,10 @@ class UserClientImplTest {
         var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
         if (!completed)
             fail(new IllegalStateException("Callback execution timed out"));
-        verify(callbackSpy, only()).onError(ArgumentMatchers.any());
-        verify(callbackSpy, never()).onRequest(ArgumentMatchers.any());
-        verify(callbackSpy, never()).onFail(ArgumentMatchers.any());
         var error = errRef.get();
         assertNotNull(error);
+        verify(callbackSpy).onError(ArgumentMatchers.any());
+        verify(callbackSpy, only()).onError(ArgumentMatchers.any());
     }
 
     @Test
@@ -286,11 +281,10 @@ class UserClientImplTest {
         var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
         if (!completed)
             fail(new IllegalStateException("Callback execution timed out"));
-        verify(callbackSpy, only()).onRequest(ArgumentMatchers.any());
-        verify(callbackSpy, never()).onError(ArgumentMatchers.any());
-        verify(callbackSpy, never()).onFail(ArgumentMatchers.any());
         var responseUser = userRef.get();
         assertNotNull(responseUser);
+        verify(callbackSpy).onRequest(ArgumentMatchers.any());
+        verify(callbackSpy, only()).onRequest(ArgumentMatchers.any());
     }
 
     @Test
@@ -330,11 +324,10 @@ class UserClientImplTest {
         var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
         if (!completed)
             fail(new IllegalStateException("Callback execution timed out"));
-        verify(callbackSpy, only()).onError(ArgumentMatchers.any());
-        verify(callbackSpy, never()).onRequest(ArgumentMatchers.any());
-        verify(callbackSpy, never()).onFail(ArgumentMatchers.any());
         var error = errRef.get();
         assertNotNull(error);
+        verify(callbackSpy).onError(ArgumentMatchers.any());
+        verify(callbackSpy, only()).onError(ArgumentMatchers.any());
     }
 
 }
