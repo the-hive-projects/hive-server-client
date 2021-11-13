@@ -7,19 +7,19 @@ import org.thehive.hiveserverclient.payload.Payload;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SessionUrlEndpointResolverImpl implements SessionUrlEndpointResolver {
+public class UrlEndpointResolverImpl implements UrlEndpointResolver {
 
     private final String subscriptionUrlEndpoint;
     private final String destinationPrefix;
     private final Map<Class<? extends Payload>, String> payloadTypeDestinationUrlEndpointMap;
 
-    public SessionUrlEndpointResolverImpl(@NonNull String subscriptionUrlEndpoint, @Nullable String destinationPrefix) {
+    public UrlEndpointResolverImpl(@NonNull String subscriptionUrlEndpoint, @Nullable String destinationPrefix) {
         this.subscriptionUrlEndpoint = subscriptionUrlEndpoint;
         this.destinationPrefix = destinationPrefix;
         this.payloadTypeDestinationUrlEndpointMap = new HashMap<>();
     }
 
-    public SessionUrlEndpointResolverImpl(@NonNull String subscriptionUrlEndpoint) {
+    public UrlEndpointResolverImpl(@NonNull String subscriptionUrlEndpoint) {
         this(subscriptionUrlEndpoint, null);
     }
 
