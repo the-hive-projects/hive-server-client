@@ -69,7 +69,7 @@ public class UserClientImpl implements UserClient {
         }
         var reqUrl = RequestUtils.concatUrlVariables(url, id);
         var req = RequestUtils.putRequestOf(reqUrl, userStr, headers);
-        log.debug("#update id: {} user: {}",id, user);
+        log.debug("#update id: {} user: {}", id, user);
         executeRequest(req, callback);
     }
 
@@ -98,7 +98,7 @@ public class UserClientImpl implements UserClient {
                     log.debug("Executing callback onFail, exception: {}", e.getClass().getName());
                     callback.onFail(e);
                 } else
-                    e.printStackTrace();
+                    log.warn("Error while http request", e);
             }
         });
     }

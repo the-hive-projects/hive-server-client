@@ -12,7 +12,7 @@ public class WebSocketSingleConnServiceImpl extends WebSocketServiceImpl impleme
 
     protected final AtomicReference<WebSocketSingleSubConnection> connectionReference;
 
-    protected WebSocketSingleConnServiceImpl(@NonNull WebSocketClient webSocketClient) {
+    public WebSocketSingleConnServiceImpl(@NonNull WebSocketClient webSocketClient) {
         super(webSocketClient);
         this.connectionReference = new AtomicReference<>();
     }

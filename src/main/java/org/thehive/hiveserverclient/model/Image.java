@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Image implements Entity{
+public class Image implements Entity {
 
     private Integer id;
     private byte[] content;

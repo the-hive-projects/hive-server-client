@@ -22,7 +22,7 @@ public class ImageServiceImpl implements ImageService {
 
     @Override
     public void take(@NonNull String username, @NonNull Consumer<? super Result<? extends Image>> consumer) {
-        log.info("#take username: {}",username);
+        log.info("#take username: {}", username);
         if (!Authentication.INSTANCE.isAuthenticated())
             throw new IllegalStateException("Authentication instance has not been authenticated");
         imageClient.get(username, new RequestCallback<>() {

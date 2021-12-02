@@ -1,6 +1,9 @@
 package org.thehive.hiveserverclient.util;
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @ToString
 @EqualsAndHashCode

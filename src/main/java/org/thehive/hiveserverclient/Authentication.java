@@ -6,9 +6,9 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class Authentication {
 
-    public static Authentication INSTANCE = new Authentication();
+    public static final Authentication INSTANCE = new Authentication();
 
-    private AtomicReference<String> tokenReference;
+    private final AtomicReference<String> tokenReference;
 
     private Authentication() {
         this.tokenReference = new AtomicReference<>(null);

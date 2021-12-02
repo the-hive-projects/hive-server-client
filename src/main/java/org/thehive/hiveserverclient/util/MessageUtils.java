@@ -37,7 +37,7 @@ public class MessageUtils {
             var item = tokenizer.nextToken();
             if (item.contains(separator)) {
                 var index = item.indexOf(separator);
-                list.add(Pair.of(item.substring(0, index), item.substring(index+1)));
+                list.add(Pair.of(item.substring(0, index), item.substring(index + 1)));
             } else
                 list.add(Pair.of(null, item));
         }

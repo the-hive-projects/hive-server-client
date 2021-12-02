@@ -30,8 +30,8 @@ public class UrlEndpointResolverImpl implements UrlEndpointResolver {
 
     @Override
     public void addDestinationUrlEndpoint(@NonNull Class<? extends Payload> payloadType, @NonNull String destinationUrlEndpoint) {
-        if(destinationPrefix!=null)
-            destinationUrlEndpoint=destinationPrefix.concat(destinationUrlEndpoint);
+        if (destinationPrefix != null)
+            destinationUrlEndpoint = destinationPrefix.concat(destinationUrlEndpoint);
         payloadTypeDestinationUrlEndpointMap.put(payloadType, destinationUrlEndpoint);
     }
 

@@ -56,7 +56,7 @@ public class ImageClientImpl implements ImageClient {
                     log.debug("Executing callback onFail, exception: {}", e.getClass().getName());
                     callback.onFail(e);
                 } else
-                    e.printStackTrace();
+                    log.warn("Error while http request", e);
             }
         });
 

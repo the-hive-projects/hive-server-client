@@ -17,7 +17,7 @@ public class WebSocketServiceImpl implements WebSocketService {
     }
 
     @Override
-    public WebSocketConnection connect( WebSocketListener listener) {
+    public WebSocketConnection connect(WebSocketListener listener) {
         if (!Authentication.INSTANCE.isAuthenticated())
             throw new IllegalStateException("Authentication instance has not been authenticated");
         var headers = new WebSocketHttpHeaders();

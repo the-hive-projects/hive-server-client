@@ -18,7 +18,7 @@
         <spring-framework-bom.version>5.3.12</spring-framework-bom.version>
         <jackson-bom.version>2.12.5</jackson-bom.version>
         <commons-lang3.version>3.12.0</commons-lang3.version>
-        <slf4j.version>1.7.30</slf4j.version>
+        <slf4j.version>1.7.32</slf4j.version>
         <lombok.version>1.18.22</lombok.version>
         <junit-jupiter-api.version>5.8.0-RC1</junit-jupiter-api.version>
         <mockito.version>4.0.0</mockito.version>
