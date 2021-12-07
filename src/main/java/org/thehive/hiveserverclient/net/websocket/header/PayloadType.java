@@ -1,14 +1,15 @@
 package org.thehive.hiveserverclient.net.websocket.header;
 
 import lombok.NonNull;
-import org.thehive.hiveserverclient.payload.Chat;
-import org.thehive.hiveserverclient.payload.Information;
-import org.thehive.hiveserverclient.payload.Payload;
+import org.thehive.hiveserverclient.payload.*;
 
 public enum PayloadType {
 
-    INFORMATION(Information.class, "information"),
-    CHAT(Chat.class, "chat");
+    JOIN_NOTIFICATION(JoinNotification.class, "join-notification"),
+    LEAVE_NOTIFICATION(LeaveNotification.class, "leave-notification"),
+    CHAT_MESSAGE(ChatMessage.class, "chat-message"),
+    SESSION_INFORMATION(SessionInformation.class, "session-information"),
+    TERMINATION_NOTIFICATION(TerminationNotification.class, "termination-notification");
 
     public final Class<? extends Payload> type;
     public final String value;
