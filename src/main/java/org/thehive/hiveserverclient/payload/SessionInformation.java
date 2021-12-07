@@ -11,8 +11,8 @@ import java.util.List;
 @NoArgsConstructor
 public class SessionInformation implements Payload {
 
-    private long timestamp;
     private String ownerUsername;
     private List<String> participantUsernameList;
+    private long timestamp;
 
 }

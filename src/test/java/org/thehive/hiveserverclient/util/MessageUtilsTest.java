@@ -146,5 +146,4 @@ class MessageUtilsTest {
         assertEquals(expectedList, resultList);
     }
 
-
 }

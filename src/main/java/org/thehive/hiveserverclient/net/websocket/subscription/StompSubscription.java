@@ -4,7 +4,9 @@ import org.thehive.hiveserverclient.payload.Payload;
 
 public interface StompSubscription {
 
-    boolean inSubscription();
+    String getDestination();
+
+    boolean isInSubscription();
 
     void send(Payload payload);
 

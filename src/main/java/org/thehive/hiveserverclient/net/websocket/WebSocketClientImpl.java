@@ -132,7 +132,8 @@ public class WebSocketClientImpl implements WebSocketClient {
         public SessionSubscription subscribeToSession(String id, SubscriptionListener listener) {
             if (status != ConnectionStatus.CONNECTED)
                 throw new IllegalStateException();
-            var subscription = sessionReference.get().subscribe(urlEndpointResolver.resolveSubscriptionUrlEndpoint(id), new StompFrameHandler() {
+            var destination = urlEndpointResolver.resolveSubscriptionUrlEndpoint(id);
+            var subscription = sessionReference.get().subscribe(destination, new StompFrameHandler() {
                 @Override
                 public Type getPayloadType(StompHeaders headers) {
                     var appStompHeaders = new AppStompHeaders(headers);
@@ -148,7 +149,7 @@ public class WebSocketClientImpl implements WebSocketClient {
                     listener.onReceive(appStompHeaders, appPayload);
                 }
             });
-            return new SessionSubscriptionImpl(id, listener, subscription);
+            return new SessionSubscriptionImpl(id, destination, listener, subscription);
         }
 
         @Override
@@ -160,16 +161,17 @@ public class WebSocketClientImpl implements WebSocketClient {
             webSocketListener.onDisconnect(this);
         }
 
-
         private class SessionSubscriptionImpl implements SessionSubscription {
 
             private final String id;
+            private final String destination;
             private final SubscriptionListener subscriptionListener;
             private final StompSession.Subscription subscription;
             private volatile boolean inSubscription;
 
-            public SessionSubscriptionImpl(String id, SubscriptionListener subscriptionListener, StompSession.Subscription subscription) {
+            public SessionSubscriptionImpl(String id, String destination, SubscriptionListener subscriptionListener, StompSession.Subscription subscription) {
                 this.id = id;
+                this.destination = destination;
                 this.subscriptionListener = subscriptionListener;
                 this.subscription = subscription;
                 this.inSubscription = true;
@@ -178,13 +180,13 @@ public class WebSocketClientImpl implements WebSocketClient {
             }
 
             @Override
-            public String id() {
+            public String getId() {
                 return id;
             }
 
             @Override
             public void send(Payload payload) {
-                if (!inSubscription())
+                if (!isInSubscription())
                     throw new IllegalStateException();
                 var endpoint = urlEndpointResolver.resolveDestinationUrlEndpoint(payload.getClass(), id);
                 sessionReference.get().send(endpoint, payload);
@@ -194,7 +196,7 @@ public class WebSocketClientImpl implements WebSocketClient {
 
             @Override
             public void unsubscribe() {
-                if (!inSubscription())
+                if (!isInSubscription())
                     throw new IllegalStateException();
                 subscription.unsubscribe();
                 inSubscription = false;
@@ -203,7 +205,12 @@ public class WebSocketClientImpl implements WebSocketClient {
             }
 
             @Override
-            public boolean inSubscription() {
+            public String getDestination() {
+                return destination;
+            }
+
+            @Override
+            public boolean isInSubscription() {
                 return inSubscription;
             }
         }

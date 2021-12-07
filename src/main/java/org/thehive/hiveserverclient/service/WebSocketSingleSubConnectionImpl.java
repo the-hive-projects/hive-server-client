@@ -28,7 +28,7 @@ public class WebSocketSingleSubConnectionImpl extends WebSocketConnectionProxy i
 
     @Override
     public boolean hasSessionSubscription() {
-        return sessionSubscriptionReference.get() != null && sessionSubscriptionReference.get().inSubscription();
+        return sessionSubscriptionReference.get() != null && sessionSubscriptionReference.get().isInSubscription();
     }
 
     @Override

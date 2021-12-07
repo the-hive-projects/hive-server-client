@@ -18,7 +18,7 @@ import org.thehive.hiveserverclient.net.websocket.WebSocketConnection;
 import org.thehive.hiveserverclient.net.websocket.WebSocketListener;
 import org.thehive.hiveserverclient.net.websocket.header.AppStompHeaders;
 import org.thehive.hiveserverclient.net.websocket.subscription.StompSubscription;
-import org.thehive.hiveserverclient.payload.Chat;
+import org.thehive.hiveserverclient.payload.ChatMessage;
 import org.thehive.hiveserverclient.payload.Payload;
 import org.thehive.hiveserverclient.util.HeaderUtils;
 
@@ -41,14 +41,14 @@ class WebSocketServiceImplTest {
     static String URL = "ws://localhost:8080/stomp";
     static String SUBSCRIPTION_ENDPOINT = "/topic/session/{id}";
     static String DESTINATION_PREFIX = "/websocket";
-    static String PAYLOAD_CHAT_ENDPOINT = "/session/chat/{id}";
+    static String CHAT_MESSAGE_PAYLOAD_ENDPOINT = "/session/chat/{id}";
 
     WebSocketServiceImpl webSocketService;
 
     @BeforeEach
     void init() {
         var urlEndpointResolver = new UrlEndpointResolverImpl(SUBSCRIPTION_ENDPOINT, DESTINATION_PREFIX);
-        urlEndpointResolver.addDestinationUrlEndpoint(Chat.class, PAYLOAD_CHAT_ENDPOINT);
+        urlEndpointResolver.addDestinationUrlEndpoint(ChatMessage.class, CHAT_MESSAGE_PAYLOAD_ENDPOINT);
         var wsClient = new StandardWebSocketClient();
         var wsStompClient = new WebSocketStompClient(wsClient);
         wsStompClient.setMessageConverter(new MappingJackson2MessageConverter());
