@@ -38,7 +38,7 @@ public class UserClientImpl implements UserClient {
 
     @Override
     public void get(int id, RequestCallback<? super User> callback, Header... headers) {
-        var reqUrl = RequestUtils.concatUrlVariables(url, id);
+        var reqUrl = RequestUtils.concatUrlPath(url, id);
         var req = RequestUtils.getRequestOf(reqUrl, headers);
         log.debug("#get id: {}", id);
         executeRequest(req, callback);
@@ -67,7 +67,7 @@ public class UserClientImpl implements UserClient {
             e.printStackTrace();
             return;
         }
-        var reqUrl = RequestUtils.concatUrlVariables(url, id);
+        var reqUrl = RequestUtils.concatUrlPath(url, id);
         var req = RequestUtils.putRequestOf(reqUrl, userStr, headers);
         log.debug("#update id: {} user: {}", id, user);
         executeRequest(req, callback);

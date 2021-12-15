@@ -30,10 +30,18 @@ public class SessionClientImpl implements SessionClient {
     }
 
     @Override
-    public void get(String id, RequestCallback<? super Session> callback, Header... headers) {
-        var reqUrl = RequestUtils.concatUrlVariables(url, id);
+    public void get(int id, RequestCallback<? super Session> callback, Header... headers) {
+        var reqUrl = RequestUtils.concatUrlPath(url, id);
         var req = RequestUtils.getRequestOf(reqUrl, headers);
         log.debug("#get id: {}", id);
+        executeRequest(req, callback);
+    }
+
+    @Override
+    public void getLive(String liveId, RequestCallback<? super Session> callback, Header... headers) {
+        var reqUrl = RequestUtils.concatUrlPath(url, "live", liveId);
+        var req = RequestUtils.getRequestOf(reqUrl, headers);
+        log.debug("#getLive liveId: {}", liveId);
         executeRequest(req, callback);
     }
 

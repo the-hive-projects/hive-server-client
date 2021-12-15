@@ -21,7 +21,7 @@ public class SessionServiceImpl implements SessionService {
     }
 
     @Override
-    public void take(@NonNull String id, @NonNull Consumer<? super Result<? extends Session>> consumer) {
+    public void take(@NonNull int id, @NonNull Consumer<? super Result<? extends Session>> consumer) {
         log.info("#take id: {}", id);
         if (!Authentication.INSTANCE.isAuthenticated())
             throw new IllegalStateException("Authentication instance has not been authenticated");
@@ -48,6 +48,39 @@ public class SessionServiceImpl implements SessionService {
             public void onFail(Throwable t) {
                 var result = Result.<Session>of(t);
                 log.info("#take id: {}, status: {}", id, result.status().name());
+                consumer.accept(result);
+            }
+        }, HeaderUtils.httpBasicAuthenticationHeader(Authentication.INSTANCE.getToken()));
+    }
+
+    @Override
+    public void takeLive(String liveId, Consumer<? super Result<? extends Session>> consumer) {
+        log.info("#takeLive liveId: {}", liveId);
+        if (!Authentication.INSTANCE.isAuthenticated())
+            throw new IllegalStateException("Authentication instance has not been authenticated");
+        sessionClient.getLive(liveId, new RequestCallback<>() {
+            @Override
+            public void onRequest(Session entity) {
+                var result = Result.of(entity);
+                log.info("#take liveId: {}, status: {}", liveId, result.status().name());
+                consumer.accept(result);
+            }
+
+            @Override
+            public void onError(Error error) {
+                Result<Session> result;
+                if (error.getStatus() == 404)
+                    result = Result.of(ResultStatus.ERROR_UNAVAILABLE, error.getMessage());
+                else
+                    result = Result.of(error.getMessage());
+                log.info("#take liveId: {}, status: {}", liveId, result.status().name());
+                consumer.accept(result);
+            }
+
+            @Override
+            public void onFail(Throwable t) {
+                var result = Result.<Session>of(t);
+                log.info("#take liveId: {}, status: {}", liveId, result.status().name());
                 consumer.accept(result);
             }
         }, HeaderUtils.httpBasicAuthenticationHeader(Authentication.INSTANCE.getToken()));

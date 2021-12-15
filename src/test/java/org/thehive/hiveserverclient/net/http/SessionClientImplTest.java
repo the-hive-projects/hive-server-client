@@ -33,6 +33,9 @@ class SessionClientImplTest {
     static final long TIMEOUT_MS_CALL = 3_000L;
     static final long TIMEOUT_MS_EXECUTE = 1_000L;
 
+    // Set this value according to ongoing live session.
+    static final String LIVE_SESSION_LIVE_ID = "66324463687";
+
     SessionClient sessionClient;
 
     @BeforeEach
@@ -51,7 +54,7 @@ class SessionClientImplTest {
         final var password = "password";
         var authHeader = HeaderUtils.httpBasicAuthenticationHeader(username, password);
         log.info("Username: {}, Password: {}", username, password);
-        final var id = "00000000000";
+        final var id = 1;
         log.info("Id: {}", id);
         var latch = new CountDownLatch(1);
         var sessionRef = new AtomicReference<Session>();
@@ -92,7 +95,7 @@ class SessionClientImplTest {
         final var password = "password";
         var authHeader = HeaderUtils.httpBasicAuthenticationHeader(username, password);
         log.info("Username: {}, Password: {}", username, password);
-        final var id = "11111111111";
+        final var id = Integer.MAX_VALUE;
         log.info("Id: {}", id);
         var latch = new CountDownLatch(1);
         var errRef = new AtomicReference<Error>();
@@ -127,13 +130,13 @@ class SessionClientImplTest {
     }
 
     @Test
-    @DisplayName("Get with unsuccessful authentication")
-    void getWithUnsuccessfulAuthentication() throws InterruptedException {
+    @DisplayName("Get session with unsuccessful authentication")
+    void getSessionWithUnsuccessfulAuthentication() throws InterruptedException {
         final var username = "username";
         final var password = "password";
         var authHeader = HeaderUtils.httpBasicAuthenticationHeader(username, password);
         log.info("Username: {}, Password: {}", username, password);
-        final var id = "00000000000";
+        final var id = 1;
         log.info("Id: {}", id);
         var latch = new CountDownLatch(1);
         var errRef = new AtomicReference<Error>();
@@ -157,6 +160,129 @@ class SessionClientImplTest {
         };
         var callbackSpy = spy(callback);
         sessionClient.get(id, callbackSpy, authHeader);
+        verify(callbackSpy, timeout(TIMEOUT_MS_CALL)).onError(ArgumentMatchers.any());
+        var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
+        if (!completed)
+            fail(new IllegalStateException("Callback execution timed out"));
+        var error = errRef.get();
+        assertNotNull(error);
+        verify(callbackSpy).onError(ArgumentMatchers.any());
+        verify(callbackSpy, only()).onError(ArgumentMatchers.any());
+    }
+
+    @Test
+    @DisplayName("Get existing live session with successful authentication")
+    void getExistingLiveSessionWithSuccessfulAuthentication() throws InterruptedException {
+        final var username = "user";
+        final var password = "password";
+        var authHeader = HeaderUtils.httpBasicAuthenticationHeader(username, password);
+        log.info("Username: {}, Password: {}", username, password);
+        final var liveId = LIVE_SESSION_LIVE_ID;
+        log.info("LiveId: {}", liveId);
+        var latch = new CountDownLatch(1);
+        var sessionRef = new AtomicReference<Session>();
+        var callback = new RequestCallback<Session>() {
+            @Override
+            public void onRequest(Session entity) {
+                log.info("Session: {}", entity);
+                sessionRef.set(entity);
+                latch.countDown();
+            }
+
+            @Override
+            public void onError(Error error) {
+                log.error("Error: {}", error);
+            }
+
+            @Override
+            public void onFail(Throwable t) {
+                log.error(t.getMessage());
+            }
+        };
+        var callbackSpy = spy(callback);
+        sessionClient.getLive(liveId, callbackSpy, authHeader);
+        verify(callbackSpy, timeout(TIMEOUT_MS_CALL)).onRequest(ArgumentMatchers.any());
+        var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
+        if (!completed)
+            fail(new IllegalStateException("Callback execution timed out"));
+        var session = sessionRef.get();
+        assertNotNull(session);
+        verify(callbackSpy).onRequest(ArgumentMatchers.any());
+        verify(callbackSpy, only()).onRequest(ArgumentMatchers.any());
+    }
+
+    @Test
+    @DisplayName("Get non-existing live session with successful authentication")
+    void getNonExistingLiveSessionWithSuccessfulAuthentication() throws InterruptedException {
+        final var username = "user";
+        final var password = "password";
+        var authHeader = HeaderUtils.httpBasicAuthenticationHeader(username, password);
+        log.info("Username: {}, Password: {}", username, password);
+        final var liveId = "00000000000";
+        log.info("LiveId: {}", liveId);
+        var latch = new CountDownLatch(1);
+        var errRef = new AtomicReference<Error>();
+        var callback = new RequestCallback<Session>() {
+            @Override
+            public void onRequest(Session entity) {
+                log.error("Session: {}", entity);
+            }
+
+            @Override
+            public void onError(Error error) {
+                log.info("Error: {}", error);
+                errRef.set(error);
+                latch.countDown();
+            }
+
+            @Override
+            public void onFail(Throwable t) {
+                log.error(t.getMessage());
+            }
+        };
+        var callbackSpy = spy(callback);
+        sessionClient.getLive(liveId, callbackSpy, authHeader);
+        verify(callbackSpy, timeout(TIMEOUT_MS_CALL)).onError(ArgumentMatchers.any());
+        var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
+        if (!completed)
+            fail(new IllegalStateException("Callback execution timed out"));
+        var error = errRef.get();
+        assertNotNull(error);
+        verify(callbackSpy).onError(ArgumentMatchers.any());
+        verify(callbackSpy, only()).onError(ArgumentMatchers.any());
+    }
+
+    @Test
+    @DisplayName("Get live session with unsuccessful authentication")
+    void getLiveSessionWithUnsuccessfulAuthentication() throws InterruptedException {
+        final var username = "username";
+        final var password = "password";
+        var authHeader = HeaderUtils.httpBasicAuthenticationHeader(username, password);
+        log.info("Username: {}, Password: {}", username, password);
+        final var liveId = LIVE_SESSION_LIVE_ID;
+        log.info("LiveId: {}", liveId);
+        var latch = new CountDownLatch(1);
+        var errRef = new AtomicReference<Error>();
+        var callback = new RequestCallback<Session>() {
+            @Override
+            public void onRequest(Session entity) {
+                log.error("Session: {}", entity);
+            }
+
+            @Override
+            public void onError(Error error) {
+                log.info("Error: {}", error);
+                errRef.set(error);
+                latch.countDown();
+            }
+
+            @Override
+            public void onFail(Throwable t) {
+                log.error(t.getMessage());
+            }
+        };
+        var callbackSpy = spy(callback);
+        sessionClient.getLive(liveId, callbackSpy, authHeader);
         verify(callbackSpy, timeout(TIMEOUT_MS_CALL)).onError(ArgumentMatchers.any());
         var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
         if (!completed)
@@ -175,7 +301,7 @@ class SessionClientImplTest {
         var authHeader = HeaderUtils.httpBasicAuthenticationHeader(username, password);
         log.info("Username: {}, Password: {}", username, password);
         final var name = RandomStringUtils.randomAlphabetic(9, 17);
-        var session = new Session(null, name, null, null);
+        var session = new Session(null, name, null, null, null);
         log.info("Session: {}", session);
         var latch = new CountDownLatch(1);
         var sessionRef = new AtomicReference<Session>();
@@ -217,7 +343,7 @@ class SessionClientImplTest {
         var authHeader = HeaderUtils.httpBasicAuthenticationHeader(username, password);
         log.info("Username: {}, Password: {}", username, password);
         final var name = RandomStringUtils.randomAlphabetic(9, 17);
-        var session = new Session(null, name, null, null);
+        var session = new Session(null, name, null, null, null);
         log.info("Name: {}", name);
         var latch = new CountDownLatch(1);
         var errRef = new AtomicReference<>();

@@ -35,6 +35,9 @@ class SessionServiceImplTest {
     static final long TIMEOUT_MS_CALL = 3_000L;
     static final long TIMEOUT_MS_EXECUTE = 1_000L;
 
+    // Set this value according to ongoing live session.
+    static final String LIVE_SESSION_LIVE_ID = "66324463687";
+
     SessionServiceImpl sessionService;
 
     @BeforeEach
@@ -60,7 +63,7 @@ class SessionServiceImplTest {
         var token = HeaderUtils.httpBasicAuthenticationToken(username, password);
         Authentication.INSTANCE.authenticate(token);
         log.info("Username: {}, Password: {}", username, password);
-        final var id = "00000000000";
+        final var id = 1;
         log.info("Id: {}", id);
         var latch = new CountDownLatch(1);
         var resultRef = new AtomicReference<Result<? extends Session>>();
@@ -93,7 +96,7 @@ class SessionServiceImplTest {
         var token = HeaderUtils.httpBasicAuthenticationToken(username, password);
         Authentication.INSTANCE.authenticate(token);
         log.info("Username: {}, Password: {}", username, password);
-        final var id = "11111111111";
+        final var id = Integer.MAX_VALUE;
         log.info("Id: {}", id);
         var latch = new CountDownLatch(1);
         var resultRef = new AtomicReference<Result<? extends Session>>();
@@ -126,7 +129,7 @@ class SessionServiceImplTest {
         var token = HeaderUtils.httpBasicAuthenticationToken(username, password);
         Authentication.INSTANCE.authenticate(token);
         log.info("Username: {}, Password: {}", username, password);
-        final var id = "00000000000";
+        final var id = 1;
         log.info("Id: {}", id);
         var latch = new CountDownLatch(1);
         var resultRef = new AtomicReference<Result<? extends Session>>();
@@ -152,6 +155,106 @@ class SessionServiceImplTest {
     }
 
     @Test
+    @DisplayName("Take existing live session when authentication is correct")
+    void takeExistingLiveSessionWhenAuthenticationIsCorrect() throws InterruptedException {
+        final var username = "user";
+        final var password = "password";
+        var token = HeaderUtils.httpBasicAuthenticationToken(username, password);
+        Authentication.INSTANCE.authenticate(token);
+        log.info("Username: {}, Password: {}", username, password);
+        final var liveId = LIVE_SESSION_LIVE_ID;
+        log.info("LiveId: {}", liveId);
+        var latch = new CountDownLatch(1);
+        var resultRef = new AtomicReference<Result<? extends Session>>();
+        var consumer = new Consumer<Result<? extends Session>>() {
+            @Override
+            public void accept(Result<? extends Session> result) {
+                log.info("Result: {}", result);
+                resultRef.set(result);
+                latch.countDown();
+            }
+        };
+        var consumerSpy = spy(consumer);
+        sessionService.takeLive(liveId, consumerSpy);
+        verify(consumerSpy, timeout(TIMEOUT_MS_CALL)).accept(ArgumentMatchers.any());
+        var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
+        if (!completed)
+            fail(new IllegalStateException("Callback execution timed out"));
+        var result = resultRef.get();
+        assertNotNull(result);
+        assertEquals(ResultStatus.SUCCESS, result.status());
+        verify(consumerSpy).accept(ArgumentMatchers.any());
+        verify(consumerSpy, only()).accept(ArgumentMatchers.any());
+    }
+
+    @Test
+    @DisplayName("Take non-existing live session when authentication is correct")
+    void takeNonExistingLiveSessionWhenAuthenticationIsCorrect() throws InterruptedException {
+        final var username = "user";
+        final var password = "password";
+        var token = HeaderUtils.httpBasicAuthenticationToken(username, password);
+        Authentication.INSTANCE.authenticate(token);
+        log.info("Username: {}, Password: {}", username, password);
+        final var liveId = "00000000000";
+        log.info("LiveId: {}", liveId);
+        var latch = new CountDownLatch(1);
+        var resultRef = new AtomicReference<Result<? extends Session>>();
+        var consumer = new Consumer<Result<? extends Session>>() {
+            @Override
+            public void accept(Result<? extends Session> result) {
+                log.info("Result: {}", result);
+                resultRef.set(result);
+                latch.countDown();
+            }
+        };
+        var consumerSpy = spy(consumer);
+        sessionService.takeLive(liveId, consumerSpy);
+        verify(consumerSpy, timeout(TIMEOUT_MS_CALL)).accept(ArgumentMatchers.any());
+        var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
+        if (!completed)
+            fail(new IllegalStateException("Callback execution timed out"));
+        var result = resultRef.get();
+        assertNotNull(result);
+        assertEquals(ResultStatus.ERROR_UNAVAILABLE, result.status());
+        verify(consumerSpy).accept(ArgumentMatchers.any());
+        verify(consumerSpy, only()).accept(ArgumentMatchers.any());
+    }
+
+    @Test
+    @DisplayName("Take live session when authentication is incorrect")
+    void takeLiveSessionWhenAuthenticationIsIncorrect() throws InterruptedException {
+        final var username = "username";
+        final var password = "password";
+        var token = HeaderUtils.httpBasicAuthenticationToken(username, password);
+        Authentication.INSTANCE.authenticate(token);
+        log.info("Username: {}, Password: {}", username, password);
+        final var liveId = LIVE_SESSION_LIVE_ID;
+        log.info("LiveId: {}", liveId);
+        var latch = new CountDownLatch(1);
+        var resultRef = new AtomicReference<Result<? extends Session>>();
+        var consumer = new Consumer<Result<? extends Session>>() {
+            @Override
+            public void accept(Result<? extends Session> result) {
+                log.info("Result: {}", result);
+                resultRef.set(result);
+                latch.countDown();
+            }
+        };
+        var consumerSpy = spy(consumer);
+        sessionService.takeLive(liveId, consumerSpy);
+        verify(consumerSpy, timeout(TIMEOUT_MS_CALL)).accept(ArgumentMatchers.any());
+        var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
+        if (!completed)
+            fail(new IllegalStateException("Callback execution timed out"));
+        var result = resultRef.get();
+        assertNotNull(result);
+        assertEquals(ResultStatus.ERROR, result.status());
+        verify(consumerSpy).accept(ArgumentMatchers.any());
+        verify(consumerSpy, only()).accept(ArgumentMatchers.any());
+    }
+
+
+    @Test
     @DisplayName("Create session when authenticated is correct")
     void createSessionWhenAuthenticationIsCorrect() throws InterruptedException {
         final var username = "user";
@@ -160,7 +263,7 @@ class SessionServiceImplTest {
         Authentication.INSTANCE.authenticate(token);
         log.info("Username: {}, Password: {}", username, password);
         final var name = RandomStringUtils.randomAlphanumeric(9, 17);
-        var session = new Session(null, name, null, null);
+        var session = new Session(null, name, null, null, null);
         log.info("Session: {}", session);
         var latch = new CountDownLatch(1);
         var resultRef = new AtomicReference<Result<? extends Session>>();
@@ -194,7 +297,7 @@ class SessionServiceImplTest {
         Authentication.INSTANCE.authenticate(token);
         log.info("Username: {}, Password: {}", username, password);
         final var name = RandomStringUtils.randomAlphanumeric(9, 17);
-        var session = new Session(null, name, null, null);
+        var session = new Session(null, name, null, null, null);
         log.info("Session: {}", session);
         var latch = new CountDownLatch(1);
         var resultRef = new AtomicReference<Result<? extends Session>>();

@@ -29,7 +29,7 @@ public class ImageClientImpl implements ImageClient {
 
     @Override
     public void get(String username, RequestCallback<? super Image> callback, Header... headers) {
-        var reqUrl = RequestUtils.concatUrlVariables(url, username);
+        var reqUrl = RequestUtils.concatUrlPath(url, username);
         var req = RequestUtils.getRequestOf(reqUrl, headers);
         log.debug("#get username: {}", username);
         executorService.execute(() -> {

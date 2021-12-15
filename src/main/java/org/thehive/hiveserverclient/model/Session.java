@@ -9,8 +9,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Session implements Entity {
 
-    private String id;
+    private Integer id;
     private String name;
+    private Long duration;
     private User createdBy;
     private Long createdAt;
 

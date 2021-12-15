@@ -53,7 +53,7 @@ public class RequestUtils {
         return req;
     }
 
-    public static String concatUrlVariables(@NonNull String baseUrl, Object... vars) {
+    public static String concatUrlPath(@NonNull String baseUrl, Object... vars) {
         var result = baseUrl;
         for (var var : vars)
             result = result.concat("/").concat(var.toString());
