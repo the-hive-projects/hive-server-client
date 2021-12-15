@@ -1,6 +1,5 @@
 package org.thehive.hiveserverclient.service;
 
-
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -40,7 +39,7 @@ class WebSocketSingleConnServiceImplTest {
     static final long TIMEOUT_MS_CALL = 3_000L;
     static final long TIMEOUT_MS_EXECUTE = 1_000L;
     static String URL = "ws://localhost:8080/stomp";
-    static String SUBSCRIPTION_ENDPOINT = "/topic/session/{id}";
+    static String SUBSCRIPTION_ENDPOINT = "/user/queue/session/{id}";
     static String DESTINATION_PREFIX = "/websocket";
     static String CHAT_MESSAGE_PAYLOAD_ENDPOINT = "/session/chat/{id}";
 

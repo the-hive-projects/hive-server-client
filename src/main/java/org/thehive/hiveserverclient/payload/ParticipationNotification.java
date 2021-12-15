@@ -7,9 +7,10 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class LeaveNotification implements Payload {
+public class ParticipationNotification implements Payload {
 
-    private String username;
+    private String participant;
+    private boolean isJoined;
     private long timestamp;
 
 }

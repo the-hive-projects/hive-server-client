@@ -5,11 +5,10 @@ import org.thehive.hiveserverclient.payload.*;
 
 public enum PayloadType {
 
-    JOIN_NOTIFICATION(JoinNotification.class, "join-notification"),
-    LEAVE_NOTIFICATION(LeaveNotification.class, "leave-notification"),
-    CHAT_MESSAGE(ChatMessage.class, "chat-message"),
-    SESSION_INFORMATION(SessionInformation.class, "session-information"),
-    TERMINATION_NOTIFICATION(TerminationNotification.class, "termination-notification");
+    LIVE_SESSION_INFORMATION(LiveSessionInformation.class, "live-session-information"),
+    PARTICIPATION_NOTIFICATION(ParticipationNotification.class, "participation-notification"),
+    EXPIRATION_NOTIFICATION(ExpirationNotification.class, "expiration-notification"),
+    CHAT_MESSAGE(ChatMessage.class, "chat-message");
 
     public final Class<? extends Payload> type;
     public final String value;

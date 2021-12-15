@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TerminationNotification implements Payload {
+public class ExpirationNotification implements Payload {
 
     private long timestamp;
 
