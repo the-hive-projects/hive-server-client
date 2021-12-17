@@ -263,7 +263,7 @@ class SessionServiceImplTest {
         Authentication.INSTANCE.authenticate(token);
         log.info("Username: {}, Password: {}", username, password);
         final var name = RandomStringUtils.randomAlphanumeric(9, 17);
-        var session = new Session(null, name, null, null, null);
+        var session = new Session(null, name, null, null, null, null);
         log.info("Session: {}", session);
         var latch = new CountDownLatch(1);
         var resultRef = new AtomicReference<AppResponse<? extends Session>>();
@@ -297,7 +297,7 @@ class SessionServiceImplTest {
         Authentication.INSTANCE.authenticate(token);
         log.info("Username: {}, Password: {}", username, password);
         final var name = RandomStringUtils.randomAlphanumeric(9, 17);
-        var session = new Session(null, name, null, null, null);
+        var session = new Session(null, name, null, null, null, null);
         log.info("Session: {}", session);
         var latch = new CountDownLatch(1);
         var resultRef = new AtomicReference<AppResponse<? extends Session>>();

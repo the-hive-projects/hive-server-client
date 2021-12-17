@@ -301,7 +301,7 @@ class SessionClientImplTest {
         var authHeader = HeaderUtils.httpBasicAuthenticationHeader(username, password);
         log.info("Username: {}, Password: {}", username, password);
         final var name = RandomStringUtils.randomAlphabetic(9, 17);
-        var session = new Session(null, name, null, null, null);
+        var session = new Session(null, name, null, null, null, null);
         log.info("Session: {}", session);
         var latch = new CountDownLatch(1);
         var sessionRef = new AtomicReference<Session>();
@@ -343,7 +343,7 @@ class SessionClientImplTest {
         var authHeader = HeaderUtils.httpBasicAuthenticationHeader(username, password);
         log.info("Username: {}, Password: {}", username, password);
         final var name = RandomStringUtils.randomAlphabetic(9, 17);
-        var session = new Session(null, name, null, null, null);
+        var session = new Session(null, name, null, null, null, null);
         log.info("Name: {}", name);
         var latch = new CountDownLatch(1);
         var errRef = new AtomicReference<>();

@@ -40,7 +40,7 @@ public class SessionClientImpl extends AppHttpClient implements SessionClient {
     public void save(Session session, RequestCallback<? super Session> callback, Header... headers) {
         String userStr;
         try {
-            userStr = objectMapper.writeValueAsString(callback);
+            userStr = objectMapper.writeValueAsString(session);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             return;

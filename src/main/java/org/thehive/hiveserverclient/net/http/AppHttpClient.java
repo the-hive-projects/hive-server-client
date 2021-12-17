@@ -14,7 +14,7 @@ public abstract class AppHttpClient {
     protected final ExecutorService executorService;
 
     protected AppHttpClient(@NonNull String url, @NonNull ObjectMapper objectMapper,
-                         @NonNull CloseableHttpClient httpClient, @NonNull ExecutorService executorService) {
+                            @NonNull CloseableHttpClient httpClient, @NonNull ExecutorService executorService) {
         this.url = url;
         this.objectMapper = objectMapper;
         this.httpClient = httpClient;
