@@ -2,9 +2,9 @@ package org.thehive.hiveserverclient.net.http;
 
 import org.thehive.hiveserverclient.model.Error;
 
-public interface RequestCallback<E> {
+public interface RequestCallback<R> {
 
-    void onRequest(E entity);
+    void onResponse(R responseBody);
 
     void onError(Error error);
 

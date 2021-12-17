@@ -63,7 +63,7 @@ public class SessionClientImpl extends AppHttpClient implements SessionClient {
                     if (statusCode / 100 == 2) {
                         var session = objectMapper.readValue(responseBody, Session.class);
                         log.debug("Executing callback onRequest, session: {}", session);
-                        callback.onRequest(session);
+                        callback.onResponse(session);
                     } else {
                         var error = objectMapper.readValue(responseBody, Error.class);
                         log.debug("Executing callback onError, error: {}", error);

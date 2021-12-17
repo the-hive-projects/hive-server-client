@@ -1,7 +1,6 @@
 package org.thehive.hiveserverclient.service;
 
 import lombok.*;
-import org.thehive.hiveserverclient.model.Entity;
 
 import java.util.Optional;
 
@@ -9,21 +8,21 @@ import java.util.Optional;
 @EqualsAndHashCode
 @Builder(access = AccessLevel.PACKAGE)
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
-public class ResultImpl<E extends Entity> implements Result<E> {
+public class AppResponseImpl<R> implements AppResponse<R> {
 
-    private final ResultStatus status;
-    private final E entity;
+    private final ResponseStatus status;
+    private final R response;
     private final String message;
     private final Throwable exception;
 
     @Override
-    public ResultStatus status() {
+    public ResponseStatus status() {
         return status;
     }
 
     @Override
-    public Optional<E> entity() {
-        return Optional.ofNullable(entity);
+    public Optional<R> response() {
+        return Optional.ofNullable(response);
     }
 
     @Override

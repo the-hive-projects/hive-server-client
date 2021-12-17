@@ -60,11 +60,11 @@ class ImageServiceImplTest {
         final var imageUsername = "username";
         log.info("ImageUsername: {}", imageUsername);
         var latch = new CountDownLatch(1);
-        var resultRef = new AtomicReference<Result<? extends Image>>();
-        var consumer = new Consumer<Result<? extends Image>>() {
+        var resultRef = new AtomicReference<AppResponse<? extends Image>>();
+        var consumer = new Consumer<AppResponse<? extends Image>>() {
             @Override
-            public void accept(Result<? extends Image> result) {
-                log.info("Result: {}", result);
+            public void accept(AppResponse<? extends Image> result) {
+                log.info("AppResponse: {}", result);
                 resultRef.set(result);
                 latch.countDown();
             }
@@ -77,7 +77,7 @@ class ImageServiceImplTest {
             fail(new IllegalStateException("Callback execution timed out"));
         var result = resultRef.get();
         assertNotNull(result);
-        assertEquals(ResultStatus.SUCCESS, result.status());
+        assertEquals(ResponseStatus.SUCCESS, result.status());
         verify(consumerSpy).accept(ArgumentMatchers.any());
         verify(consumerSpy, only()).accept(ArgumentMatchers.any());
     }
@@ -93,11 +93,11 @@ class ImageServiceImplTest {
         final var imageUsername = "username";
         log.info("ImageUsername: {}", imageUsername);
         var latch = new CountDownLatch(1);
-        var resultRef = new AtomicReference<Result<? extends Image>>();
-        var consumer = new Consumer<Result<? extends Image>>() {
+        var resultRef = new AtomicReference<AppResponse<? extends Image>>();
+        var consumer = new Consumer<AppResponse<? extends Image>>() {
             @Override
-            public void accept(Result<? extends Image> result) {
-                log.info("Result: {}", result);
+            public void accept(AppResponse<? extends Image> result) {
+                log.info("AppResponse: {}", result);
                 resultRef.set(result);
                 latch.countDown();
             }
@@ -110,7 +110,7 @@ class ImageServiceImplTest {
             fail(new IllegalStateException("Callback execution timed out"));
         var result = resultRef.get();
         assertNotNull(result);
-        assertEquals(ResultStatus.ERROR, result.status());
+        assertEquals(ResponseStatus.ERROR, result.status());
         verify(consumerSpy).accept(ArgumentMatchers.any());
         verify(consumerSpy, only()).accept(ArgumentMatchers.any());
     }

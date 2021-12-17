@@ -77,7 +77,7 @@ public class UserClientImpl extends AppHttpClient implements UserClient {
                     if (statusCode / 100 == 2) {
                         var user = objectMapper.readValue(responseBody, User.class);
                         log.debug("Executing callback onRequest, user: {}", user);
-                        callback.onRequest(user);
+                        callback.onResponse(user);
                     } else {
                         var error = objectMapper.readValue(responseBody, Error.class);
                         log.debug("Executing callback onError, error: {}", error);

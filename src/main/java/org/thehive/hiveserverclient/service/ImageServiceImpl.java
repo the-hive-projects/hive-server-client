@@ -21,30 +21,30 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public void take(@NonNull String username, @NonNull Consumer<? super Result<? extends Image>> consumer) {
+    public void take(@NonNull String username, @NonNull Consumer<? super AppResponse<? extends Image>> consumer) {
         log.info("#take username: {}", username);
         if (!Authentication.INSTANCE.isAuthenticated())
             throw new IllegalStateException("Authentication instance has not been authenticated");
         imageClient.get(username, new RequestCallback<>() {
             @Override
-            public void onRequest(Image entity) {
-                var result = Result.of(entity);
-                log.info("#take username: {}, status: {}", username, result.status().name());
-                consumer.accept(result);
+            public void onResponse(Image responseBody) {
+                var response = AppResponse.of(responseBody);
+                log.info("#take username: {}, status: {}", username, response.status().name());
+                consumer.accept(response);
             }
 
             @Override
             public void onError(Error error) {
-                var result = Result.<Image>of(error.getMessage());
-                log.info("#take username: {}, status: {}", username, result.status().name());
-                consumer.accept(result);
+                var response = AppResponse.<Image>of(error.getMessage());
+                log.info("#take username: {}, status: {}", username, response.status().name());
+                consumer.accept(response);
             }
 
             @Override
             public void onFail(Throwable t) {
-                var result = Result.<Image>of(t);
-                log.info("#take username: {}, status: {}", username, result.status().name());
-                consumer.accept(result);
+                var response = AppResponse.<Image>of(t);
+                log.info("#take username: {}, status: {}", username, response.status().name());
+                consumer.accept(response);
             }
         }, HeaderUtils.httpBasicAuthenticationHeader(Authentication.INSTANCE.getToken()));
     }

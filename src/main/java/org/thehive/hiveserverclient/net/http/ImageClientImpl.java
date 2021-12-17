@@ -1,8 +1,10 @@
 package org.thehive.hiveserverclient.net.http;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.Header;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.thehive.hiveserverclient.model.Error;
@@ -22,6 +24,10 @@ public class ImageClientImpl extends AppHttpClient implements ImageClient {
         var reqUrl = RequestUtils.concatUrlPath(url, username);
         var req = RequestUtils.getRequestOf(reqUrl, headers);
         log.debug("#get username: {}", username);
+        executeRequest(req, callback);
+    }
+
+    private void executeRequest(@NonNull HttpRequestBase req, @NonNull RequestCallback<? super Image> callback) {
         executorService.execute(() -> {
             log.debug("Request is being sent, path: {}, method: {}", req.getURI().getPath(), req.getMethod());
             var executeCallbackFail = true;
@@ -34,7 +40,7 @@ public class ImageClientImpl extends AppHttpClient implements ImageClient {
                     if (statusCode / 100 == 2) {
                         var image = objectMapper.readValue(responseBody, Image.class);
                         log.debug("Executing callback onRequest, image: {}", image);
-                        callback.onRequest(image);
+                        callback.onResponse(image);
                     } else {
                         var error = objectMapper.readValue(responseBody, Error.class);
                         log.debug("Executing callback onError, error: {}", error);
@@ -49,7 +55,6 @@ public class ImageClientImpl extends AppHttpClient implements ImageClient {
                     log.warn("Error while http request", e);
             }
         });
-
     }
 
 }

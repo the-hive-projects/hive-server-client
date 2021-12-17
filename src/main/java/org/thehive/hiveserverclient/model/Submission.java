@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Submission {
+public class Submission implements Entity{
 
     private int id;
     private String content;

@@ -60,9 +60,9 @@ class SessionClientImplTest {
         var sessionRef = new AtomicReference<Session>();
         var callback = new RequestCallback<Session>() {
             @Override
-            public void onRequest(Session entity) {
-                log.info("Session: {}", entity);
-                sessionRef.set(entity);
+            public void onResponse(Session responseBody) {
+                log.info("Session: {}", responseBody);
+                sessionRef.set(responseBody);
                 latch.countDown();
             }
 
@@ -78,14 +78,14 @@ class SessionClientImplTest {
         };
         var callbackSpy = spy(callback);
         sessionClient.get(id, callbackSpy, authHeader);
-        verify(callbackSpy, timeout(TIMEOUT_MS_CALL)).onRequest(ArgumentMatchers.any());
+        verify(callbackSpy, timeout(TIMEOUT_MS_CALL)).onResponse(ArgumentMatchers.any());
         var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
         if (!completed)
             fail(new IllegalStateException("Callback execution timed out"));
         var session = sessionRef.get();
         assertNotNull(session);
-        verify(callbackSpy).onRequest(ArgumentMatchers.any());
-        verify(callbackSpy, only()).onRequest(ArgumentMatchers.any());
+        verify(callbackSpy).onResponse(ArgumentMatchers.any());
+        verify(callbackSpy, only()).onResponse(ArgumentMatchers.any());
     }
 
     @Test
@@ -101,8 +101,8 @@ class SessionClientImplTest {
         var errRef = new AtomicReference<Error>();
         var callback = new RequestCallback<Session>() {
             @Override
-            public void onRequest(Session entity) {
-                log.error("Session: {}", entity);
+            public void onResponse(Session responseBody) {
+                log.error("Session: {}", responseBody);
             }
 
             @Override
@@ -142,8 +142,8 @@ class SessionClientImplTest {
         var errRef = new AtomicReference<Error>();
         var callback = new RequestCallback<Session>() {
             @Override
-            public void onRequest(Session entity) {
-                log.error("Session: {}", entity);
+            public void onResponse(Session responseBody) {
+                log.error("Session: {}", responseBody);
             }
 
             @Override
@@ -183,9 +183,9 @@ class SessionClientImplTest {
         var sessionRef = new AtomicReference<Session>();
         var callback = new RequestCallback<Session>() {
             @Override
-            public void onRequest(Session entity) {
-                log.info("Session: {}", entity);
-                sessionRef.set(entity);
+            public void onResponse(Session responseBody) {
+                log.info("Session: {}", responseBody);
+                sessionRef.set(responseBody);
                 latch.countDown();
             }
 
@@ -201,14 +201,14 @@ class SessionClientImplTest {
         };
         var callbackSpy = spy(callback);
         sessionClient.getLive(liveId, callbackSpy, authHeader);
-        verify(callbackSpy, timeout(TIMEOUT_MS_CALL)).onRequest(ArgumentMatchers.any());
+        verify(callbackSpy, timeout(TIMEOUT_MS_CALL)).onResponse(ArgumentMatchers.any());
         var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
         if (!completed)
             fail(new IllegalStateException("Callback execution timed out"));
         var session = sessionRef.get();
         assertNotNull(session);
-        verify(callbackSpy).onRequest(ArgumentMatchers.any());
-        verify(callbackSpy, only()).onRequest(ArgumentMatchers.any());
+        verify(callbackSpy).onResponse(ArgumentMatchers.any());
+        verify(callbackSpy, only()).onResponse(ArgumentMatchers.any());
     }
 
     @Test
@@ -224,8 +224,8 @@ class SessionClientImplTest {
         var errRef = new AtomicReference<Error>();
         var callback = new RequestCallback<Session>() {
             @Override
-            public void onRequest(Session entity) {
-                log.error("Session: {}", entity);
+            public void onResponse(Session responseBody) {
+                log.error("Session: {}", responseBody);
             }
 
             @Override
@@ -265,8 +265,8 @@ class SessionClientImplTest {
         var errRef = new AtomicReference<Error>();
         var callback = new RequestCallback<Session>() {
             @Override
-            public void onRequest(Session entity) {
-                log.error("Session: {}", entity);
+            public void onResponse(Session responseBody) {
+                log.error("Session: {}", responseBody);
             }
 
             @Override
@@ -307,9 +307,9 @@ class SessionClientImplTest {
         var sessionRef = new AtomicReference<Session>();
         var callback = new RequestCallback<Session>() {
             @Override
-            public void onRequest(Session entity) {
-                log.info("Session: {}", entity);
-                sessionRef.set(entity);
+            public void onResponse(Session responseBody) {
+                log.info("Session: {}", responseBody);
+                sessionRef.set(responseBody);
                 latch.countDown();
             }
 
@@ -325,14 +325,14 @@ class SessionClientImplTest {
         };
         var callbackSpy = spy(callback);
         sessionClient.save(session, callbackSpy, authHeader);
-        verify(callbackSpy, timeout(TIMEOUT_MS_CALL)).onRequest(ArgumentMatchers.any());
+        verify(callbackSpy, timeout(TIMEOUT_MS_CALL)).onResponse(ArgumentMatchers.any());
         var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
         if (!completed)
             fail(new IllegalStateException("Callback execution timed out"));
         var responseSession = sessionRef.get();
         assertNotNull(responseSession);
-        verify(callbackSpy).onRequest(ArgumentMatchers.any());
-        verify(callbackSpy, only()).onRequest(ArgumentMatchers.any());
+        verify(callbackSpy).onResponse(ArgumentMatchers.any());
+        verify(callbackSpy, only()).onResponse(ArgumentMatchers.any());
     }
 
     @Test
@@ -349,8 +349,8 @@ class SessionClientImplTest {
         var errRef = new AtomicReference<>();
         var callback = new RequestCallback<Session>() {
             @Override
-            public void onRequest(Session entity) {
-                log.error("Session: {}", entity);
+            public void onResponse(Session responseBody) {
+                log.error("Session: {}", responseBody);
             }
 
             @Override

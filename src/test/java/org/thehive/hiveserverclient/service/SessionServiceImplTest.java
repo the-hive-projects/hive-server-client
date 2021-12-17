@@ -66,11 +66,11 @@ class SessionServiceImplTest {
         final var id = 1;
         log.info("Id: {}", id);
         var latch = new CountDownLatch(1);
-        var resultRef = new AtomicReference<Result<? extends Session>>();
-        var consumer = new Consumer<Result<? extends Session>>() {
+        var resultRef = new AtomicReference<AppResponse<? extends Session>>();
+        var consumer = new Consumer<AppResponse<? extends Session>>() {
             @Override
-            public void accept(Result<? extends Session> result) {
-                log.info("Result: {}", result);
+            public void accept(AppResponse<? extends Session> result) {
+                log.info("AppResponse: {}", result);
                 resultRef.set(result);
                 latch.countDown();
             }
@@ -83,7 +83,7 @@ class SessionServiceImplTest {
             fail(new IllegalStateException("Callback execution timed out"));
         var result = resultRef.get();
         assertNotNull(result);
-        assertEquals(ResultStatus.SUCCESS, result.status());
+        assertEquals(ResponseStatus.SUCCESS, result.status());
         verify(consumerSpy).accept(ArgumentMatchers.any());
         verify(consumerSpy, only()).accept(ArgumentMatchers.any());
     }
@@ -99,11 +99,11 @@ class SessionServiceImplTest {
         final var id = Integer.MAX_VALUE;
         log.info("Id: {}", id);
         var latch = new CountDownLatch(1);
-        var resultRef = new AtomicReference<Result<? extends Session>>();
-        var consumer = new Consumer<Result<? extends Session>>() {
+        var resultRef = new AtomicReference<AppResponse<? extends Session>>();
+        var consumer = new Consumer<AppResponse<? extends Session>>() {
             @Override
-            public void accept(Result<? extends Session> result) {
-                log.info("Result: {}", result);
+            public void accept(AppResponse<? extends Session> result) {
+                log.info("AppResponse: {}", result);
                 resultRef.set(result);
                 latch.countDown();
             }
@@ -116,7 +116,7 @@ class SessionServiceImplTest {
             fail(new IllegalStateException("Callback execution timed out"));
         var result = resultRef.get();
         assertNotNull(result);
-        assertEquals(ResultStatus.ERROR_UNAVAILABLE, result.status());
+        assertEquals(ResponseStatus.ERROR_UNAVAILABLE, result.status());
         verify(consumerSpy).accept(ArgumentMatchers.any());
         verify(consumerSpy, only()).accept(ArgumentMatchers.any());
     }
@@ -132,11 +132,11 @@ class SessionServiceImplTest {
         final var id = 1;
         log.info("Id: {}", id);
         var latch = new CountDownLatch(1);
-        var resultRef = new AtomicReference<Result<? extends Session>>();
-        var consumer = new Consumer<Result<? extends Session>>() {
+        var resultRef = new AtomicReference<AppResponse<? extends Session>>();
+        var consumer = new Consumer<AppResponse<? extends Session>>() {
             @Override
-            public void accept(Result<? extends Session> result) {
-                log.info("Result: {}", result);
+            public void accept(AppResponse<? extends Session> result) {
+                log.info("AppResponse: {}", result);
                 resultRef.set(result);
                 latch.countDown();
             }
@@ -149,7 +149,7 @@ class SessionServiceImplTest {
             fail(new IllegalStateException("Callback execution timed out"));
         var result = resultRef.get();
         assertNotNull(result);
-        assertEquals(ResultStatus.ERROR, result.status());
+        assertEquals(ResponseStatus.ERROR, result.status());
         verify(consumerSpy).accept(ArgumentMatchers.any());
         verify(consumerSpy, only()).accept(ArgumentMatchers.any());
     }
@@ -165,11 +165,11 @@ class SessionServiceImplTest {
         final var liveId = LIVE_SESSION_LIVE_ID;
         log.info("LiveId: {}", liveId);
         var latch = new CountDownLatch(1);
-        var resultRef = new AtomicReference<Result<? extends Session>>();
-        var consumer = new Consumer<Result<? extends Session>>() {
+        var resultRef = new AtomicReference<AppResponse<? extends Session>>();
+        var consumer = new Consumer<AppResponse<? extends Session>>() {
             @Override
-            public void accept(Result<? extends Session> result) {
-                log.info("Result: {}", result);
+            public void accept(AppResponse<? extends Session> result) {
+                log.info("AppResponse: {}", result);
                 resultRef.set(result);
                 latch.countDown();
             }
@@ -182,7 +182,7 @@ class SessionServiceImplTest {
             fail(new IllegalStateException("Callback execution timed out"));
         var result = resultRef.get();
         assertNotNull(result);
-        assertEquals(ResultStatus.SUCCESS, result.status());
+        assertEquals(ResponseStatus.SUCCESS, result.status());
         verify(consumerSpy).accept(ArgumentMatchers.any());
         verify(consumerSpy, only()).accept(ArgumentMatchers.any());
     }
@@ -198,11 +198,11 @@ class SessionServiceImplTest {
         final var liveId = "00000000000";
         log.info("LiveId: {}", liveId);
         var latch = new CountDownLatch(1);
-        var resultRef = new AtomicReference<Result<? extends Session>>();
-        var consumer = new Consumer<Result<? extends Session>>() {
+        var resultRef = new AtomicReference<AppResponse<? extends Session>>();
+        var consumer = new Consumer<AppResponse<? extends Session>>() {
             @Override
-            public void accept(Result<? extends Session> result) {
-                log.info("Result: {}", result);
+            public void accept(AppResponse<? extends Session> result) {
+                log.info("AppResponse: {}", result);
                 resultRef.set(result);
                 latch.countDown();
             }
@@ -215,7 +215,7 @@ class SessionServiceImplTest {
             fail(new IllegalStateException("Callback execution timed out"));
         var result = resultRef.get();
         assertNotNull(result);
-        assertEquals(ResultStatus.ERROR_UNAVAILABLE, result.status());
+        assertEquals(ResponseStatus.ERROR_UNAVAILABLE, result.status());
         verify(consumerSpy).accept(ArgumentMatchers.any());
         verify(consumerSpy, only()).accept(ArgumentMatchers.any());
     }
@@ -231,11 +231,11 @@ class SessionServiceImplTest {
         final var liveId = LIVE_SESSION_LIVE_ID;
         log.info("LiveId: {}", liveId);
         var latch = new CountDownLatch(1);
-        var resultRef = new AtomicReference<Result<? extends Session>>();
-        var consumer = new Consumer<Result<? extends Session>>() {
+        var resultRef = new AtomicReference<AppResponse<? extends Session>>();
+        var consumer = new Consumer<AppResponse<? extends Session>>() {
             @Override
-            public void accept(Result<? extends Session> result) {
-                log.info("Result: {}", result);
+            public void accept(AppResponse<? extends Session> result) {
+                log.info("AppResponse: {}", result);
                 resultRef.set(result);
                 latch.countDown();
             }
@@ -248,7 +248,7 @@ class SessionServiceImplTest {
             fail(new IllegalStateException("Callback execution timed out"));
         var result = resultRef.get();
         assertNotNull(result);
-        assertEquals(ResultStatus.ERROR, result.status());
+        assertEquals(ResponseStatus.ERROR, result.status());
         verify(consumerSpy).accept(ArgumentMatchers.any());
         verify(consumerSpy, only()).accept(ArgumentMatchers.any());
     }
@@ -266,11 +266,11 @@ class SessionServiceImplTest {
         var session = new Session(null, name, null, null, null);
         log.info("Session: {}", session);
         var latch = new CountDownLatch(1);
-        var resultRef = new AtomicReference<Result<? extends Session>>();
-        var consumer = new Consumer<Result<? extends Session>>() {
+        var resultRef = new AtomicReference<AppResponse<? extends Session>>();
+        var consumer = new Consumer<AppResponse<? extends Session>>() {
             @Override
-            public void accept(Result<? extends Session> result) {
-                log.info("Result: {}", result);
+            public void accept(AppResponse<? extends Session> result) {
+                log.info("AppResponse: {}", result);
                 resultRef.set(result);
                 latch.countDown();
             }
@@ -283,7 +283,7 @@ class SessionServiceImplTest {
             fail(new IllegalStateException("Callback execution timed out"));
         var result = resultRef.get();
         assertNotNull(result);
-        assertEquals(ResultStatus.SUCCESS, result.status());
+        assertEquals(ResponseStatus.SUCCESS, result.status());
         verify(consumerSpy).accept(ArgumentMatchers.any());
         verify(consumerSpy, only()).accept(ArgumentMatchers.any());
     }
@@ -300,11 +300,11 @@ class SessionServiceImplTest {
         var session = new Session(null, name, null, null, null);
         log.info("Session: {}", session);
         var latch = new CountDownLatch(1);
-        var resultRef = new AtomicReference<Result<? extends Session>>();
-        var consumer = new Consumer<Result<? extends Session>>() {
+        var resultRef = new AtomicReference<AppResponse<? extends Session>>();
+        var consumer = new Consumer<AppResponse<? extends Session>>() {
             @Override
-            public void accept(Result<? extends Session> result) {
-                log.info("Result: {}", result);
+            public void accept(AppResponse<? extends Session> result) {
+                log.info("AppResponse: {}", result);
                 resultRef.set(result);
                 latch.countDown();
             }
@@ -317,7 +317,7 @@ class SessionServiceImplTest {
             fail(new IllegalStateException("Callback execution timed out"));
         var result = resultRef.get();
         assertNotNull(result);
-        assertEquals(ResultStatus.ERROR, result.status());
+        assertEquals(ResponseStatus.ERROR, result.status());
         verify(consumerSpy).accept(ArgumentMatchers.any());
         verify(consumerSpy, only()).accept(ArgumentMatchers.any());
     }

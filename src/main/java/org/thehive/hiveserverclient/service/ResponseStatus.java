@@ -1,6 +1,6 @@
 package org.thehive.hiveserverclient.service;
 
-public enum ResultStatus {
+public enum ResponseStatus {
 
     SUCCESS(0),
     ERROR_INCORRECT(1),
@@ -14,7 +14,7 @@ public enum ResultStatus {
     // 2 -> fail
     private final int type;
 
-    ResultStatus(int type) {
+    ResponseStatus(int type) {
         this.type = type;
     }
 

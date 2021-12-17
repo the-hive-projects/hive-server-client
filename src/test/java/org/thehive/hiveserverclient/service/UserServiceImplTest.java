@@ -58,11 +58,11 @@ class UserServiceImplTest {
         final var password = "password";
         log.info("Username: {}, Password: {}", username, password);
         var latch = new CountDownLatch(1);
-        var resultRef = new AtomicReference<Result<? extends User>>();
-        var consumer = new Consumer<Result<? extends User>>() {
+        var resultRef = new AtomicReference<AppResponse<? extends User>>();
+        var consumer = new Consumer<AppResponse<? extends User>>() {
             @Override
-            public void accept(Result<? extends User> result) {
-                log.info("Result: {}", result);
+            public void accept(AppResponse<? extends User> result) {
+                log.info("AppResponse: {}", result);
                 resultRef.set(result);
                 latch.countDown();
             }
@@ -75,7 +75,7 @@ class UserServiceImplTest {
             fail(new IllegalStateException("Callback execution timed out"));
         var result = resultRef.get();
         assertNotNull(result);
-        assertEquals(ResultStatus.SUCCESS, result.status());
+        assertEquals(ResponseStatus.SUCCESS, result.status());
         verify(consumerSpy).accept(ArgumentMatchers.any());
         verify(consumerSpy, only()).accept(ArgumentMatchers.any());
     }
@@ -87,11 +87,11 @@ class UserServiceImplTest {
         final var password = "password";
         log.info("Username: {}, Password: {}", username, password);
         var latch = new CountDownLatch(1);
-        var resultRef = new AtomicReference<Result<? extends User>>();
-        var consumer = new Consumer<Result<? extends User>>() {
+        var resultRef = new AtomicReference<AppResponse<? extends User>>();
+        var consumer = new Consumer<AppResponse<? extends User>>() {
             @Override
-            public void accept(Result<? extends User> result) {
-                log.info("Result: {}", result);
+            public void accept(AppResponse<? extends User> result) {
+                log.info("AppResponse: {}", result);
                 resultRef.set(result);
                 latch.countDown();
             }
@@ -104,7 +104,7 @@ class UserServiceImplTest {
             fail(new IllegalStateException("Callback execution timed out"));
         var result = resultRef.get();
         assertNotNull(result);
-        assertEquals(ResultStatus.ERROR_INCORRECT, result.status());
+        assertEquals(ResponseStatus.ERROR_INCORRECT, result.status());
         verify(consumerSpy).accept(ArgumentMatchers.any());
         verify(consumerSpy, only()).accept(ArgumentMatchers.any());
     }
@@ -121,11 +121,11 @@ class UserServiceImplTest {
         var user = new User(0, username, email, password, userInfo);
         log.info("User: {}", user);
         var latch = new CountDownLatch(1);
-        var resultRef = new AtomicReference<Result<? extends User>>();
-        var consumer = new Consumer<Result<? extends User>>() {
+        var resultRef = new AtomicReference<AppResponse<? extends User>>();
+        var consumer = new Consumer<AppResponse<? extends User>>() {
             @Override
-            public void accept(Result<? extends User> result) {
-                log.info("Result: {}", result);
+            public void accept(AppResponse<? extends User> result) {
+                log.info("AppResponse: {}", result);
                 resultRef.set(result);
                 latch.countDown();
             }
@@ -138,7 +138,7 @@ class UserServiceImplTest {
             fail(new IllegalStateException("Callback execution timed out"));
         var result = resultRef.get();
         assertNotNull(result);
-        assertEquals(ResultStatus.SUCCESS, result.status());
+        assertEquals(ResponseStatus.SUCCESS, result.status());
         verify(consumerSpy).accept(ArgumentMatchers.any());
         verify(consumerSpy, only()).accept(ArgumentMatchers.any());
     }
@@ -155,11 +155,11 @@ class UserServiceImplTest {
         var user = new User(0, username, email, password, userInfo);
         log.info("User: {}", user);
         var latch = new CountDownLatch(1);
-        var resultRef = new AtomicReference<Result<? extends User>>();
-        var consumer = new Consumer<Result<? extends User>>() {
+        var resultRef = new AtomicReference<AppResponse<? extends User>>();
+        var consumer = new Consumer<AppResponse<? extends User>>() {
             @Override
-            public void accept(Result<? extends User> result) {
-                log.info("Result: {}", result);
+            public void accept(AppResponse<? extends User> result) {
+                log.info("AppResponse: {}", result);
                 resultRef.set(result);
                 latch.countDown();
             }
@@ -172,7 +172,7 @@ class UserServiceImplTest {
             fail(new IllegalStateException("Callback execution timed out"));
         var result = resultRef.get();
         assertNotNull(result);
-        assertEquals(ResultStatus.ERROR_INVALID, result.status());
+        assertEquals(ResponseStatus.ERROR_INVALID, result.status());
         verify(consumerSpy).accept(ArgumentMatchers.any());
         verify(consumerSpy, only()).accept(ArgumentMatchers.any());
     }
@@ -186,11 +186,11 @@ class UserServiceImplTest {
         Authentication.INSTANCE.authenticate(token);
         log.info("Username: {}, Password: {}", username, password);
         var latch = new CountDownLatch(1);
-        var resultRef = new AtomicReference<Result<? extends User>>();
-        var consumer = new Consumer<Result<? extends User>>() {
+        var resultRef = new AtomicReference<AppResponse<? extends User>>();
+        var consumer = new Consumer<AppResponse<? extends User>>() {
             @Override
-            public void accept(Result<? extends User> result) {
-                log.info("Result: {}", result);
+            public void accept(AppResponse<? extends User> result) {
+                log.info("AppResponse: {}", result);
                 resultRef.set(result);
                 latch.countDown();
             }
@@ -203,7 +203,7 @@ class UserServiceImplTest {
             fail(new IllegalStateException("Callback execution timed out"));
         var result = resultRef.get();
         assertNotNull(result);
-        assertEquals(ResultStatus.SUCCESS, result.status());
+        assertEquals(ResponseStatus.SUCCESS, result.status());
         verify(consumerSpy).accept(ArgumentMatchers.any());
         verify(consumerSpy, only()).accept(ArgumentMatchers.any());
     }
@@ -217,11 +217,11 @@ class UserServiceImplTest {
         Authentication.INSTANCE.authenticate(token);
         log.info("Username: {}, Password: {}", username, password);
         var latch = new CountDownLatch(1);
-        var resultRef = new AtomicReference<Result<? extends User>>();
-        var consumer = new Consumer<Result<? extends User>>() {
+        var resultRef = new AtomicReference<AppResponse<? extends User>>();
+        var consumer = new Consumer<AppResponse<? extends User>>() {
             @Override
-            public void accept(Result<? extends User> result) {
-                log.info("Result: {}", result);
+            public void accept(AppResponse<? extends User> result) {
+                log.info("AppResponse: {}", result);
                 resultRef.set(result);
                 latch.countDown();
             }
@@ -234,7 +234,7 @@ class UserServiceImplTest {
             fail(new IllegalStateException("Callback execution timed out"));
         var result = resultRef.get();
         assertNotNull(result);
-        assertEquals(ResultStatus.ERROR, result.status());
+        assertEquals(ResponseStatus.ERROR, result.status());
         verify(consumerSpy).accept(ArgumentMatchers.any());
         verify(consumerSpy, only()).accept(ArgumentMatchers.any());
     }
@@ -250,11 +250,11 @@ class UserServiceImplTest {
         final var id = 1;
         log.info("Id: {}", id);
         var latch = new CountDownLatch(1);
-        var resultRef = new AtomicReference<Result<? extends User>>();
-        var consumer = new Consumer<Result<? extends User>>() {
+        var resultRef = new AtomicReference<AppResponse<? extends User>>();
+        var consumer = new Consumer<AppResponse<? extends User>>() {
             @Override
-            public void accept(Result<? extends User> result) {
-                log.info("Result: {}", result);
+            public void accept(AppResponse<? extends User> result) {
+                log.info("AppResponse: {}", result);
                 resultRef.set(result);
                 latch.countDown();
             }
@@ -267,7 +267,7 @@ class UserServiceImplTest {
             fail(new IllegalStateException("Callback execution timed out"));
         var result = resultRef.get();
         assertNotNull(result);
-        assertEquals(ResultStatus.SUCCESS, result.status());
+        assertEquals(ResponseStatus.SUCCESS, result.status());
         verify(consumerSpy).accept(ArgumentMatchers.any());
         verify(consumerSpy, only()).accept(ArgumentMatchers.any());
     }
@@ -283,11 +283,11 @@ class UserServiceImplTest {
         final var id = 9000;
         log.info("Id: {}", id);
         var latch = new CountDownLatch(1);
-        var resultRef = new AtomicReference<Result<? extends User>>();
-        var consumer = new Consumer<Result<? extends User>>() {
+        var resultRef = new AtomicReference<AppResponse<? extends User>>();
+        var consumer = new Consumer<AppResponse<? extends User>>() {
             @Override
-            public void accept(Result<? extends User> result) {
-                log.info("Result: {}", result);
+            public void accept(AppResponse<? extends User> result) {
+                log.info("AppResponse: {}", result);
                 resultRef.set(result);
                 latch.countDown();
             }
@@ -300,7 +300,7 @@ class UserServiceImplTest {
             fail(new IllegalStateException("Callback execution timed out"));
         var result = resultRef.get();
         assertNotNull(result);
-        assertEquals(ResultStatus.ERROR_UNAVAILABLE, result.status());
+        assertEquals(ResponseStatus.ERROR_UNAVAILABLE, result.status());
         verify(consumerSpy).accept(ArgumentMatchers.any());
         verify(consumerSpy, only()).accept(ArgumentMatchers.any());
     }
@@ -316,11 +316,11 @@ class UserServiceImplTest {
         final var id = 1;
         log.info("Id: {}", id);
         var latch = new CountDownLatch(1);
-        var resultRef = new AtomicReference<Result<? extends User>>();
-        var consumer = new Consumer<Result<? extends User>>() {
+        var resultRef = new AtomicReference<AppResponse<? extends User>>();
+        var consumer = new Consumer<AppResponse<? extends User>>() {
             @Override
-            public void accept(Result<? extends User> result) {
-                log.info("Result: {}", result);
+            public void accept(AppResponse<? extends User> result) {
+                log.info("AppResponse: {}", result);
                 resultRef.set(result);
                 latch.countDown();
             }
@@ -333,7 +333,7 @@ class UserServiceImplTest {
             fail(new IllegalStateException("Callback execution timed out"));
         var result = resultRef.get();
         assertNotNull(result);
-        assertEquals(ResultStatus.ERROR, result.status());
+        assertEquals(ResponseStatus.ERROR, result.status());
         verify(consumerSpy).accept(ArgumentMatchers.any());
         verify(consumerSpy, only()).accept(ArgumentMatchers.any());
     }

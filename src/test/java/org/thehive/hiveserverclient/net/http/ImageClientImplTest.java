@@ -55,9 +55,9 @@ class ImageClientImplTest {
         var imgRef = new AtomicReference<Image>();
         var callback = new RequestCallback<Image>() {
             @Override
-            public void onRequest(Image entity) {
-                log.info("Image: {}", entity);
-                imgRef.set(entity);
+            public void onResponse(Image responseBody) {
+                log.info("Image: {}", responseBody);
+                imgRef.set(responseBody);
                 latch.countDown();
             }
 
@@ -73,14 +73,14 @@ class ImageClientImplTest {
         };
         var callbackSpy = spy(callback);
         imageClient.get(imageUsername, callbackSpy, authHeader);
-        verify(callbackSpy, timeout(TIMEOUT_MS_CALL)).onRequest(ArgumentMatchers.any());
+        verify(callbackSpy, timeout(TIMEOUT_MS_CALL)).onResponse(ArgumentMatchers.any());
         var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
         if (!completed)
             fail(new IllegalStateException("Callback execution timed out"));
         var image = imgRef.get();
         assertNotNull(image);
-        verify(callbackSpy).onRequest(ArgumentMatchers.any());
-        verify(callbackSpy, only()).onRequest(ArgumentMatchers.any());
+        verify(callbackSpy).onResponse(ArgumentMatchers.any());
+        verify(callbackSpy, only()).onResponse(ArgumentMatchers.any());
     }
 
     @Test
@@ -96,8 +96,8 @@ class ImageClientImplTest {
         var errRef = new AtomicReference<Error>();
         var callback = new RequestCallback<Image>() {
             @Override
-            public void onRequest(Image entity) {
-                log.error("Image: {}", entity);
+            public void onResponse(Image responseBody) {
+                log.error("Image: {}", responseBody);
             }
 
             @Override

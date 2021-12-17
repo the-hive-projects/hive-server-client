@@ -54,9 +54,9 @@ class UserClientImplTest {
         var userRef = new AtomicReference<User>();
         var callback = new RequestCallback<User>() {
             @Override
-            public void onRequest(User entity) {
-                log.info("User: {}", entity);
-                userRef.set(entity);
+            public void onResponse(User responseBody) {
+                log.info("User: {}", responseBody);
+                userRef.set(responseBody);
                 latch.countDown();
             }
 
@@ -72,14 +72,14 @@ class UserClientImplTest {
         };
         var callbackSpy = spy(callback);
         userClient.get(callbackSpy, authHeader);
-        verify(callbackSpy, timeout(TIMEOUT_MS_CALL)).onRequest(ArgumentMatchers.any());
+        verify(callbackSpy, timeout(TIMEOUT_MS_CALL)).onResponse(ArgumentMatchers.any());
         var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
         if (!completed)
             fail(new IllegalStateException("Callback execution timed out"));
         var user = userRef.get();
         assertNotNull(user);
-        verify(callbackSpy).onRequest(ArgumentMatchers.any());
-        verify(callbackSpy, only()).onRequest(ArgumentMatchers.any());
+        verify(callbackSpy).onResponse(ArgumentMatchers.any());
+        verify(callbackSpy, only()).onResponse(ArgumentMatchers.any());
     }
 
     @Test
@@ -93,8 +93,8 @@ class UserClientImplTest {
         var errRef = new AtomicReference<Error>();
         var callback = new RequestCallback<User>() {
             @Override
-            public void onRequest(User entity) {
-                log.error("User: {}", entity);
+            public void onResponse(User responseBody) {
+                log.error("User: {}", responseBody);
             }
 
             @Override
@@ -134,9 +134,9 @@ class UserClientImplTest {
         var userRef = new AtomicReference<User>();
         var callback = new RequestCallback<User>() {
             @Override
-            public void onRequest(User entity) {
-                log.info("User: {}", entity);
-                userRef.set(entity);
+            public void onResponse(User responseBody) {
+                log.info("User: {}", responseBody);
+                userRef.set(responseBody);
                 latch.countDown();
             }
 
@@ -152,14 +152,14 @@ class UserClientImplTest {
         };
         var callbackSpy = spy(callback);
         userClient.get(id, callbackSpy, authHeader);
-        verify(callbackSpy, timeout(TIMEOUT_MS_CALL)).onRequest(ArgumentMatchers.any());
+        verify(callbackSpy, timeout(TIMEOUT_MS_CALL)).onResponse(ArgumentMatchers.any());
         var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
         if (!completed)
             fail(new IllegalStateException("Callback execution timed out"));
         var user = userRef.get();
         assertNotNull(user);
-        verify(callbackSpy).onRequest(ArgumentMatchers.any());
-        verify(callbackSpy, only()).onRequest(ArgumentMatchers.any());
+        verify(callbackSpy).onResponse(ArgumentMatchers.any());
+        verify(callbackSpy, only()).onResponse(ArgumentMatchers.any());
     }
 
     @Test
@@ -175,8 +175,8 @@ class UserClientImplTest {
         var errRef = new AtomicReference<Error>();
         var callback = new RequestCallback<User>() {
             @Override
-            public void onRequest(User entity) {
-                log.error("User: {}", entity);
+            public void onResponse(User responseBody) {
+                log.error("User: {}", responseBody);
             }
 
             @Override
@@ -216,8 +216,8 @@ class UserClientImplTest {
         var errRef = new AtomicReference<Error>();
         var callback = new RequestCallback<User>() {
             @Override
-            public void onRequest(User entity) {
-                log.error("User: {}", entity);
+            public void onResponse(User responseBody) {
+                log.error("User: {}", responseBody);
             }
 
             @Override
@@ -259,9 +259,9 @@ class UserClientImplTest {
         var userRef = new AtomicReference<User>();
         var callback = new RequestCallback<User>() {
             @Override
-            public void onRequest(User entity) {
-                log.info("User: {}", entity);
-                userRef.set(entity);
+            public void onResponse(User responseBody) {
+                log.info("User: {}", responseBody);
+                userRef.set(responseBody);
                 latch.countDown();
             }
 
@@ -277,14 +277,14 @@ class UserClientImplTest {
         };
         var callbackSpy = spy(callback);
         userClient.save(user, callbackSpy);
-        verify(callbackSpy, timeout(TIMEOUT_MS_CALL)).onRequest(ArgumentMatchers.any());
+        verify(callbackSpy, timeout(TIMEOUT_MS_CALL)).onResponse(ArgumentMatchers.any());
         var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
         if (!completed)
             fail(new IllegalStateException("Callback execution timed out"));
         var responseUser = userRef.get();
         assertNotNull(responseUser);
-        verify(callbackSpy).onRequest(ArgumentMatchers.any());
-        verify(callbackSpy, only()).onRequest(ArgumentMatchers.any());
+        verify(callbackSpy).onResponse(ArgumentMatchers.any());
+        verify(callbackSpy, only()).onResponse(ArgumentMatchers.any());
     }
 
     @Test
@@ -302,8 +302,8 @@ class UserClientImplTest {
         var errRef = new AtomicReference<Error>();
         var callback = new RequestCallback<User>() {
             @Override
-            public void onRequest(User entity) {
-                log.error("User: {}", entity);
+            public void onResponse(User responseBody) {
+                log.error("User: {}", responseBody);
             }
 
             @Override

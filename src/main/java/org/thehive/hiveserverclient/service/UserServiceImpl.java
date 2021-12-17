@@ -23,134 +23,134 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void signIn(@NonNull String username, @NonNull String password, @NonNull Consumer<? super Result<? extends User>> consumer) {
+    public void signIn(@NonNull String username, @NonNull String password, @NonNull Consumer<? super AppResponse<? extends User>> consumer) {
         log.info("#signIn username: {}, password: {}", username, password);
         if (Authentication.INSTANCE.isAuthenticated())
             throw new IllegalStateException("Authentication instance has already been authenticated");
         var authenticationHeader = new BasicHeader(HeaderUtils.HTTP_BASIC_AUTHENTICATION_HEADER_NAME, HeaderUtils.httpBasicAuthenticationToken(username, password));
         userClient.get(new RequestCallback<>() {
             @Override
-            public void onRequest(User entity) {
+            public void onResponse(User responseBody) {
                 Authentication.INSTANCE.authenticate(authenticationHeader.getValue());
-                var result = Result.of(entity);
-                log.info("#signIn username: {}, password: {}, status: {}", username, password, result.status().name());
-                consumer.accept(result);
+                var response = AppResponse.of(responseBody);
+                log.info("#signIn username: {}, password: {}, status: {}", username, password, response.status().name());
+                consumer.accept(response);
             }
 
             @Override
             public void onError(Error error) {
-                Result<User> result;
+                AppResponse<User> response;
                 if (error.getStatus() == HttpStatus.SC_UNAUTHORIZED) {
-                    result = Result.of(ResultStatus.ERROR_INCORRECT, error.getMessage());
+                    response = AppResponse.of(ResponseStatus.ERROR_INCORRECT, error.getMessage());
                 } else {
-                    result = Result.of(error.getMessage());
+                    response = AppResponse.of(error.getMessage());
                 }
-                log.info("#signIn username: {}, password: {}, status: {}", username, password, result.status().name());
-                consumer.accept(result);
+                log.info("#signIn username: {}, password: {}, status: {}", username, password, response.status().name());
+                consumer.accept(response);
             }
 
             @Override
             public void onFail(Throwable t) {
-                var result = Result.<User>of(t);
-                log.info("#signIn username: {}, password: {}, status: {}", username, password, result.status().name());
-                consumer.accept(result);
+                var response = AppResponse.<User>of(t);
+                log.info("#signIn username: {}, password: {}, status: {}", username, password, response.status().name());
+                consumer.accept(response);
             }
         }, authenticationHeader);
     }
 
     @Override
-    public void signUp(@NonNull User user, @NonNull Consumer<? super Result<? extends User>> consumer) {
+    public void signUp(@NonNull User user, @NonNull Consumer<? super AppResponse<? extends User>> consumer) {
         log.info("#signUp user: {}", user);
         if (Authentication.INSTANCE.isAuthenticated())
             throw new IllegalStateException("Authentication instance has already been authenticated");
         userClient.save(user, new RequestCallback<>() {
             @Override
-            public void onRequest(User entity) {
-                var result = Result.of(entity);
-                log.info("#signUp user: {}, status: {}", user, result.status().name());
-                consumer.accept(result);
+            public void onResponse(User responseBody) {
+                var response = AppResponse.of(responseBody);
+                log.info("#signUp user: {}, status: {}", user, response.status().name());
+                consumer.accept(response);
             }
 
             @Override
             public void onError(Error error) {
-                Result<User> result;
+                AppResponse<User> response;
                 if (error.getStatus() == HttpStatus.SC_BAD_REQUEST) {
-                    result = Result.of(ResultStatus.ERROR_INVALID, error.getMessage());
+                    response = AppResponse.of(ResponseStatus.ERROR_INVALID, error.getMessage());
                 } else {
-                    result = Result.of(error.getMessage());
+                    response = AppResponse.of(error.getMessage());
                 }
-                log.info("#signUp user: {}, status: {}", user, result.status().name());
-                consumer.accept(result);
+                log.info("#signUp user: {}, status: {}", user, response.status().name());
+                consumer.accept(response);
             }
 
             @Override
             public void onFail(Throwable t) {
-                var result = Result.<User>of(t);
-                log.info("#signUp user: {}, status: {}", user, result.status().name());
-                consumer.accept(result);
+                var response = AppResponse.<User>of(t);
+                log.info("#signUp user: {}, status: {}", user, response.status().name());
+                consumer.accept(response);
             }
         });
     }
 
     @Override
-    public void profile(@NonNull Consumer<? super Result<? extends User>> consumer) {
+    public void profile(@NonNull Consumer<? super AppResponse<? extends User>> consumer) {
         log.info("#profile");
         if (!Authentication.INSTANCE.isAuthenticated())
             throw new IllegalStateException("Authentication instance has not been authenticated");
         userClient.get(new RequestCallback<>() {
             @Override
-            public void onRequest(User entity) {
-                var result = Result.of(entity);
-                log.info("#profile status: {}", result.status().name());
-                consumer.accept(result);
+            public void onResponse(User responseBody) {
+                var response = AppResponse.of(responseBody);
+                log.info("#profile status: {}", response.status().name());
+                consumer.accept(response);
             }
 
             @Override
             public void onError(Error error) {
-                var result = Result.<User>of(error.getMessage());
-                log.info("#profile status: {}", result.status().name());
-                consumer.accept(result);
+                var response = AppResponse.<User>of(error.getMessage());
+                log.info("#profile status: {}", response.status().name());
+                consumer.accept(response);
             }
 
             @Override
             public void onFail(Throwable t) {
-                var result = Result.<User>of(t);
-                log.info("#profile status: {}", result.status().name());
-                consumer.accept(result);
+                var response = AppResponse.<User>of(t);
+                log.info("#profile status: {}", response.status().name());
+                consumer.accept(response);
             }
         }, HeaderUtils.httpBasicAuthenticationHeader(Authentication.INSTANCE.getToken()));
     }
 
     @Override
-    public void profile(int id, @NonNull Consumer<? super Result<? extends User>> consumer) {
+    public void profile(int id, @NonNull Consumer<? super AppResponse<? extends User>> consumer) {
         log.info("#profile id: {}", id);
         if (!Authentication.INSTANCE.isAuthenticated())
             throw new IllegalStateException("Authentication instance has not been authenticated");
         userClient.get(id, new RequestCallback<>() {
             @Override
-            public void onRequest(User entity) {
-                var result = Result.of(entity);
-                log.info("#profile id: {}, status: {}", id, result.status().name());
-                consumer.accept(result);
+            public void onResponse(User responseBody) {
+                var response = AppResponse.of(responseBody);
+                log.info("#profile id: {}, status: {}", id, response.status().name());
+                consumer.accept(response);
             }
 
             @Override
             public void onError(Error error) {
-                Result<User> result;
+                AppResponse<User> response;
                 if (error.getStatus() == HttpStatus.SC_NOT_FOUND) {
-                    result = Result.of(ResultStatus.ERROR_UNAVAILABLE, error.getMessage());
+                    response = AppResponse.of(ResponseStatus.ERROR_UNAVAILABLE, error.getMessage());
                 } else {
-                    result = Result.of(error.getMessage());
+                    response = AppResponse.of(error.getMessage());
                 }
-                log.info("#profile id: {}, status: {}", id, result.status().name());
-                consumer.accept(result);
+                log.info("#profile id: {}, status: {}", id, response.status().name());
+                consumer.accept(response);
             }
 
             @Override
             public void onFail(Throwable t) {
-                var result = Result.<User>of(t);
-                log.info("#profile id: {}, status: {}", id, result.status().name());
-                consumer.accept(result);
+                var response = AppResponse.<User>of(t);
+                log.info("#profile id: {}, status: {}", id, response.status().name());
+                consumer.accept(response);
             }
         }, HeaderUtils.httpBasicAuthenticationHeader(Authentication.INSTANCE.getToken()));
     }
