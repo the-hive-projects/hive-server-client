@@ -7,12 +7,12 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Session implements Entity {
+public class Submission {
 
-    private Integer id;
-    private String name;
-    private Long duration;
+    private int id;
+    private String content;
+    private Session session;
     private User user;
-    private Long creationTime;
+    private long creationTime;
 
 }

@@ -36,7 +36,7 @@ class SessionServiceImplTest {
     static final long TIMEOUT_MS_EXECUTE = 1_000L;
 
     // Set this value according to ongoing live session.
-    static final String LIVE_SESSION_LIVE_ID = "66324463687";
+    static final String LIVE_SESSION_LIVE_ID = "84697174304";
 
     SessionServiceImpl sessionService;
 

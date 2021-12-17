@@ -1,7 +1,6 @@
 package org.thehive.hiveserverclient.net.http;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.Header;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -12,19 +11,10 @@ import org.thehive.hiveserverclient.model.Image;
 import java.util.concurrent.ExecutorService;
 
 @Slf4j
-public class ImageClientImpl implements ImageClient {
+public class ImageClientImpl extends AppHttpClient implements ImageClient {
 
-    private final String url;
-    private final ObjectMapper objectMapper;
-    private final CloseableHttpClient httpClient;
-    private final ExecutorService executorService;
-
-    public ImageClientImpl(@NonNull String url, @NonNull ObjectMapper objectMapper,
-                           @NonNull CloseableHttpClient httpClient, @NonNull ExecutorService executorService) {
-        this.url = url;
-        this.objectMapper = objectMapper;
-        this.httpClient = httpClient;
-        this.executorService = executorService;
+    public ImageClientImpl(String url, ObjectMapper objectMapper, CloseableHttpClient httpClient, ExecutorService executorService) {
+        super(url, objectMapper, httpClient, executorService);
     }
 
     @Override

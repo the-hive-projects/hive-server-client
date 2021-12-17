@@ -13,6 +13,6 @@ public class UserInfo {
     private Integer id;
     private String firstname;
     private String lastname;
-    private Long createdAt;
+    private Long creationTime;
 
 }

@@ -14,19 +14,10 @@ import org.thehive.hiveserverclient.model.Session;
 import java.util.concurrent.ExecutorService;
 
 @Slf4j
-public class SessionClientImpl implements SessionClient {
+public class SessionClientImpl extends AppHttpClient implements SessionClient {
 
-    private final String url;
-    private final ObjectMapper objectMapper;
-    private final CloseableHttpClient httpClient;
-    private final ExecutorService executorService;
-
-    public SessionClientImpl(@NonNull String url, @NonNull ObjectMapper objectMapper,
-                             @NonNull CloseableHttpClient httpClient, @NonNull ExecutorService executorService) {
-        this.url = url;
-        this.objectMapper = objectMapper;
-        this.httpClient = httpClient;
-        this.executorService = executorService;
+    public SessionClientImpl(String url, ObjectMapper objectMapper, CloseableHttpClient httpClient, ExecutorService executorService) {
+        super(url, objectMapper, httpClient, executorService);
     }
 
     @Override
