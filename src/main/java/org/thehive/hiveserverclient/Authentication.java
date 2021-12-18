@@ -8,22 +8,30 @@ public class Authentication {
 
     public static final Authentication INSTANCE = new Authentication();
 
+    private final AtomicReference<String> usernameReference;
     private final AtomicReference<String> tokenReference;
 
     private Authentication() {
+        this.usernameReference = new AtomicReference<>(null);
         this.tokenReference = new AtomicReference<>(null);
+    }
+
+    public String getUsername() {
+        return usernameReference.get();
     }
 
     public String getToken() {
         return tokenReference.get();
     }
 
-    public void authenticate(@NonNull String token) {
+    public void authenticate(@NonNull String username,@NonNull String token) {
+        usernameReference.set(username);
         tokenReference.set(token);
     }
 
     public void unauthenticate() {
         tokenReference.set(null);
+        usernameReference.set(null);
     }
 
     public boolean isAuthenticated() {

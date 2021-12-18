@@ -31,9 +31,9 @@ public class UserServiceImpl implements UserService {
         userClient.get(new RequestCallback<>() {
             @Override
             public void onResponse(User responseBody) {
-                Authentication.INSTANCE.authenticate(authenticationHeader.getValue());
+                Authentication.INSTANCE.authenticate(username, authenticationHeader.getValue());
                 var response = AppResponse.of(responseBody);
-                log.info("#signIn username: {}, password: {}, status: {}", username, password, response.status().name());
+                log.info("#signIn username: {}, status: {}", username, response.status().name());
                 consumer.accept(response);
             }
 
@@ -45,14 +45,14 @@ public class UserServiceImpl implements UserService {
                 } else {
                     response = AppResponse.of(error.getMessage());
                 }
-                log.info("#signIn username: {}, password: {}, status: {}", username, password, response.status().name());
+                log.info("#signIn username: {}, status: {}", username, response.status().name());
                 consumer.accept(response);
             }
 
             @Override
             public void onFail(Throwable t) {
                 var response = AppResponse.<User>of(t);
-                log.info("#signIn username: {}, password: {}, status: {}", username, password, response.status().name());
+                log.info("#signIn username: {}, status: {}", username, response.status().name());
                 consumer.accept(response);
             }
         }, authenticationHeader);

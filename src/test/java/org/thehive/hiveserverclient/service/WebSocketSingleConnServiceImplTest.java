@@ -69,7 +69,7 @@ class WebSocketSingleConnServiceImplTest {
         final var username = "user";
         final var password = "password";
         var token = HeaderUtils.httpBasicAuthenticationToken(username, password);
-        Authentication.INSTANCE.authenticate(token);
+        Authentication.INSTANCE.authenticate(username,token);
         log.info("Username: {}, Password: {}", username, password);
         var latch = new CountDownLatch(1);
         var connRef = new AtomicReference<WebSocketConnection>();
@@ -129,7 +129,7 @@ class WebSocketSingleConnServiceImplTest {
         final var username = "username";
         final var password = "password";
         var token = HeaderUtils.httpBasicAuthenticationToken(username, password);
-        Authentication.INSTANCE.authenticate(token);
+        Authentication.INSTANCE.authenticate(username,token);
         log.info("Username: {}, Password: {}", username, password);
         var latch = new CountDownLatch(1);
         var expRef = new AtomicReference<Throwable>();
@@ -189,7 +189,7 @@ class WebSocketSingleConnServiceImplTest {
         final var username = "user";
         final var password = "password";
         var token = HeaderUtils.httpBasicAuthenticationToken(username, password);
-        Authentication.INSTANCE.authenticate(token);
+        Authentication.INSTANCE.authenticate(username,token);
         log.info("Username: {}, Password: {}", username, password);
         var connLatch = new CountDownLatch(1);
         var disconnLatch = new CountDownLatch(1);

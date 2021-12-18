@@ -32,6 +32,13 @@ public interface AppResponse<R> {
                 .build();
     }
 
+    static <R> AppResponse<R> wrap(R response) {
+        return AppResponseImpl.<R>builder()
+                .status(ResponseStatus.SUCCESS)
+                .response(response)
+                .build();
+    }
+
     ResponseStatus status();
 
     Optional<R> response();

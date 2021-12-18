@@ -14,7 +14,7 @@ import java.util.function.Consumer;
 @Slf4j
 public class ImageServiceImpl implements ImageService {
 
-    private final ImageClient imageClient;
+    protected final ImageClient imageClient;
 
     public ImageServiceImpl(@NonNull ImageClient imageClient) {
         this.imageClient = imageClient;

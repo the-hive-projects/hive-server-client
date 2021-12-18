@@ -183,7 +183,7 @@ class UserServiceImplTest {
         final var username = "user";
         final var password = "password";
         var token = HeaderUtils.httpBasicAuthenticationToken(username, password);
-        Authentication.INSTANCE.authenticate(token);
+        Authentication.INSTANCE.authenticate(username,token);
         log.info("Username: {}, Password: {}", username, password);
         var latch = new CountDownLatch(1);
         var resultRef = new AtomicReference<AppResponse<? extends User>>();
@@ -214,7 +214,7 @@ class UserServiceImplTest {
         final var username = "username";
         final var password = "password";
         var token = HeaderUtils.httpBasicAuthenticationToken(username, password);
-        Authentication.INSTANCE.authenticate(token);
+        Authentication.INSTANCE.authenticate(username,token);
         log.info("Username: {}, Password: {}", username, password);
         var latch = new CountDownLatch(1);
         var resultRef = new AtomicReference<AppResponse<? extends User>>();
@@ -245,7 +245,7 @@ class UserServiceImplTest {
         final var username = "user";
         final var password = "password";
         var token = HeaderUtils.httpBasicAuthenticationToken(username, password);
-        Authentication.INSTANCE.authenticate(token);
+        Authentication.INSTANCE.authenticate(username,token);
         log.info("Username: {}, Password: {}", username, password);
         final var id = 1;
         log.info("Id: {}", id);
@@ -278,7 +278,7 @@ class UserServiceImplTest {
         final var username = "user";
         final var password = "password";
         var token = HeaderUtils.httpBasicAuthenticationToken(username, password);
-        Authentication.INSTANCE.authenticate(token);
+        Authentication.INSTANCE.authenticate(username,token);
         log.info("Username: {}, Password: {}", username, password);
         final var id = 9000;
         log.info("Id: {}", id);
@@ -311,7 +311,7 @@ class UserServiceImplTest {
         final var username = "username";
         final var password = "password";
         var token = HeaderUtils.httpBasicAuthenticationToken(username, password);
-        Authentication.INSTANCE.authenticate(token);
+        Authentication.INSTANCE.authenticate(username,token);
         log.info("Username: {}, Password: {}", username, password);
         final var id = 1;
         log.info("Id: {}", id);
