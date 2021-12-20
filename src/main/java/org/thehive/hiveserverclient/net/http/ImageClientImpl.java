@@ -23,7 +23,7 @@ public class ImageClientImpl extends AppHttpClient implements ImageClient {
     public void get(String username, RequestCallback<? super Image> callback, Header... headers) {
         var reqUrl = RequestUtils.concatUrlPath(url, username);
         var req = RequestUtils.getRequestOf(reqUrl, headers);
-        log.debug("#get username: {}", username);
+        log.debug("#get uri: {}", req.getURI());
         executeRequest(req, callback);
     }
 
@@ -35,11 +35,11 @@ public class ImageClientImpl extends AppHttpClient implements ImageClient {
                 try (var response = httpClient.execute(req)) {
                     var statusCode = response.getStatusLine().getStatusCode();
                     var responseBody = EntityUtils.toString(response.getEntity());
-                    log.debug("Request has been received, path: {}, method: {}, statusCode: {}, body: {}", req.getURI().getPath(), req.getMethod(), statusCode, responseBody);
+                    log.debug("Response has been received, path: {}, method: {}, statusCode: {}", req.getURI().getPath(), req.getMethod(), statusCode);
                     executeCallbackFail = false;
                     if (statusCode / 100 == 2) {
                         var image = objectMapper.readValue(responseBody, Image.class);
-                        log.debug("Executing callback onRequest, image: {}", image);
+                        log.debug("Executing callback onResponse, image: {}", image);
                         callback.onResponse(image);
                     } else {
                         var error = objectMapper.readValue(responseBody, Error.class);

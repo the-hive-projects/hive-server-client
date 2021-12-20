@@ -21,32 +21,57 @@ public class SessionClientImpl extends AppHttpClient implements SessionClient {
     }
 
     @Override
-    public void get(int id, RequestCallback<? super Session> callback, Header... headers) {
-        var reqUrl = RequestUtils.concatUrlPath(url, id);
-        var req = RequestUtils.getRequestOf(reqUrl, headers);
-        log.debug("#get id: {}", id);
-        executeRequest(req, callback);
+    public void getAllSessions(RequestCallback<? super Session[]> callback, Header... headers) {
+        var req = RequestUtils.getRequestOf(url, headers);
+        log.debug("#getAllSessions uri: {}", req.getURI());
+        executorService.execute(() -> {
+            log.debug("Request is being sent, path: {}, method: {}", req.getURI().getPath(), req.getMethod());
+            boolean executeCallbackFail = true;
+            try {
+                try (var response = httpClient.execute(req)) {
+                    var statusCode = response.getStatusLine().getStatusCode();
+                    var responseBody = EntityUtils.toString(response.getEntity());
+                    log.debug("Response has been received, path: {}, method: {}, statusCode: {}, body: {}", req.getURI().getPath(), req.getMethod(), statusCode, responseBody);
+                    executeCallbackFail = false;
+                    if (statusCode / 100 == 2) {
+                        var sessions = objectMapper.readValue(responseBody, Session[].class);
+                        log.debug("Executing callback onResponse, sessionsLength: {}", sessions.length);
+                        callback.onResponse(sessions);
+                    } else {
+                        var error = objectMapper.readValue(responseBody, Error.class);
+                        log.debug("Executing callback onError, error: {}", error);
+                        callback.onError(error);
+                    }
+                }
+            } catch (Exception e) {
+                if (executeCallbackFail) {
+                    log.debug("Executing callback onFail, exception: {}", e.getClass().getName());
+                    callback.onFail(e);
+                } else
+                    log.warn("Error while http request", e);
+            }
+        });
     }
 
     @Override
-    public void getLive(String liveId, RequestCallback<? super Session> callback, Header... headers) {
-        var reqUrl = RequestUtils.concatUrlPath(url, "live", liveId);
+    public void getLiveSession(String liveId, RequestCallback<? super Session> callback, Header... headers) {
+        var reqUrl = RequestUtils.concatUrlPath(url, liveId);
         var req = RequestUtils.getRequestOf(reqUrl, headers);
-        log.debug("#getLive liveId: {}", liveId);
+        log.debug("#getLiveSession uri: {}", req.getURI());
         executeRequest(req, callback);
     }
 
     @Override
     public void save(Session session, RequestCallback<? super Session> callback, Header... headers) {
-        String userStr;
+        String sessionStr;
         try {
-            userStr = objectMapper.writeValueAsString(session);
+            sessionStr = objectMapper.writeValueAsString(session);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             return;
         }
-        var req = RequestUtils.postRequestOf(url, userStr, headers);
-        log.debug("#save session: {}", session);
+        var req = RequestUtils.postRequestOf(url, sessionStr, headers);
+        log.debug("#save uri: {}, body: {}", req.getURI(), sessionStr);
         executeRequest(req, callback);
     }
 
@@ -58,11 +83,11 @@ public class SessionClientImpl extends AppHttpClient implements SessionClient {
                 try (var response = httpClient.execute(req)) {
                     var statusCode = response.getStatusLine().getStatusCode();
                     var responseBody = EntityUtils.toString(response.getEntity());
-                    log.debug("Request has been received, path: {}, method: {}, statusCode: {}, body: {}", req.getURI().getPath(), req.getMethod(), statusCode, responseBody);
+                    log.debug("Response has been received, path: {}, method: {}, statusCode: {}, body: {}", req.getURI().getPath(), req.getMethod(), statusCode, responseBody);
                     executeCallbackFail = false;
                     if (statusCode / 100 == 2) {
                         var session = objectMapper.readValue(responseBody, Session.class);
-                        log.debug("Executing callback onRequest, session: {}", session);
+                        log.debug("Executing callback onResponse, session: {}", session);
                         callback.onResponse(session);
                     } else {
                         var error = objectMapper.readValue(responseBody, Error.class);

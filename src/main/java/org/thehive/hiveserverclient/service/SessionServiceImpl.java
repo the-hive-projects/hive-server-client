@@ -21,33 +21,33 @@ public class SessionServiceImpl implements SessionService {
     }
 
     @Override
-    public void take(@NonNull int id, @NonNull Consumer<? super AppResponse<? extends Session>> consumer) {
-        log.info("#take id: {}", id);
+    public void takeAll(@NonNull Consumer<? super AppResponse<? extends Session[]>> consumer) {
+        log.info("#takeAll");
         if (!Authentication.INSTANCE.isAuthenticated())
             throw new IllegalStateException("Authentication instance has not been authenticated");
-        sessionClient.get(id, new RequestCallback<>() {
+        sessionClient.getAllSessions(new RequestCallback<>() {
             @Override
-            public void onResponse(Session responseBody) {
+            public void onResponse(Session[] responseBody) {
                 var response = AppResponse.of(responseBody);
-                log.info("#take id: {}, status: {}", id, response.status().name());
+                log.info("#takeAll status: {}", response.status().name());
                 consumer.accept(response);
             }
 
             @Override
             public void onError(Error error) {
-                AppResponse<Session> response;
+                AppResponse<Session[]> response;
                 if (error.getStatus() == 404)
                     response = AppResponse.of(ResponseStatus.ERROR_UNAVAILABLE, error.getMessage());
                 else
                     response = AppResponse.of(error.getMessage());
-                log.info("#take id: {}, status: {}", id, response.status().name());
+                log.info("#takeAll , status: {}", response.status().name());
                 consumer.accept(response);
             }
 
             @Override
             public void onFail(Throwable t) {
-                var response = AppResponse.<Session>of(t);
-                log.info("#take id: {}, status: {}", id, response.status().name());
+                var response = AppResponse.<Session[]>of(t);
+                log.info("#takeAll status: {}", response.status().name());
                 consumer.accept(response);
             }
         }, HeaderUtils.httpBasicAuthenticationHeader(Authentication.INSTANCE.getToken()));
@@ -58,7 +58,7 @@ public class SessionServiceImpl implements SessionService {
         log.info("#takeLive liveId: {}", liveId);
         if (!Authentication.INSTANCE.isAuthenticated())
             throw new IllegalStateException("Authentication instance has not been authenticated");
-        sessionClient.getLive(liveId, new RequestCallback<>() {
+        sessionClient.getLiveSession(liveId, new RequestCallback<>() {
             @Override
             public void onResponse(Session responseBody) {
                 var response = AppResponse.of(responseBody);

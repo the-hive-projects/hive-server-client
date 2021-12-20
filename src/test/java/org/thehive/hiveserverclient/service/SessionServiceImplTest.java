@@ -56,27 +56,25 @@ class SessionServiceImplTest {
     }
 
     @Test
-    @DisplayName("Take existing session when authentication is correct")
-    void takeExistingSessionWhenAuthenticationIsCorrect() throws InterruptedException {
+    @DisplayName("Take all sessions when authentication is correct")
+    void takeAllSessionsWhenAuthenticationIsCorrect() throws InterruptedException {
         final var username = "user";
         final var password = "password";
         var token = HeaderUtils.httpBasicAuthenticationToken(username, password);
-        Authentication.INSTANCE.authenticate(username,token);
+        Authentication.INSTANCE.authenticate(username, token);
         log.info("Username: {}, Password: {}", username, password);
-        final var id = 1;
-        log.info("Id: {}", id);
         var latch = new CountDownLatch(1);
-        var resultRef = new AtomicReference<AppResponse<? extends Session>>();
-        var consumer = new Consumer<AppResponse<? extends Session>>() {
+        var resultRef = new AtomicReference<AppResponse<? extends Session[]>>();
+        var consumer = new Consumer<AppResponse<? extends Session[]>>() {
             @Override
-            public void accept(AppResponse<? extends Session> result) {
+            public void accept(AppResponse<? extends Session[]> result) {
                 log.info("AppResponse: {}", result);
                 resultRef.set(result);
                 latch.countDown();
             }
         };
         var consumerSpy = spy(consumer);
-        sessionService.take(id, consumerSpy);
+        sessionService.takeAll(consumerSpy);
         verify(consumerSpy, timeout(TIMEOUT_MS_CALL)).accept(ArgumentMatchers.any());
         var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
         if (!completed)
@@ -89,60 +87,25 @@ class SessionServiceImplTest {
     }
 
     @Test
-    @DisplayName("Take non-existing session when authentication is correct")
-    void takeNonExistingSessionWhenAuthenticationIsCorrect() throws InterruptedException {
-        final var username = "user";
-        final var password = "password";
-        var token = HeaderUtils.httpBasicAuthenticationToken(username, password);
-        Authentication.INSTANCE.authenticate(username,token);
-        log.info("Username: {}, Password: {}", username, password);
-        final var id = Integer.MAX_VALUE;
-        log.info("Id: {}", id);
-        var latch = new CountDownLatch(1);
-        var resultRef = new AtomicReference<AppResponse<? extends Session>>();
-        var consumer = new Consumer<AppResponse<? extends Session>>() {
-            @Override
-            public void accept(AppResponse<? extends Session> result) {
-                log.info("AppResponse: {}", result);
-                resultRef.set(result);
-                latch.countDown();
-            }
-        };
-        var consumerSpy = spy(consumer);
-        sessionService.take(id, consumerSpy);
-        verify(consumerSpy, timeout(TIMEOUT_MS_CALL)).accept(ArgumentMatchers.any());
-        var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
-        if (!completed)
-            fail(new IllegalStateException("Callback execution timed out"));
-        var result = resultRef.get();
-        assertNotNull(result);
-        assertEquals(ResponseStatus.ERROR_UNAVAILABLE, result.status());
-        verify(consumerSpy).accept(ArgumentMatchers.any());
-        verify(consumerSpy, only()).accept(ArgumentMatchers.any());
-    }
-
-    @Test
-    @DisplayName("Take session when authentication is incorrect")
-    void takeSessionWhenAuthenticationIsIncorrect() throws InterruptedException {
+    @DisplayName("Take all sessions when authentication is incorrect")
+    void takeAllSessionsWhenAuthenticationIsIncorrect() throws InterruptedException {
         final var username = "username";
         final var password = "password";
         var token = HeaderUtils.httpBasicAuthenticationToken(username, password);
-        Authentication.INSTANCE.authenticate(username,token);
+        Authentication.INSTANCE.authenticate(username, token);
         log.info("Username: {}, Password: {}", username, password);
-        final var id = 1;
-        log.info("Id: {}", id);
         var latch = new CountDownLatch(1);
-        var resultRef = new AtomicReference<AppResponse<? extends Session>>();
-        var consumer = new Consumer<AppResponse<? extends Session>>() {
+        var resultRef = new AtomicReference<AppResponse<? extends Session[]>>();
+        var consumer = new Consumer<AppResponse<? extends Session[]>>() {
             @Override
-            public void accept(AppResponse<? extends Session> result) {
+            public void accept(AppResponse<? extends Session[]> result) {
                 log.info("AppResponse: {}", result);
                 resultRef.set(result);
                 latch.countDown();
             }
         };
         var consumerSpy = spy(consumer);
-        sessionService.take(id, consumerSpy);
+        sessionService.takeAll(consumerSpy);
         verify(consumerSpy, timeout(TIMEOUT_MS_CALL)).accept(ArgumentMatchers.any());
         var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
         if (!completed)
@@ -160,7 +123,7 @@ class SessionServiceImplTest {
         final var username = "user";
         final var password = "password";
         var token = HeaderUtils.httpBasicAuthenticationToken(username, password);
-        Authentication.INSTANCE.authenticate(username,token);
+        Authentication.INSTANCE.authenticate(username, token);
         log.info("Username: {}, Password: {}", username, password);
         final var liveId = LIVE_SESSION_LIVE_ID;
         log.info("LiveId: {}", liveId);
@@ -193,7 +156,7 @@ class SessionServiceImplTest {
         final var username = "user";
         final var password = "password";
         var token = HeaderUtils.httpBasicAuthenticationToken(username, password);
-        Authentication.INSTANCE.authenticate(username,token);
+        Authentication.INSTANCE.authenticate(username, token);
         log.info("Username: {}, Password: {}", username, password);
         final var liveId = "00000000000";
         log.info("LiveId: {}", liveId);
@@ -226,7 +189,7 @@ class SessionServiceImplTest {
         final var username = "username";
         final var password = "password";
         var token = HeaderUtils.httpBasicAuthenticationToken(username, password);
-        Authentication.INSTANCE.authenticate(username,token);
+        Authentication.INSTANCE.authenticate(username, token);
         log.info("Username: {}, Password: {}", username, password);
         final var liveId = LIVE_SESSION_LIVE_ID;
         log.info("LiveId: {}", liveId);
@@ -260,7 +223,7 @@ class SessionServiceImplTest {
         final var username = "user";
         final var password = "password";
         var token = HeaderUtils.httpBasicAuthenticationToken(username, password);
-        Authentication.INSTANCE.authenticate(username,token);
+        Authentication.INSTANCE.authenticate(username, token);
         log.info("Username: {}, Password: {}", username, password);
         final var name = RandomStringUtils.randomAlphanumeric(9, 17);
         var session = new Session(null, name, null, null, null, null);
@@ -294,7 +257,7 @@ class SessionServiceImplTest {
         final var username = "username";
         final var password = "password";
         var token = HeaderUtils.httpBasicAuthenticationToken(username, password);
-        Authentication.INSTANCE.authenticate(username,token);
+        Authentication.INSTANCE.authenticate(username, token);
         log.info("Username: {}, Password: {}", username, password);
         final var name = RandomStringUtils.randomAlphanumeric(9, 17);
         var session = new Session(null, name, null, null, null, null);

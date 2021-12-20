@@ -48,20 +48,18 @@ class SessionClientImplTest {
     }
 
     @Test
-    @DisplayName("Get existing session with successful authentication")
-    void getExistingSessionWithSuccessfulAuthentication() throws InterruptedException {
+    @DisplayName("Get all sessions with successful authentication")
+    void getAllSessionsWithSuccessfulAuthentication() throws InterruptedException {
         final var username = "user";
         final var password = "password";
         var authHeader = HeaderUtils.httpBasicAuthenticationHeader(username, password);
         log.info("Username: {}, Password: {}", username, password);
-        final var id = 1;
-        log.info("Id: {}", id);
         var latch = new CountDownLatch(1);
-        var sessionRef = new AtomicReference<Session>();
-        var callback = new RequestCallback<Session>() {
+        var sessionRef = new AtomicReference<Session[]>();
+        var callback = new RequestCallback<Session[]>() {
             @Override
-            public void onResponse(Session responseBody) {
-                log.info("Session: {}", responseBody);
+            public void onResponse(Session[] responseBody) {
+                log.info("Sessions: {}", (Object) responseBody);
                 sessionRef.set(responseBody);
                 latch.countDown();
             }
@@ -77,7 +75,7 @@ class SessionClientImplTest {
             }
         };
         var callbackSpy = spy(callback);
-        sessionClient.get(id, callbackSpy, authHeader);
+        sessionClient.getAllSessions(callbackSpy, authHeader);
         verify(callbackSpy, timeout(TIMEOUT_MS_CALL)).onResponse(ArgumentMatchers.any());
         var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
         if (!completed)
@@ -89,61 +87,18 @@ class SessionClientImplTest {
     }
 
     @Test
-    @DisplayName("Get non-existing session with successful authentication")
-    void getNonExistingSessionWithSuccessfulAuthentication() throws InterruptedException {
-        final var username = "user";
-        final var password = "password";
-        var authHeader = HeaderUtils.httpBasicAuthenticationHeader(username, password);
-        log.info("Username: {}, Password: {}", username, password);
-        final var id = Integer.MAX_VALUE;
-        log.info("Id: {}", id);
-        var latch = new CountDownLatch(1);
-        var errRef = new AtomicReference<Error>();
-        var callback = new RequestCallback<Session>() {
-            @Override
-            public void onResponse(Session responseBody) {
-                log.error("Session: {}", responseBody);
-            }
-
-            @Override
-            public void onError(Error error) {
-                log.info("Error: {}", error);
-                errRef.set(error);
-                latch.countDown();
-            }
-
-            @Override
-            public void onFail(Throwable t) {
-                log.error(t.getMessage());
-            }
-        };
-        var callbackSpy = spy(callback);
-        sessionClient.get(id, callbackSpy, authHeader);
-        verify(callbackSpy, timeout(TIMEOUT_MS_CALL)).onError(ArgumentMatchers.any());
-        var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
-        if (!completed)
-            fail(new IllegalStateException("Callback execution timed out"));
-        var error = errRef.get();
-        assertNotNull(error);
-        verify(callbackSpy).onError(ArgumentMatchers.any());
-        verify(callbackSpy, only()).onError(ArgumentMatchers.any());
-    }
-
-    @Test
-    @DisplayName("Get session with unsuccessful authentication")
-    void getSessionWithUnsuccessfulAuthentication() throws InterruptedException {
+    @DisplayName("Get all sessions with unsuccessful authentication")
+    void getAllSessionsWithUnsuccessfulAuthentication() throws InterruptedException {
         final var username = "username";
         final var password = "password";
         var authHeader = HeaderUtils.httpBasicAuthenticationHeader(username, password);
         log.info("Username: {}, Password: {}", username, password);
-        final var id = 1;
-        log.info("Id: {}", id);
         var latch = new CountDownLatch(1);
         var errRef = new AtomicReference<Error>();
-        var callback = new RequestCallback<Session>() {
+        var callback = new RequestCallback<Session[]>() {
             @Override
-            public void onResponse(Session responseBody) {
-                log.error("Session: {}", responseBody);
+            public void onResponse(Session[] responseBody) {
+                log.error("Sessions: {}", (Object) responseBody);
             }
 
             @Override
@@ -159,7 +114,7 @@ class SessionClientImplTest {
             }
         };
         var callbackSpy = spy(callback);
-        sessionClient.get(id, callbackSpy, authHeader);
+        sessionClient.getAllSessions(callbackSpy, authHeader);
         verify(callbackSpy, timeout(TIMEOUT_MS_CALL)).onError(ArgumentMatchers.any());
         var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
         if (!completed)
@@ -200,7 +155,7 @@ class SessionClientImplTest {
             }
         };
         var callbackSpy = spy(callback);
-        sessionClient.getLive(liveId, callbackSpy, authHeader);
+        sessionClient.getLiveSession(liveId, callbackSpy, authHeader);
         verify(callbackSpy, timeout(TIMEOUT_MS_CALL)).onResponse(ArgumentMatchers.any());
         var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
         if (!completed)
@@ -241,7 +196,7 @@ class SessionClientImplTest {
             }
         };
         var callbackSpy = spy(callback);
-        sessionClient.getLive(liveId, callbackSpy, authHeader);
+        sessionClient.getLiveSession(liveId, callbackSpy, authHeader);
         verify(callbackSpy, timeout(TIMEOUT_MS_CALL)).onError(ArgumentMatchers.any());
         var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
         if (!completed)
@@ -282,7 +237,7 @@ class SessionClientImplTest {
             }
         };
         var callbackSpy = spy(callback);
-        sessionClient.getLive(liveId, callbackSpy, authHeader);
+        sessionClient.getLiveSession(liveId, callbackSpy, authHeader);
         verify(callbackSpy, timeout(TIMEOUT_MS_CALL)).onError(ArgumentMatchers.any());
         var completed = latch.await(TIMEOUT_MS_EXECUTE, TimeUnit.MILLISECONDS);
         if (!completed)

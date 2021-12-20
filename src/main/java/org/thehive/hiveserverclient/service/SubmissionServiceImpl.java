@@ -21,15 +21,15 @@ public class SubmissionServiceImpl implements SubmissionService {
     }
 
     @Override
-    public void takeByUser(int userId, @NonNull Consumer<? super AppResponse<? extends Submission[]>> consumer) {
-        log.info("#takeByUser userId: {}", userId);
+    public void takeAll(@NonNull Consumer<? super AppResponse<? extends Submission[]>> consumer) {
+        log.info("#takeAll");
         if (!Authentication.INSTANCE.isAuthenticated())
             throw new IllegalStateException("Authentication instance has not been authenticated");
-        submissionClient.getByUserId(userId, new RequestCallback<>() {
+        submissionClient.getAllSubmissions(new RequestCallback<>() {
             @Override
             public void onResponse(Submission[] responseBody) {
                 var response = AppResponse.of(responseBody);
-                log.info("#takeByUser userId: {}, status: {}", userId, response.status().name());
+                log.info("#take, status: {}", response.status().name());
                 consumer.accept(response);
             }
 
@@ -40,25 +40,25 @@ public class SubmissionServiceImpl implements SubmissionService {
                     response = AppResponse.of(ResponseStatus.ERROR_UNAVAILABLE, error.getMessage());
                 else
                     response = AppResponse.of(error.getMessage());
-                log.info("#takeByUser userId: {}, status: {}", userId, response.status().name());
+                log.info("#take status: {}", response.status().name());
                 consumer.accept(response);
             }
 
             @Override
             public void onFail(Throwable t) {
                 var response = AppResponse.<Submission[]>of(t);
-                log.info("#takeByUser userId: {}, status: {}", userId, response.status().name());
+                log.info("#takeByUser, status: {}", response.status().name());
                 consumer.accept(response);
             }
         }, HeaderUtils.httpBasicAuthenticationHeader(Authentication.INSTANCE.getToken()));
     }
 
     @Override
-    public void takeBySession(int sessionId, @NonNull Consumer<? super AppResponse<? extends Submission[]>> consumer) {
+    public void takeAllBySession(int sessionId, @NonNull Consumer<? super AppResponse<? extends Submission[]>> consumer) {
         log.info("#takeBySession sessionId: {}", sessionId);
         if (!Authentication.INSTANCE.isAuthenticated())
             throw new IllegalStateException("Authentication instance has not been authenticated");
-        submissionClient.getBySessionId(sessionId, new RequestCallback<>() {
+        submissionClient.getAllBySessionId(sessionId, new RequestCallback<>() {
             @Override
             public void onResponse(Submission[] responseBody) {
                 var response = AppResponse.of(responseBody);
@@ -81,6 +81,39 @@ public class SubmissionServiceImpl implements SubmissionService {
             public void onFail(Throwable t) {
                 var response = AppResponse.<Submission[]>of(t);
                 log.info("#takeBySession sessionId: {}, status: {}", sessionId, response.status().name());
+                consumer.accept(response);
+            }
+        }, HeaderUtils.httpBasicAuthenticationHeader(Authentication.INSTANCE.getToken()));
+    }
+
+    @Override
+    public void takeThis(Consumer<? super AppResponse<? extends Submission>> consumer) {
+        log.info("#takeThis");
+        if (!Authentication.INSTANCE.isAuthenticated())
+            throw new IllegalStateException("Authentication instance has not been authenticated");
+        submissionClient.getThisSubmission(new RequestCallback<>() {
+            @Override
+            public void onResponse(Submission responseBody) {
+                var response = AppResponse.of(responseBody);
+                log.info("#takeThis status: {}", response.status().name());
+                consumer.accept(response);
+            }
+
+            @Override
+            public void onError(Error error) {
+                AppResponse<Submission> response;
+                if (error.getStatus() == 404)
+                    response = AppResponse.of(ResponseStatus.ERROR_UNAVAILABLE, error.getMessage());
+                else
+                    response = AppResponse.of(error.getMessage());
+                log.info("#takeThis status: {}", response.status().name());
+                consumer.accept(response);
+            }
+
+            @Override
+            public void onFail(Throwable t) {
+                var response = AppResponse.<Submission>of(t);
+                log.info("#takeThis status: {}", response.status().name());
                 consumer.accept(response);
             }
         }, HeaderUtils.httpBasicAuthenticationHeader(Authentication.INSTANCE.getToken()));

@@ -21,19 +21,57 @@ public class SubmissionClientImpl extends AppHttpClient implements SubmissionCli
     }
 
     @Override
-    public void getByUserId(int userId, RequestCallback<? super Submission[]> callback, Header... headers) {
-        var reqUrl = RequestUtils.concatUrlPath(url, "user", userId);
-        var req = RequestUtils.getRequestOf(reqUrl, headers);
-        log.debug("#getByUserId userId: {}", userId);
+    public void getAllSubmissions(RequestCallback<? super Submission[]> callback, Header... headers) {
+        var req = RequestUtils.getRequestOf(url, headers);
+        log.debug("#getAllSubmissions uri: {}", req.getURI());
         executeGetRequest(req, callback);
     }
 
     @Override
-    public void getBySessionId(int sessionId, RequestCallback<? super Submission[]> callback, Header... headers) {
-        var reqUrl = RequestUtils.concatUrlPath(url, "session", sessionId);
+    public void getAllBySessionId(int sessionId, RequestCallback<? super Submission[]> callback, Header... headers) {
+        var reqUrl = RequestUtils.concatUrlPath(url, sessionId);
         var req = RequestUtils.getRequestOf(reqUrl, headers);
-        log.debug("#getBySessionId sessionId: {}", sessionId);
+        log.debug("#getAllBySessionId uri: {}", req.getURI());
         executeGetRequest(req, callback);
+    }
+
+    @Override
+    public void getThisSubmission(RequestCallback<? super Submission> callback, Header... headers) {
+        var reqUrl = RequestUtils.concatUrlPath(url, "this");
+        var req = RequestUtils.getRequestOf(reqUrl, headers);
+        log.debug("#getThisSubmission uri: {}", req.getURI());
+        executorService.execute(() -> {
+            log.debug("Request is being sent, path: {}, method: {}", req.getURI().getPath(), req.getMethod());
+            var executeCallbackFail = true;
+            try {
+                try (var response = httpClient.execute(req)) {
+                    var statusCode = response.getStatusLine().getStatusCode();
+                    if (response.getEntity().getContentLength() == 0L) {
+                        log.debug("Response has been received, path: {}, method: {}, statusCode: {}, body: {}", req.getURI().getPath(), req.getMethod(), statusCode, "[EMPTY]");
+                        callback.onResponse(Submission.EMPTY);
+                    } else {
+                        var responseBody = EntityUtils.toString(response.getEntity());
+                        log.debug("Response has been received, path: {}, method: {}, statusCode: {}, body: {}", req.getURI().getPath(), req.getMethod(), statusCode, responseBody);
+                        executeCallbackFail = false;
+                        if (statusCode / 100 == 2) {
+                            var submission = objectMapper.readValue(responseBody, Submission.class);
+                            log.debug("Executing callback onResponse, submission: {}", submission);
+                            callback.onResponse(submission);
+                        } else {
+                            var error = objectMapper.readValue(responseBody, Error.class);
+                            log.debug("Executing callback onError, error: {}", error);
+                            callback.onError(error);
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                if (executeCallbackFail) {
+                    log.debug("Executing callback onFail, exception: {}", e.getClass().getName());
+                    callback.onFail(e);
+                } else
+                    log.warn("Error while http request", e);
+            }
+        });
     }
 
     @Override
@@ -46,8 +84,8 @@ public class SubmissionClientImpl extends AppHttpClient implements SubmissionCli
             e.printStackTrace();
             return;
         }
-        var req = RequestUtils.putRequestOf(reqUrl, submissionStr, headers);
-        log.debug("#save submission: {}", submission);
+        var req = RequestUtils.postRequestOf(reqUrl, submissionStr, headers);
+        log.debug("#save uri: {}, body: {}", req.getURI(), submissionStr);
         executeSaveRequest(req, callback);
     }
 
@@ -59,11 +97,11 @@ public class SubmissionClientImpl extends AppHttpClient implements SubmissionCli
                 try (var response = httpClient.execute(req)) {
                     var statusCode = response.getStatusLine().getStatusCode();
                     var responseBody = EntityUtils.toString(response.getEntity());
-                    log.debug("Request has been received, path: {}, method: {}, statusCode: {}, body: {}", req.getURI().getPath(), req.getMethod(), statusCode, responseBody);
+                    log.debug("Response has been received, path: {}, method: {}, statusCode: {}, body: {}", req.getURI().getPath(), req.getMethod(), statusCode, responseBody);
                     executeCallbackFail = false;
                     if (statusCode / 100 == 2) {
                         var submissions = objectMapper.readValue(responseBody, Submission[].class);
-                        log.debug("Executing callback onRequest, submissionsLength: {}", submissions.length);
+                        log.debug("Executing callback onResponse, submissionsLength: {}", submissions.length);
                         callback.onResponse(submissions);
                     } else {
                         var error = objectMapper.readValue(responseBody, Error.class);
@@ -89,11 +127,11 @@ public class SubmissionClientImpl extends AppHttpClient implements SubmissionCli
                 try (var response = httpClient.execute(req)) {
                     var statusCode = response.getStatusLine().getStatusCode();
                     var responseBody = EntityUtils.toString(response.getEntity());
-                    log.debug("Request has been received, path: {}, method: {}, statusCode: {}, body: {}", req.getURI().getPath(), req.getMethod(), statusCode, responseBody);
+                    log.debug("Response has been received, path: {}, method: {}, statusCode: {}, body: {}", req.getURI().getPath(), req.getMethod(), statusCode, responseBody);
                     executeCallbackFail = false;
                     if (statusCode / 100 == 2) {
                         var submission = objectMapper.readValue(responseBody, Submission.class);
-                        log.debug("Executing callback onRequest, submission: {}", submission);
+                        log.debug("Executing callback onResponse, submission: {}", submission);
                         callback.onResponse(submission);
                     } else {
                         var error = objectMapper.readValue(responseBody, Error.class);

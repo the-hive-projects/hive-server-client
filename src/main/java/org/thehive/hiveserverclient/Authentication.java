@@ -24,7 +24,7 @@ public class Authentication {
         return tokenReference.get();
     }
 
-    public void authenticate(@NonNull String username,@NonNull String token) {
+    public void authenticate(@NonNull String username, @NonNull String token) {
         usernameReference.set(username);
         tokenReference.set(token);
     }

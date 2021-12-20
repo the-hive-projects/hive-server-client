@@ -23,7 +23,7 @@ public class UserClientImpl extends AppHttpClient implements UserClient {
     @Override
     public void get(RequestCallback<? super User> callback, Header... headers) {
         var req = RequestUtils.getRequestOf(url, headers);
-        log.debug("#get");
+        log.debug("#get uri: {}", req.getURI());
         executeRequest(req, callback);
     }
 
@@ -31,7 +31,7 @@ public class UserClientImpl extends AppHttpClient implements UserClient {
     public void get(int id, RequestCallback<? super User> callback, Header... headers) {
         var reqUrl = RequestUtils.concatUrlPath(url, id);
         var req = RequestUtils.getRequestOf(reqUrl, headers);
-        log.debug("#get id: {}", id);
+        log.debug("#get uri: {}", req.getURI());
         executeRequest(req, callback);
     }
 
@@ -45,7 +45,7 @@ public class UserClientImpl extends AppHttpClient implements UserClient {
             return;
         }
         var req = RequestUtils.postRequestOf(url, userStr, headers);
-        log.debug("#save user: {}", user);
+        log.debug("#save uri: {}", req.getURI());
         executeRequest(req, callback);
     }
 
@@ -60,7 +60,7 @@ public class UserClientImpl extends AppHttpClient implements UserClient {
         }
         var reqUrl = RequestUtils.concatUrlPath(url, id);
         var req = RequestUtils.putRequestOf(reqUrl, userStr, headers);
-        log.debug("#update id: {} user: {}", id, user);
+        log.debug("#update uri: {}, body: {}", req.getURI(), userStr);
         executeRequest(req, callback);
     }
 
@@ -72,11 +72,11 @@ public class UserClientImpl extends AppHttpClient implements UserClient {
                 try (var response = httpClient.execute(req)) {
                     var statusCode = response.getStatusLine().getStatusCode();
                     var responseBody = EntityUtils.toString(response.getEntity());
-                    log.debug("Request has been received, path: {}, method: {}, statusCode: {}, body: {}", req.getURI().getPath(), req.getMethod(), statusCode, responseBody);
+                    log.debug("Response has been received, path: {}, method: {}, statusCode: {}, body: {}", req.getURI().getPath(), req.getMethod(), statusCode, responseBody);
                     executeCallbackFail = false;
                     if (statusCode / 100 == 2) {
                         var user = objectMapper.readValue(responseBody, User.class);
-                        log.debug("Executing callback onRequest, user: {}", user);
+                        log.debug("Executing callback onResponse, user: {}", user);
                         callback.onResponse(user);
                     } else {
                         var error = objectMapper.readValue(responseBody, Error.class);

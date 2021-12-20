@@ -55,7 +55,7 @@ class ImageServiceImplTest {
         final var username = "user";
         final var password = "password";
         var token = HeaderUtils.httpBasicAuthenticationToken(username, password);
-        Authentication.INSTANCE.authenticate(username,token);
+        Authentication.INSTANCE.authenticate(username, token);
         log.info("Username: {}, Password: {}", username, password);
         final var imageUsername = "username";
         log.info("ImageUsername: {}", imageUsername);
@@ -88,7 +88,7 @@ class ImageServiceImplTest {
         final var username = "username";
         final var password = "password";
         var token = HeaderUtils.httpBasicAuthenticationToken(username, password);
-        Authentication.INSTANCE.authenticate(username,token);
+        Authentication.INSTANCE.authenticate(username, token);
         log.info("Username: {}, Password: {}", username, password);
         final var imageUsername = "username";
         log.info("ImageUsername: {}", imageUsername);

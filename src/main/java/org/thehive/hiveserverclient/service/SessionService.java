@@ -7,7 +7,7 @@ import java.util.function.Consumer;
 
 public interface SessionService {
 
-    void take(int id, Consumer<? super AppResponse<? extends Session>> consumer);
+    void takeAll(Consumer<? super AppResponse<? extends Session[]>> consumer);
 
     void takeLive(String liveId, Consumer<? super AppResponse<? extends Session>> consumer);
 

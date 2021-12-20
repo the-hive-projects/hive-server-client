@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Submission implements Entity {
 
+    public static final Submission EMPTY = new Submission();
+
     private int id;
     private String content;
     private Session session;
