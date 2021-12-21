@@ -25,7 +25,7 @@ public class UrlEndpointResolverImpl implements UrlEndpointResolver {
 
     @Override
     public String resolveSubscriptionUrlEndpoint(@NonNull String id) {
-        return injectId(subscriptionUrlEndpoint, id);
+        return subscriptionUrlEndpoint;
     }
 
     @Override
@@ -42,13 +42,7 @@ public class UrlEndpointResolverImpl implements UrlEndpointResolver {
 
     @Override
     public String resolveDestinationUrlEndpoint(@NonNull Class<? extends Payload> payloadType, @NonNull String id) {
-        return injectId(payloadTypeDestinationUrlEndpointMap.get(payloadType), id);
-    }
-
-    private String injectId(@NonNull String urlEndpoint, @NonNull String id) {
-        if (urlEndpoint.contains("{id}"))
-            return urlEndpoint.replace("{id}", id);
-        return urlEndpoint;
+        return payloadTypeDestinationUrlEndpointMap.get(payloadType);
     }
 
 }

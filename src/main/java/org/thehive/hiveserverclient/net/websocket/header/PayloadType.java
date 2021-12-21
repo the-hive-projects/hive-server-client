@@ -8,7 +8,9 @@ public enum PayloadType {
     LIVE_SESSION_INFORMATION(LiveSessionInformation.class, "live-session-information"),
     PARTICIPATION_NOTIFICATION(ParticipationNotification.class, "participation-notification"),
     EXPIRATION_NOTIFICATION(ExpirationNotification.class, "expiration-notification"),
-    CHAT_MESSAGE(ChatMessage.class, "chat-message");
+    CHAT_MESSAGE(ChatMessage.class, "chat-message"),
+    CODE_RECEIVING_REQUEST(CodeReceivingRequest.class, "code-receiving-request"),
+    CODE_BROADCASTING_INFORMATION(CodeBroadcastingInformation.class, "code-broadcasting-information");
 
     public final Class<? extends Payload> type;
     public final String value;
