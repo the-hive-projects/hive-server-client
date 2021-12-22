@@ -25,7 +25,9 @@ public class UrlEndpointResolverImpl implements UrlEndpointResolver {
 
     @Override
     public String resolveSubscriptionUrlEndpoint(@NonNull String id) {
-        return subscriptionUrlEndpoint;
+        if (subscriptionUrlEndpoint.endsWith("/"))
+            return subscriptionUrlEndpoint + id;
+        return subscriptionUrlEndpoint + "/" + id;
     }
 
     @Override

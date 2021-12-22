@@ -10,6 +10,7 @@ public enum PayloadType {
     EXPIRATION_NOTIFICATION(ExpirationNotification.class, "expiration-notification"),
     CHAT_MESSAGE(ChatMessage.class, "chat-message"),
     CODE_RECEIVING_REQUEST(CodeReceivingRequest.class, "code-receiving-request"),
+    CODE_BROADCASTING_NOTIFICATION(CodeBroadcastingNotification.class, "code-broadcasting-notification"),
     CODE_BROADCASTING_INFORMATION(CodeBroadcastingInformation.class, "code-broadcasting-information");
 
     public final Class<? extends Payload> type;
